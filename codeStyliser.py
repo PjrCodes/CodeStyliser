@@ -57,6 +57,7 @@ def styliseCode(fileToEdit):
             openParenthNo = len(allOpenParenth)
             closeParenthNo = len(allCloseParenth)
             if openParenthNo != closeParenthNo:
+                isOnSameLine = False
                 # the line doesnt have same amt of close and open parentheses
                 # we must find till len(allOpenParenth) = closeParenth count
                 nxtLnIndex = lineIndex + 1
@@ -73,14 +74,18 @@ def styliseCode(fileToEdit):
                     # nxtLnIndex must be where openCurlyBrace should be.
                     # check for OPEN curly Brace on THE SAME LINE as for loop
                     print("BROKE LOOP")
-                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+                    openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
             else:
                 openCurlyBraceIndex = line.find("{")
+                isOnSameLine = True
 
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:
-                nextLineIndex = lineIndex + 1
+                if isOnSameLine:
+                    nextLineIndex = lineIndex + 1
+                else:
+                    nextLineIndex = nxtLnIndex + 1
                 while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
                     # next line is a singleLineComment OR a space, we must skip it
                     nextLineIndex =  nextLineIndex + 1
@@ -91,12 +96,21 @@ def styliseCode(fileToEdit):
                         print("No open brace on same line or next line, adding curly braces")
                         # add open CURLY on same line
                         #TODO: change this part
-                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
-                        del lines[lineIndex]
-                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                        # if line is the for line, then add at lineINdex or add { at nxtLnIndex
                         
+                        if (isOnSameLine):
+                            toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                            del lines[lineIndex]
+                            lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                            checkForSemiColonIndex = lineIndex + 1
+
+                        elif (isOnSameLine == False):
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                            del lines[nxtLnIndex - 1]
+                            lines.insert(nxtLnIndex - 1, toAddLine)
+                            checkForSemiColonIndex = nxtLnIndex + 1
+
                         # check for semicolons to add Closing brace
-                        checkForSemiColonIndex = lineIndex + 1
                         while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
                             # line has no semicolon or it is a comment
                             checkForSemiColonIndex = checkForSemiColonIndex + 1

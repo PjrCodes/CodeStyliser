@@ -41,11 +41,13 @@ int main()
         
         
     for (int p = 0; 
-    p < 10; p++) 
-  
+    p < 10;
+     p++) 
+    
+    
         printf("NO CURLIES %d", p); 
     
-    
+
     for (int p = 0; p < 10; p++) { /* this should work */
 
         printf("NO CURLIES %d", p); 
