@@ -88,10 +88,11 @@ int main()
         dance == 3)
         "DANCE"
 
-    for (int p = 0; p < 10; p++) 
+    for (int p = 0; p < 10; p++)  {
 
         printf("NO CURLIES %d", p); 
-    
+    }
+     
 
 }
 

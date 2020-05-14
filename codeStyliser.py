@@ -8,6 +8,9 @@ import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
 VERSION_NUMBER = "0.0.6-alpha"
 
+def getFirstCharacterIndex(str):
+    return len(str) - len(str.lstrip())
+
 def styliseCode(fileToEdit):
     
     # so that first line's index is 0
@@ -23,7 +26,7 @@ def styliseCode(fileToEdit):
         if (comment):
             # found a Single line comment
             line = line[:comment.start()]
-        firstCharIndex = len(line) - len(line.lstrip())
+        firstCharIndex = getFirstCharacterIndex(line)
 
         # ---------------------------------------------------------------------------
 
@@ -33,6 +36,7 @@ def styliseCode(fileToEdit):
             # found a for loop
 
             # we must now skip over all parentheses to find the end of the (condition)
+            
             openParenthNo = len(re.findall(r"\(", line))
             closeParenthNo = len(re.findall(r"\)", line))
 
@@ -44,7 +48,7 @@ def styliseCode(fileToEdit):
 
                 while closeParenthNo != openParenthNo:
                     forChecker = lines[nxtLnIndex].find("for")
-                    firstCharOfNxtLn = len(lines[nxtLnIndex]) - len(lines[nxtLnIndex].lstrip())
+                    firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
                     if forChecker == firstCharOfNxtLn:
                         # another for has been found before () number got equal, Cancel case
                         break
@@ -109,13 +113,11 @@ def styliseCode(fileToEdit):
         whileLoopIndex = line.find("while")
         if whileLoopIndex == firstCharIndex:
             # found a while loop
-            print("\nwhile loop found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
-            
+
             # we must now skip over all parentheses to find the end of the (condition)
-            allOpenParenth = re.findall(r"\(", line)
-            allCloseParenth = re.findall(r"\)", line)
-            openParenthNo = len(allOpenParenth)
-            closeParenthNo = len(allCloseParenth)
+
+            openParenthNo = len(re.findall(r"\(", line))
+            closeParenthNo = len(re.findall(r"\)", line))
             if openParenthNo != closeParenthNo:
                 isOnSameLine = False
                 # the line doesnt have same amt of close and open parentheses
@@ -123,15 +125,13 @@ def styliseCode(fileToEdit):
                 nxtLnIndex = lineIndex + 1
                 while closeParenthNo != openParenthNo:
                     whileChecker = lines[nxtLnIndex].find("while")
-                    firstCharOfNxtLn = len(lines[nxtLnIndex]) - len(lines[nxtLnIndex].lstrip())
+                    firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
                     if whileChecker == firstCharOfNxtLn:
                         # another while has been found before () number got equal, Cancel case
                         break
                     else:
-                        newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
-                        newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
-                        openParenthNo = len(newOpenParenth) + openParenthNo
-                        closeParenthNo = len(newCloseParenth) + closeParenthNo
+                        openParenthNo = len(re.findall(r"\(", lines[nxtLnIndex])) + openParenthNo
+                        closeParenthNo = len(re.findall(r"\)", lines[nxtLnIndex])) + closeParenthNo
                         nxtLnIndex = nxtLnIndex + 1
                 else:
                     # closeParenthNo = openParenthNo
@@ -191,10 +191,8 @@ def styliseCode(fileToEdit):
             # found an if comndion
 
             # we must now skip over all parentheses to find the end of the (condition)
-            allOpenParenth = re.findall(r"\(", line)
-            allCloseParenth = re.findall(r"\)", line)
-            openParenthNo = len(allOpenParenth)
-            closeParenthNo = len(allCloseParenth)
+            openParenthNo = len(re.findall(r"\(", line))
+            closeParenthNo = len(re.findall(r"\)", line))
             if openParenthNo != closeParenthNo:
                 isOnSameLine = False
                 # the line doesnt have same amt of close and open parentheses
@@ -206,10 +204,9 @@ def styliseCode(fileToEdit):
                         # another if has been found before () number got equal, Cancel case
                         break
                     else:
-                        newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
-                        newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
-                        openParenthNo = len(newOpenParenth) + openParenthNo
-                        closeParenthNo = len(newCloseParenth) + closeParenthNo
+     
+                        openParenthNo = len(re.findall(r"\(", lines[nxtLnIndex])) + openParenthNo
+                        closeParenthNo = len(re.findall(r"\)", lines[nxtLnIndex])) + closeParenthNo
                         nxtLnIndex = nxtLnIndex + 1
                 else:
                     # nxtLnIndex must be where openCurlyBrace should be.
@@ -262,6 +259,11 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         
         # ---------------------------------------------------------------------------
+        # find else conditions
+        ifConditionIndex = line.find("else")
+        if ifConditionIndex == firstCharIndex:
+            print("Else detected")
+        # --------------------------------------------------------------------------- 
 
     # write lines back to fileToEdit
 
@@ -272,18 +274,18 @@ def styliseCode(fileToEdit):
 def openFile():
     try:
         fileToEdit = open(FILE_NAME, "r+")
-        print("Stylising code")
+        print("Stylising code in " + FILE_NAME)
         styliseCode(fileToEdit)
-        print("-- DONE -- Closing files")
+        print("DONE")
         fileToEdit.close()
     except FileNotFoundError:
         print("Error file not found")
         sys.exit()
 
-print("Welcome to CodeStyliser, Made in python 3.7.7 64-Bit, please use correct Intrepreter")
-print("VERSION NUMBER: " + VERSION_NUMBER)
+print("Welcome to CodeStyliser VERSION " + VERSION_NUMBER)
+print("Adds curly braces {} for all single line if, for, while, else statements in (.c) files")
 print("Made by Pranjal Rastogi")
-print("Adds curly braces {} for all for loops/ while loops in (.c) files")
+print("= Made in python 3.7.7 64-Bit, please use correct Interpreter =")
 if (len(sys.argv) == 1):
     FILE_NAME = input('Please enter file name to be edited(File must be in same directory as codeStyliser.py): ')
 elif (len(sys.argv) == 2):
@@ -293,28 +295,8 @@ else:
     print("File name is optional")
 
 if FILE_NAME.find(".c") == -1:
-    print("error, must be C file")
+    print("Error, " + FILE_NAME + " is not a \".c\" file.")
     sys.exit()
 else:
     openFile()
 
-
-""" 
-elif multiLineComment != -1:
-    #found a comment that starts with /*
-    
-    # check if comment ends on same line
-    sameLineClose = line.find("*/")
-    if sameLineClose != -1:
-        # comment ends on same line, see only before /*
-        line = line[:multiLineComment]
-    else:
-        # comment doesnt end on same line, check through subsequent lines for */
-        commentCheckerIndex = lineIndex + 1 
-        while lines[commentCheckerIndex].find("*/") == -1:
-            # did not find */, still in comment
-            commentCheckerIndex = commentCheckerIndex + 1
-        else: 
-            # found */, this line is when comment ends
-            line = line[commentCheckerIndex + 1]
-"""
