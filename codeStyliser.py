@@ -4,9 +4,11 @@
 
 import sys
 import re
+import os
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.8-alpha"
+VERSION_NUMBER = "0.0.9-alpha"
+NEW_CHANGES = " added recursive folder searching and stylising"
 
 def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
@@ -363,32 +365,32 @@ def styliseCode(fileToEdit):
     fileToEdit.writelines(lines)
 
 
-def openFile():
-    try:
-        fileToEdit = open(FILE_NAME, "r+")
-        print("Stylising code in " + FILE_NAME)
-        styliseCode(fileToEdit)
-        print("DONE")
-        fileToEdit.close()
-    except FileNotFoundError:
-        print("Error file not found")
-        sys.exit()
-
-print("Welcome to CodeStyliser VERSION " + VERSION_NUMBER)
-print("Adds curly braces {} for all single line if, for, while, else statements in (.c) files")
-print("Made by Pranjal Rastogi")
-print("Made in python 3.7.7 64-Bit, please use correct Interpreter")
-if (len(sys.argv) == 1):
-    FILE_NAME = input('Please enter file name to be edited(File must be in same directory as codeStyliser.py): ')
-elif (len(sys.argv) == 2):
-    FILE_NAME = sys.argv[1]
-else:
-    print("Usage: python3.7 main.py [filename]")
-    print("File name is optional")
-
-if FILE_NAME.find(".c") == -1:
-    print("Error, " + FILE_NAME + " is not a \".c\" file.")
+if (len(sys.argv) != 2):
+    print("Usage: python3.7 codeStyliser.py [DIRECTORY_NAME]")
+    print("Directory Name must be mentioned")
     sys.exit()
 else:
-    openFile()
+    DIR_NAME = sys.argv[1]
+    print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
+    print("Made by Pranjal Rastogi")
+    print("Made for python 3.7.7 64-Bit")
+    print("NEW CHANGES IN ver" + VERSION_NUMBER + NEW_CHANGES)
+    print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
+
+    for root, subdirs, files in os.walk(DIR_NAME):
+
+        for filename in files:
+            file_path = os.path.join(root, filename)
+            if filename.find(".c") != -1:
+                with open(file_path, "r+") as fileToStyle:
+                    print("Stylising code in " + filename +  "(full path: " + file_path + ")")
+                    styliseCode(fileToStyle)
+            else:
+                print("NOT Stylising code in " + filename +  "(full path: " + file_path + ") as it is not a C file")
+                continue
+               
+    print("Done for all files, exit")
+
+
+
 
