@@ -4,7 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.4-alpha"
+VERSION_NUMBER = "0.0.5-alpha"
 
 def styliseCode(fileToEdit):
     
@@ -159,7 +159,7 @@ def styliseCode(fileToEdit):
                     # closeParenthNo = openParenthNo
                     # nxtLnIndex must be where openCurlyBrace should be.
                     # check for OPEN curly Brace on THE SAME LINE as while loop
-                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+                    openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
             else:
                 isOnSameLine = True
                 openCurlyBraceIndex = line.find("{")
@@ -236,7 +236,7 @@ def styliseCode(fileToEdit):
                     # closeParenthNo = openParenthNo
                     # nxtLnIndex must be where openCurlyBrace should be.
                     # check for OPEN curly Brace on THE SAME LINE as if condition
-                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+                    openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
             else:
                 isOnSameLine = True
                 openCurlyBraceIndex = line.find("{")
