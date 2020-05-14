@@ -41,7 +41,8 @@ def styliseCode(fileToEdit):
     
         # find for loops
         forLoopIndex = line.find("for")
-        if forLoopIndex != -1:
+        openParenthCheckFor = line[forLoopIndex:].find("(")
+        if forLoopIndex != -1 and openParenthCheckFor != -1:
             # found a for loop
             print("\nfor loop found at " + str(lineIndex + 1) + ":" + str(forLoopIndex))
 
@@ -85,7 +86,8 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         # find while loops
         whileLoopIndex = line.find("while")
-        if whileLoopIndex != -1:
+        openParenthCheckWhile = line[whileLoopIndex:].find("(")
+        if whileLoopIndex != -1 and openParenthCheckWhile != -1:
             # found a while loop
             print("\nwhile loop found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
             
