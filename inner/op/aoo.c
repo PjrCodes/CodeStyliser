@@ -2,6 +2,6 @@
 int main()
 {
 
- for() asds;
+ for() asds; {
 
-
+}

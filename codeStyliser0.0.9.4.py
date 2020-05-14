@@ -8,6 +8,8 @@ import os
 
 #TODO: same line for/ while/ if
 #TODO: error handler
+#TODO: FIX FAILLING AT CARRAIGE RETURN (CRLF/ ctrlM/ \r\n/ \r)
+#TODO: by OPENING IN BINARY MODE AND CONVERTING all \r\n into \n
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"

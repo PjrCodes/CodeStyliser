@@ -1,7 +1,7 @@
 #include <stdio.h>
 int main()
 {
-
+ // CRLF file
  for()  {
     pd();
  }
@@ -15,5 +15,17 @@ int main()
      else() {
     sp;
     }
+
+    if()
+      printf(asdasd
+         asdas);
+         asdsd
+         asdsad
+
+      if()
+      {
+         sadasd
+         sadsad;
+      }
  }
 
