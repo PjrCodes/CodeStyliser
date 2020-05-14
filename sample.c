@@ -1,24 +1,66 @@
 #include <stdio.h>
 int main()
 {
+
+
+    // for() 
+    // ;
+    // amainz
     printf("I AM HELLO WOELD");
-    //for (int i = 0; i < 10; i++)
-    // {
-    printf("I AM I");
-    // }
-    for (int j = 0; j < 10; j++)
-    {
-        // IAM COMMENT
-        printf("I AM j");
+    // asds
+    
+    // for (int i = 0; i < 10; i++)
+    //     printf("I AM I");   
+         // as
+
+    for (int j = 0; j < 10; j++) {
+        // check
+        printf("I AM j"); 
+
     }
-    for (int k = 0; k < 10; k++)
-        // IAM COMMENT
+    for (int k = 0; k < 10; k++)     {
         printf("NO CURLIES k:%d", k);
-    for (int p = 0; p < 10; p++)
-        /* IAM COMMENT */
-        printf("NO CURLIES %d", p);
-    for (int o = 0; o < 10; o++)
-        /* IAM COMMENT */
-        // ISDM
-        printf("NO CURLIES %d \n", o);
+
+    }
+
+
+
+    
+
+        for (int a = 0; a < 10; a++)  
+                // indented check
+            printf("NO CURLIES %d \n", a);  
+
+        
+        
+    for (int p = 0; p < 10; p++) {
+
+        printf("NO CURLIES %d", p); 
+
+    }
+    for (int p = 0; p < 10; p++) { /* this should work */
+
+        printf("NO CURLIES %d", p); 
+    }
+    
+    
+    
+    for (int p = 0; p < 10; p++) 
+
+
+    // check
+    { 
+        printf("NO CURLIES %d", p); 
+    }
+
+
+
+
+    // TINEE ERROR: (comment Iam disappears)
+    for (int p = 0; p < 10; p++) // I am
+
+        printf("NO CURLIES %d", p); 
+
 }
+
+

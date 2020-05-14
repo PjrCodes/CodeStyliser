@@ -9,8 +9,8 @@ int main()
     printf("I AM HELLO WOELD");
     // asds
     
-    for (int i = 0; i < 10; i++)
-        printf("I AM I");   
+    // for (int i = 0; i < 10; i++)
+    //     printf("I AM I");   
          // as
 
     for (int j = 0; j < 10; j++) {
@@ -23,22 +23,7 @@ int main()
 
     }
 
-    //FIX: ERROR CASE
-     for (int s = 0; s < 10; s++)  
 
-        // america
-        // hail
-        // cheking 
-        printf("NO CURLIES k:%d", s);
-
-    
-    for (int o = 0; o < 10; o++) 
-    
-        // multiple check
-        // for() 
-        // eams
-
-        printf("NO CURLIES %d \n", o);
 
     
 
@@ -58,9 +43,7 @@ int main()
         printf("NO CURLIES %d", p); 
     }
     
-    for (int p = 0; p < 10; p++) // I am
-
-        printf("NO CURLIES %d", p); 
+    
     
     for (int p = 0; p < 10; p++) 
 
@@ -69,4 +52,21 @@ int main()
     { 
         printf("NO CURLIES %d", p); 
     }
+    int a = 0
+    while(a < 1) {
+        printf("NO CURLIES %d", a); 
+        a++;
+    }
+    int b = 0
+    while(b < 1)
+        printf("NO CURLIES %d", b);
+
+
+    // TINEE ERROR: (comment Iam disappears)
+    for (int p = 0; p < 10; p++) // I am
+
+        printf("NO CURLIES %d", p); 
+
 }
+
+

@@ -47,45 +47,90 @@ def styliseCode(fileToEdit):
 
             # check for OPEN curly Brace on THE SAME LINE as For loop.
             openCurlyBraceIndex = line.find("{")
-
-            # check for Open brace on next few lines:
-            nextLineIndex = lineIndex + 1
-            while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
-                # next line is a singleLineComment OR a space, we must skip it
-                nextLineIndex =  nextLineIndex + 1
-            else:
-                # next line is not a comment/ space, must find openBrace
-                openCurlyBraceOnNxtLine = lines[nextLineIndex].find("{")
-            
-            if openCurlyBraceIndex == -1 and openCurlyBraceOnNxtLine == -1:
-                # no open curly braces found
-                print("No open brace on same line or next line, adding curly braces")
-                
-                # add Curlybraces
-                toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
-                del lines[lineIndex]
-                lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
-                spaces = " " * forLoopIndex
-                
-                # check for semicolons
-                checkForSemiColonIndex = lineIndex + 1
-                while lines[checkForSemiColonIndex].find(";") == -1:
-                    # line has no semicolon
-                    checkForSemiColonIndex = checkForSemiColonIndex + 1
+            if openCurlyBraceIndex == -1:
+                # no { on same ln
+                # check for Open brace on next few lines:
+                nextLineIndex = lineIndex + 1
+                while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
+                    # next line is a singleLineComment OR a space, we must skip it
+                    nextLineIndex =  nextLineIndex + 1
                 else:
-                    # line has a semicolon
-                    # we must add closing brace on nxt line:
-                    closingBraceLineIndex = checkForSemiColonIndex + 1
+                    # next line is not a comment/ space, must find openBrace
+                    if (lines[nextLineIndex].find("{") == -1):
+                        # no open curly braces found
+                        print("No open brace on same line or next line, adding curly braces")
+                        # add open CURLY on same line
+                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                        del lines[lineIndex]
+                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                        
+                        # check for semicolons to add Closing brace
+                        checkForSemiColonIndex = lineIndex + 1
+                        while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
+                            # line has no semicolon or it is a comment
+                            checkForSemiColonIndex = checkForSemiColonIndex + 1
+                        else:
+                            # line has a semicolon and is NOT a comment
+                            # we must add closing brace on nxt line:
+                            closingBraceLineIndex = checkForSemiColonIndex + 1
+                        
+                        # add closing braces at closingBraceLine (inserting a new ln)
+                        spaces = " " * forLoopIndex # add indent
+                        # if lines[closingBraceLineIndex].isspace():
+                        #     del lines[closingBraceLineIndex]
+                        #     addClosingBraceLine = "\n"+spaces + "}\n"
+                        # else:
+                        lines.insert(closingBraceLineIndex, " ")
+                        addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
+                        lines.insert(closingBraceLineIndex, addClosingBraceLine)
+        # find while loops
+        whileLoopIndex = line.find("while")
+        if whileLoopIndex != -1:
+            # found a while loop
+            print("\nwhile loop found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
             
-                # add closing braces, if line is space then add it with space, or, make line nothing
-                if lines[closingBraceLineIndex].isspace():
-                    del lines[closingBraceLineIndex]
-                    addClosingBraceLine = "\n"+spaces + "}\n"
+            # check for OPEN curly Brace on THE SAME LINE as While loop.
+            openCurlyBraceIndex = line.find("{")
+            if openCurlyBraceIndex == -1:
+                # no { on same ln
+                # check for Open brace on next few lines:
+                nextLineIndex = lineIndex + 1
+                while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
+                    # next line is a singleLineComment OR a space, we must skip it
+                    nextLineIndex =  nextLineIndex + 1
                 else:
-                    lines.insert(closingBraceLineIndex, " ")
-                    addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
-                lines.insert(closingBraceLineIndex, addClosingBraceLine)
-
+                    # next line is not a comment/ space, must find openBrace
+                    if (lines[nextLineIndex].find("{") == -1):
+                        # no open curly braces found
+                        print("No open brace on same line or next line, adding curly braces")
+                        # add open CURLY on same line
+                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                        del lines[lineIndex]
+                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                        
+                        # check for semicolons to add Closing brace
+                        checkForSemiColonIndex = lineIndex + 1
+                        while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
+                            # line has no semicolon or it is a comment
+                            checkForSemiColonIndex = checkForSemiColonIndex + 1
+                        else:
+                            # line has a semicolon and is NOT a comment
+                            # we must add closing brace on nxt line:
+                            closingBraceLineIndex = checkForSemiColonIndex + 1
+                        
+                        # add closing braces at closingBraceLine (inserting a new ln)
+                        spaces = " " * whileLoopIndex # add indent
+                        # if lines[closingBraceLineIndex].isspace():
+                        #     del lines[closingBraceLineIndex]
+                        #     addClosingBraceLine = "\n"+spaces + "}\n"
+                        # else:
+                        lines.insert(closingBraceLineIndex, " ")
+                        addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
+                        lines.insert(closingBraceLineIndex, addClosingBraceLine)
+        # find if conditions
+        ifConditionIndex = line.find("if")
+        # will also search for #if, not implementing!
+    # write lines back to fileToEdit
     fileToEdit.seek(0)
     fileToEdit.writelines(lines)
 
@@ -93,15 +138,20 @@ def styliseCode(fileToEdit):
 def openFile():
     try:
         fileToEdit = open(FILE_NAME, "r+")
+        print("Stylising code")
         styliseCode(fileToEdit)
+        print("-- DONE -- Closing files")
         fileToEdit.close()
     except FileNotFoundError:
         print("Error file not found")
         sys.exit()
 
+print("Welcome to CodeStyliser, Made in python 3.7.7 64-Bit, please use correct Intrepreter")
+print("Made by Pranjal Rastogi")
+print("Adds curly braces {} for all for loops/ while loops in (.c) files")
 
 FILE_NAME = input(
-    'Please enter file name to be edited\n File must be in same directory as main.py: ')
+    'Please enter file name to be edited(File must be in same directory as main.py): ')
 FILE_NAME = "sample-copy.c"
 if FILE_NAME.find(".c") == -1:
     print("error, must be C file")
