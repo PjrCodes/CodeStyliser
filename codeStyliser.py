@@ -199,7 +199,7 @@ print("VERSION NUMBER: " + VERSION_NUMBER)
 print("Made by Pranjal Rastogi")
 print("Adds curly braces {} for all for loops/ while loops in (.c) files")
 if (len(sys.argv) == 1):
-    FILE_NAME = input('Please enter file name to be edited(File must be in same directory as main.py): ')
+    FILE_NAME = input('Please enter file name to be edited(File must be in same directory as codeStyliser.py): ')
 elif (len(sys.argv) == 2):
     FILE_NAME = sys.argv[1]
 else:

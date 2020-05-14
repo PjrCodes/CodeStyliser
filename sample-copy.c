@@ -30,10 +30,11 @@ int main()
 
     
 
-        for (int a = 0; a < 10; a++)  
+        for (int a = 0; a < 10; a++)   {
                 // indented check
             printf("NO CURLIES %d \n", a);  
-
+        }
+ 
         
         
     for (int p = 0; p < 10; p++) {
@@ -61,15 +62,17 @@ int main()
         a++;
     }
     int b = 0
-    while(b < 1)
+    while(b < 1) {
         printf("NO CURLIES %d", b);
-
+    }
+ 
 
     // TINEE ERROR: (comment Iam disappears)
-    for (int p = 0; p < 10; p++) // I am
+    for (int p = 0; p < 10; p++) {
 
         printf("NO CURLIES %d", p); 
-
+    }
+ 
 }
 
 
