@@ -6,7 +6,7 @@ import sys
 import re
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.6-alpha"
+VERSION_NUMBER = "0.0.7-alpha"
 
 def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
