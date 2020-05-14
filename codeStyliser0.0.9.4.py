@@ -11,7 +11,7 @@ import os
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.9.3-alpha"
+VERSION_NUMBER = "0.0.9.4-alpha"
 NEW_CHANGES = " added recursive folder searching and stylising, fixed extension"
 
 def getFirstCharacterIndex(str):
@@ -366,6 +366,7 @@ def styliseCode(fileToEdit):
         except:
             e = sys.exc_info()[0]
             print("error: "+ str(e) + " at file name: " + fileToEdit.name)
+            continue
 
     # write lines back to fileToEdit
 
@@ -394,8 +395,13 @@ else:
                 continue
             fileExt = fileExtension[1]
             if fileExt == "c":
-                with open(file_path, "r+") as fileToStyle:
-                    styliseCode(fileToStyle)
+                try:
+                    with open(file_path, "r+") as fileToStyle:
+                        styliseCode(fileToStyle)
+                except:
+                    e = sys.exc_info()[0]
+                    print("error: "+ str(e) + " at file name: " + filename + "File open error")
+                    continue
             else:
                 continue
                
