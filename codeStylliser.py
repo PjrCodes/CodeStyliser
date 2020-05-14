@@ -40,10 +40,12 @@ def styliseCode(fileToEdit):
         #             # found */, this line is when comment ends
         #             line = line[commentCheckerIndex + 1]
     
+        firstCharIndex = len(line) - len(line.lstrip())
+
         # find for loops
         forLoopIndex = line.find("for")
-        openParenthCheckFor = line[forLoopIndex:].find("(")
-        if forLoopIndex != -1 and openParenthCheckFor != -1:
+        # openParenthCheckFor = line[forLoopIndex:].find("(")
+        if forLoopIndex == firstCharIndex:
             # found a for loop
             print("\nfor loop found at " + str(lineIndex + 1) + ":" + str(forLoopIndex))
 
@@ -87,8 +89,8 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         # find while loops
         whileLoopIndex = line.find("while")
-        openParenthCheckWhile = line[whileLoopIndex:].find("(")
-        if whileLoopIndex != -1 and openParenthCheckWhile != -1:
+        # openParenthCheckWhile = line[whileLoopIndex:].find("(")
+        if whileLoopIndex == firstCharIndex:
             # found a while loop
             print("\nwhile loop found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
             
@@ -132,8 +134,8 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         # find if conditions
         ifConditionIndex = line.find("if")
-        openParenthCheckIf = line[ifConditionIndex:].find("(")
-        if ifConditionIndex != -1 and openParenthCheckIf != -1:
+        # openParenthCheckIf = line[ifConditionIndex:].find("(")
+        if ifConditionIndex == firstCharIndex:
             # found a while loop
             print("\nIF CONDITION found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
             
