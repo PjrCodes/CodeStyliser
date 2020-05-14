@@ -76,12 +76,11 @@ int main()
   
     if() {
 
-    } else {
-
-    }
-    else {
-        
-    }
+    } else if (asd)
+        PRINS(SD);
+    
+    else 
+        oiasdoioaods;
     // TINEE ERROR: (comment Iam disappears)
     for (int p = 0; p < 10; p++) {
 

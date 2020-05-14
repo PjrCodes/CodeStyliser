@@ -266,13 +266,80 @@ def styliseCode(fileToEdit):
         if startingCurlyBraceIndex == firstCharIndex:
             # line starts on a }
             lineStartsOnBrace = True
-        if lineStartsOnBrace and line[startingCurlyBraceIndex:].find("else") != -1:
+        if (lineStartsOnBrace and line[startingCurlyBraceIndex:].find("else") != -1) or (startingAtElseIndex == firstCharIndex and lineStartsOnBrace == False):
             # we have a line with an } and an else after it
-            print("ELSE DETECTED")
             # process else
-        if startingAtElseIndex == firstCharIndex and lineStartsOnBrace == False:
-            print("Else detected")
-            # process else
+
+            # we must now skip over all parentheses to find the end of the (condition)
+            openParenthNo = len(re.findall(r"\(", line))
+            closeParenthNo = len(re.findall(r"\)", line))
+            if openParenthNo != closeParenthNo:
+                isOnSameLine = False
+                # the line doesnt have same amt of close and open parentheses
+                nxtLnIndex = lineIndex + 1
+                while closeParenthNo != openParenthNo:
+                    ifChecker = lines[nxtLnIndex].find("if")
+                    firstCharOfNxtLn = len(lines[nxtLnIndex]) - len(lines[nxtLnIndex].lstrip())
+                    if ifChecker == firstCharOfNxtLn:
+                        # another if has been found before () number got equal, Cancel case
+                        break
+                    else:
+                        openParenthNo = len(re.findall(r"\(", lines[nxtLnIndex])) + openParenthNo
+                        closeParenthNo = len(re.findall(r"\)", lines[nxtLnIndex])) + closeParenthNo
+                        nxtLnIndex = nxtLnIndex + 1
+                else:
+                    # nxtLnIndex must be where openCurlyBrace should be.
+                    # check for OPEN curly Brace on THE SAME LINE as if condition
+                    openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
+                continue
+            else:
+                isOnSameLine = True
+                openCurlyBraceIndex = line.find("{")
+            
+            if openCurlyBraceIndex == -1:
+                # no { on same ln
+                # check for Open brace on next few lines:
+                if(isOnSameLine):
+                    nextLineIndex = lineIndex + 1
+                else:
+                    nextLineIndex = nxtLnIndex + 1
+                while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
+                    # next line is a singleLineComment OR a space, we must skip it
+                    nextLineIndex =  nextLineIndex + 1
+                else:
+                    # next line is not a comment/ space, must find openBrace
+                    if (lines[nextLineIndex].find("{") == -1):
+                        # no open curly braces found
+                        # add open CURLY on same line
+                        if (isOnSameLine):
+                            #TODO: change this to allow inline comments to stay
+                            toAddLine = line[:-1] + " {\n"
+                            del lines[lineIndex]
+                            lines.insert(lineIndex, toAddLine)
+                            checkForSemiColonIndex = lineIndex + 1
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                            del lines[nxtLnIndex - 1]
+                            lines.insert(nxtLnIndex - 1, toAddLine)
+                            checkForSemiColonIndex = nxtLnIndex + 1
+                        # check for semicolons to add Closing brace
+                        
+                        while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
+                            # line has no semicolon or it is a comment
+                            checkForSemiColonIndex = checkForSemiColonIndex + 1
+                        else:
+                            # line has a semicolon and is NOT a comment
+                            closingBraceLineIndex = checkForSemiColonIndex + 1
+                        
+                        # add closing braces at closingBraceLine (inserting a new ln) with indentation
+                        if lineStartsOnBrace:
+                            spaces = " " * startingCurlyBraceIndex
+                        elif not lineStartsOnBrace:
+                            spaces = " " * startingAtElseIndex 
+                        lines.insert(closingBraceLineIndex, " ")
+                        addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
+                        lines.insert(closingBraceLineIndex, addClosingBraceLine)
+
         # --------------------------------------------------------------------------- 
 
     # write lines back to fileToEdit
@@ -295,7 +362,7 @@ def openFile():
 print("Welcome to CodeStyliser VERSION " + VERSION_NUMBER)
 print("Adds curly braces {} for all single line if, for, while, else statements in (.c) files")
 print("Made by Pranjal Rastogi")
-print("= Made in python 3.7.7 64-Bit, please use correct Interpreter =")
+print("Made in python 3.7.7 64-Bit, please use correct Interpreter")
 if (len(sys.argv) == 1):
     FILE_NAME = input('Please enter file name to be edited(File must be in same directory as codeStyliser.py): ')
 elif (len(sys.argv) == 2):
