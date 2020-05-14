@@ -22,23 +22,25 @@ def styliseCode(fileToEdit):
         if (comment):
             # found a Single line comment
             line = line[:comment.start()]
-        # elif multiLineComment != -1:
-        #     #found a comment that starts with /*
+        """ 
+        elif multiLineComment != -1:
+            #found a comment that starts with /*
             
-        #     # check if comment ends on same line
-        #     sameLineClose = line.find("*/")
-        #     if sameLineClose != -1:
-        #         # comment ends on same line, see only before /*
-        #         line = line[:multiLineComment]
-        #     else:
-        #         # comment doesnt end on same line, check through subsequent lines for */
-        #         commentCheckerIndex = lineIndex + 1 
-        #         while lines[commentCheckerIndex].find("*/") == -1:
-        #             # did not find */, still in comment
-        #             commentCheckerIndex = commentCheckerIndex + 1
-        #         else: 
-        #             # found */, this line is when comment ends
-        #             line = line[commentCheckerIndex + 1]
+            # check if comment ends on same line
+            sameLineClose = line.find("*/")
+            if sameLineClose != -1:
+                # comment ends on same line, see only before /*
+                line = line[:multiLineComment]
+            else:
+                # comment doesnt end on same line, check through subsequent lines for */
+                commentCheckerIndex = lineIndex + 1 
+                while lines[commentCheckerIndex].find("*/") == -1:
+                    # did not find */, still in comment
+                    commentCheckerIndex = commentCheckerIndex + 1
+                else: 
+                    # found */, this line is when comment ends
+                    line = line[commentCheckerIndex + 1]
+        """
     
         firstCharIndex = len(line) - len(line.lstrip())
 
@@ -141,6 +143,7 @@ def styliseCode(fileToEdit):
             openParenthNo = len(allOpenParenth)
             closeParenthNo = len(allCloseParenth)
             if openParenthNo != closeParenthNo:
+                isOnSameLine = False
                 # the line doesnt have same amt of close and open parentheses
                 # we must find till len(allOpenParenth) = closeParenth count
                 nxtLnIndex = lineIndex + 1
@@ -152,17 +155,23 @@ def styliseCode(fileToEdit):
                     closeParenthNo = len(newCloseParenth) + closeParenthNo
                     nxtLnIndex = nxtLnIndex + 1
                 else:
+                    
                     # closeParenthNo = openParenthNo
                     # nxtLnIndex must be where openCurlyBrace should be.
                     # check for OPEN curly Brace on THE SAME LINE as while loop
                     openCurlyBraceIndex = lines[nxtLnIndex].find("{")
             else:
+                isOnSameLine = True
                 openCurlyBraceIndex = line.find("{")
-
+            
+            
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:
-                nextLineIndex = lineIndex + 1
+                if isOnSameLine:
+                    nextLineIndex = lineIndex + 1
+                else:
+                    nextLineIndex = nxtLnIndex + 1
                 while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
                     # next line is a singleLineComment OR a space, we must skip it
                     nextLineIndex =  nextLineIndex + 1
@@ -172,12 +181,18 @@ def styliseCode(fileToEdit):
                         # no open curly braces found
                         print("No open brace on same line or next line, adding curly braces")
                         # add open CURLY on same line
-                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
-                        del lines[lineIndex]
-                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
-                        
+                        if (isOnSameLine):
+                            toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                            del lines[lineIndex]
+                            lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                            checkForSemiColonIndex = lineIndex + 1
+                        elif (isOnSameLine == False):
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                            del lines[nxtLnIndex - 1]
+                            lines.insert(nxtLnIndex - 1, toAddLine)
+                            checkForSemiColonIndex = nxtLnIndex + 1
+
                         # check for semicolons to add Closing brace
-                        checkForSemiColonIndex = lineIndex + 1
                         while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
                             # line has no semicolon or it is a comment
                             checkForSemiColonIndex = checkForSemiColonIndex + 1
@@ -207,6 +222,7 @@ def styliseCode(fileToEdit):
             openParenthNo = len(allOpenParenth)
             closeParenthNo = len(allCloseParenth)
             if openParenthNo != closeParenthNo:
+                isOnSameLine = False
                 # the line doesnt have same amt of close and open parentheses
                 # we must find till len(allOpenParenth) = closeParenth count
                 nxtLnIndex = lineIndex + 1
@@ -222,12 +238,16 @@ def styliseCode(fileToEdit):
                     # check for OPEN curly Brace on THE SAME LINE as if condition
                     openCurlyBraceIndex = lines[nxtLnIndex].find("{")
             else:
+                isOnSameLine = True
                 openCurlyBraceIndex = line.find("{")
             
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:
-                nextLineIndex = lineIndex + 1
+                if(isOnSameLine):
+                    nextLineIndex = lineIndex + 1
+                else:
+                    nextLineIndex = nxtLnIndex + 1
                 while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
                     # next line is a singleLineComment OR a space, we must skip it
                     nextLineIndex =  nextLineIndex + 1
@@ -237,12 +257,18 @@ def styliseCode(fileToEdit):
                         # no open curly braces found
                         print("No open brace on same line or next line, adding curly braces")
                         # add open CURLY on same line
-                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
-                        del lines[lineIndex]
-                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
-                        
+                        if (isOnSameLine):
+                            toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                            del lines[lineIndex]
+                            lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                            checkForSemiColonIndex = lineIndex + 1
+                        elif (isOnSameLine == False):
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                            del lines[nxtLnIndex - 1]
+                            lines.insert(nxtLnIndex - 1, toAddLine)
+                            checkForSemiColonIndex = nxtLnIndex + 1
                         # check for semicolons to add Closing brace
-                        checkForSemiColonIndex = lineIndex + 1
+                        
                         while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
                             # line has no semicolon or it is a comment
                             checkForSemiColonIndex = checkForSemiColonIndex + 1
