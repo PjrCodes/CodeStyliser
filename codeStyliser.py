@@ -4,7 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.2"
+VERSION_NUMBER = "0.0.3-alpha"
 
 def styliseCode(fileToEdit):
     
@@ -49,8 +49,34 @@ def styliseCode(fileToEdit):
             # found a for loop
             print("\nfor loop found at " + str(lineIndex + 1) + ":" + str(forLoopIndex))
 
-            # check for OPEN curly Brace on THE SAME LINE as For loop.
-            openCurlyBraceIndex = line.find("{")
+            # we must now skip over all parentheses to find the end of the (condition)
+            allOpenParenth = re.findall(r"\(", line)
+            allCloseParenth = re.findall(r"\)", line)
+            print(len(allOpenParenth))
+            print(len(allCloseParenth))
+            openParenthNo = len(allOpenParenth)
+            closeParenthNo = len(allCloseParenth)
+            if openParenthNo != closeParenthNo:
+                # the line doesnt have same amt of close and open parentheses
+                # we must find till len(allOpenParenth) = closeParenth count
+                nxtLnIndex = lineIndex + 1
+
+                while closeParenthNo != openParenthNo:
+                    
+                    newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
+                    newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
+                    openParenthNo = len(newOpenParenth) + openParenthNo
+                    closeParenthNo = len(newCloseParenth) + closeParenthNo
+                    nxtLnIndex = nxtLnIndex + 1
+                else:
+                    # closeParenthNo = openParenthNo
+                    # nxtLnIndex must be where openCurlyBrace should be.
+                    # check for OPEN curly Brace on THE SAME LINE as for loop
+                    print("BROKE LOOP")
+                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+            else:
+                openCurlyBraceIndex = line.find("{")
+
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:
@@ -64,6 +90,7 @@ def styliseCode(fileToEdit):
                         # no open curly braces found
                         print("No open brace on same line or next line, adding curly braces")
                         # add open CURLY on same line
+                        #TODO: change this part
                         toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
                         del lines[lineIndex]
                         lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
@@ -94,8 +121,30 @@ def styliseCode(fileToEdit):
             # found a while loop
             print("\nwhile loop found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
             
-            # check for OPEN curly Brace on THE SAME LINE as While loop.
-            openCurlyBraceIndex = line.find("{")
+            # we must now skip over all parentheses to find the end of the (condition)
+            allOpenParenth = re.findall(r"\(", line)
+            allCloseParenth = re.findall(r"\)", line)
+            openParenthNo = len(allOpenParenth)
+            closeParenthNo = len(allCloseParenth)
+            if openParenthNo != closeParenthNo:
+                # the line doesnt have same amt of close and open parentheses
+                # we must find till len(allOpenParenth) = closeParenth count
+                nxtLnIndex = lineIndex + 1
+                while closeParenthNo != openParenthNo:
+                    
+                    newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
+                    newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
+                    openParenthNo = len(newOpenParenth) + openParenthNo
+                    closeParenthNo = len(newCloseParenth) + closeParenthNo
+                    nxtLnIndex = nxtLnIndex + 1
+                else:
+                    # closeParenthNo = openParenthNo
+                    # nxtLnIndex must be where openCurlyBrace should be.
+                    # check for OPEN curly Brace on THE SAME LINE as while loop
+                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+            else:
+                openCurlyBraceIndex = line.find("{")
+
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:
@@ -136,11 +185,31 @@ def styliseCode(fileToEdit):
         ifConditionIndex = line.find("if")
         # openParenthCheckIf = line[ifConditionIndex:].find("(")
         if ifConditionIndex == firstCharIndex:
-            # found a while loop
-            print("\nIF CONDITION found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
+            # found a if condition
+            print("\nIF CONDITION found at " + str(lineIndex + 1) + ":" + str(ifConditionIndex))
+            # we must now skip over all parentheses to find the end of the (condition)
+            allOpenParenth = re.findall(r"\(", line)
+            allCloseParenth = re.findall(r"\)", line)
+            openParenthNo = len(allOpenParenth)
+            closeParenthNo = len(allCloseParenth)
+            if openParenthNo != closeParenthNo:
+                # the line doesnt have same amt of close and open parentheses
+                # we must find till len(allOpenParenth) = closeParenth count
+                nxtLnIndex = lineIndex + 1
+                while closeParenthNo != openParenthNo:
+                    newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
+                    newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
+                    openParenthNo = len(newOpenParenth) + openParenthNo
+                    closeParenthNo = len(newCloseParenth) + closeParenthNo
+                    nxtLnIndex = nxtLnIndex + 1
+                else:
+                    # closeParenthNo = openParenthNo
+                    # nxtLnIndex must be where openCurlyBrace should be.
+                    # check for OPEN curly Brace on THE SAME LINE as if condition
+                    openCurlyBraceIndex = lines[nxtLnIndex].find("{")
+            else:
+                openCurlyBraceIndex = line.find("{")
             
-            # check for OPEN curly Brace on THE SAME LINE as While loop.
-            openCurlyBraceIndex = line.find("{")
             if openCurlyBraceIndex == -1:
                 # no { on same ln
                 # check for Open brace on next few lines:

@@ -16,15 +16,17 @@ int main()
     amaizng as
     adodso */
 
-    for (int j = 0; j < 10; j++) {
+    for (int j = 0; j < 10; j++)  {
         // check
         printf("I AM j"); 
-
     }
+ 
+    
     for (int k = 0; k < 10; k++)     {
         printf("NO CURLIES k:%d", k);
-
     }
+ 
+
 
 
 
@@ -34,14 +36,16 @@ int main()
                 // indented check
             printf("NO CURLIES %d \n", a);  
         }
+         
  
         
         
-    for (int p = 0; p < 10; p++) {
-
+    for (int p = 0; 
+    p < 10; p++) 
+  
         printf("NO CURLIES %d", p); 
-
-    }
+    
+    
     for (int p = 0; p < 10; p++) { /* this should work */
 
         printf("NO CURLIES %d", p); 
