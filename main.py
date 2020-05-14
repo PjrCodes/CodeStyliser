@@ -19,7 +19,7 @@ def styliseCode(fileToEdit):
         multiLineComment = line.find("/*")
         if (comment):
             # found a comment that starts with //, see only before //
-            line = line[0:comment.start()]
+            line = line[:comment.start()]
         elif multiLineComment != -1:
             #found a comment that starts with /*
             
@@ -27,20 +27,22 @@ def styliseCode(fileToEdit):
             sameLineClose = line.find("*/")
             if sameLineClose != -1:
                 # comment ends on same line, see only before /*
-                line = line[0:(multiLineComment+1)]
+                line = line[:multiLineComment]
             else:
                 # comment doesnt end on same line, check through subsequent lines for */
                 commentCheckerIndex = lineIndex + 1 
                 while lines[commentCheckerIndex].find("*/") == -1:
                     # did not find */, still in comment
                     commentCheckerIndex = commentCheckerIndex + 1
-                    
-        
+                else: 
+                    # found */, this line is when comment ends
+                    line = line[commentCheckerIndex + 1]
+    
         # find for loops
         forLoopIndex = line.find("for")
         if forLoopIndex != -1:
             # found a for loop
-            print("\nFOR loop at " + str(lineIndex + 1) + ":" + str(forLoopIndex))
+            print("\nfor loop found at " + str(lineIndex + 1) + ":" + str(forLoopIndex))
 
             # check for OPEN curly Brace on THE SAME LINE as For loop.
             openCurlyBraceIndex = line.find("{")
@@ -48,42 +50,39 @@ def styliseCode(fileToEdit):
             # check for Open brace on next few lines:
             nextLineIndex = lineIndex + 1
             while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
-                # next line is a "//"comment OR a space OR a "/*" comment
+                # next line is a "//" comment OR a space, we must skip it
                 nextLineIndex =  nextLineIndex + 1
             else:
                 # next line is not a comment/ space, must find openBrace
                 openCurlyBraceOnNxtLine = lines[nextLineIndex].find("{")
-                # if no OpenCurlyBrace, this line HAS to be the statement line, so } must be on next line
-                
             
             if openCurlyBraceIndex == -1 and openCurlyBraceOnNxtLine == -1:
                 # no open curly braces found
-                print("NO open brace on same line and no CURLY on NEXT LINE")
+                print("No open brace on same line or next line, adding curly braces")
                 
                 # add Curlybraces
-                toAddLine = line[:-1] + " {\n" # len(line)-1 removes the last char
+                toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
                 spaces = " " * forLoopIndex
                 
+                # check for semicolons
                 checkForSemiColonIndex = lineIndex + 1
                 while lines[checkForSemiColonIndex].find(";") == -1:
                     # line has no semicolon
                     checkForSemiColonIndex = checkForSemiColonIndex + 1
                 else:
                     # line has a semicolon
-                    print(lines[checkForSemiColonIndex])
                     # we must add closing brace on nxt line:
                     closingBraceLineIndex = checkForSemiColonIndex + 1
             
-
+                # add closing braces, if line is space then add it with space, or, make line nothing
                 if lines[closingBraceLineIndex].isspace():
                     del lines[closingBraceLineIndex]
                     addClosingBraceLine = "\n"+spaces + "}\n"
                 else:
                     lines.insert(closingBraceLineIndex, " ")
                     addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
-                
                 lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
     fileToEdit.seek(0)
