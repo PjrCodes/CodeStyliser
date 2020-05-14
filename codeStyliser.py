@@ -4,7 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.3-alpha"
+VERSION_NUMBER = "0.0.4-alpha"
 
 def styliseCode(fileToEdit):
     
