@@ -65,23 +65,25 @@ int main()
     }
      
     int a = 0
-    while(a < 1) {
+    while(a < 1) // asdas
         printf("NO CURLIES %d", a); 
-        a++;
-    }
+        
+    
     int b = 0
-    while(b < 1) {
+    while(b < 1) //a
         printf("NO CURLIES %d", b);
-    }
+    
   
     if() {
 
-    } else if (asd)
+    } else if (asd) {
         PRINS(SD);
-    
-    else 
+    }
+     
+    else  {
         oiasdoioaods;
-    // TINEE ERROR: (comment Iam disappears)
+    }
+     // TINEE ERROR: (comment Iam disappears)
     for (int p = 0; p < 10; p++) {
 
         printf("NO CURLIES %d", p); 

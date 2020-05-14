@@ -6,7 +6,7 @@ import sys
 import re
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.7-alpha"
+VERSION_NUMBER = "0.0.8-alpha"
 
 def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
@@ -21,11 +21,14 @@ def styliseCode(fileToEdit):
     
     for line in lines:
         lineIndex = lineIndex + 1
+        currentLineIsComment = False
         # search for comments
         comment = re.search(SINGLELINE_COMMENT_PATTERN,line)
         if (comment):
             # found a Single line comment
+            currentLinesComment = line[comment.start():]
             line = line[:comment.start()]
+            currentLineIsComment = True
         firstCharIndex = getFirstCharacterIndex(line)
 
         # ---------------------------------------------------------------------------
@@ -82,7 +85,10 @@ def styliseCode(fileToEdit):
                         # add open curly brace
                         if (isOnSameLine):
                             #TODO: change this to allow inline comments to stay
-                            toAddLine = line[:-1] + " {\n"
+                            if currentLineIsComment:
+                                toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            else:
+                                toAddLine = line[:-1] + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
@@ -159,7 +165,10 @@ def styliseCode(fileToEdit):
 
                         if (isOnSameLine):
                             #TODO: change this to allow inline comments to stay
-                            toAddLine = line[:-1] + " {\n"
+                            if currentLineIsComment:
+                                toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            else:
+                                toAddLine = line[:-1] + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
@@ -234,7 +243,10 @@ def styliseCode(fileToEdit):
                         # add open CURLY on same line
                         if (isOnSameLine):
                             #TODO: change this to allow inline comments to stay
-                            toAddLine = line[:-1] + " {\n"
+                            if currentLineIsComment:
+                                toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            else:
+                                toAddLine = line[:-1] + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
@@ -313,7 +325,10 @@ def styliseCode(fileToEdit):
                         # add open CURLY on same line
                         if (isOnSameLine):
                             #TODO: change this to allow inline comments to stay
-                            toAddLine = line[:-1] + " {\n"
+                            if currentLineIsComment:
+                                toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            else:
+                                toAddLine = line[:-1] + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
