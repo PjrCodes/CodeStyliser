@@ -4,7 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-matchSingleLineComments = re.compile(SINGLELINE_COMMENT_PATTERN, re.DOTALL)
+
 def styliseCode(fileToEdit):
     
     # so that first line's index is 0
@@ -17,7 +17,7 @@ def styliseCode(fileToEdit):
         lineIndex = lineIndex + 1
 
         # search for comments
-        comment = matchSingleLineComments.match(line)
+        comment = re.search(SINGLELINE_COMMENT_PATTERN,line)
         if (comment):
             # found a Single line comment
             line = line[:comment.start()]
@@ -51,7 +51,7 @@ def styliseCode(fileToEdit):
             # check for Open brace on next few lines:
             nextLineIndex = lineIndex + 1
             while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
-                # next line is a "//" comment OR a space, we must skip it
+                # next line is a singleLineComment OR a space, we must skip it
                 nextLineIndex =  nextLineIndex + 1
             else:
                 # next line is not a comment/ space, must find openBrace

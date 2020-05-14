@@ -1,6 +1,11 @@
 #include <stdio.h>
 int main()
 {
+
+
+    // for() 
+    // ;
+    // amainz
     printf("I AM HELLO WOELD");
     // asds
     
@@ -23,11 +28,11 @@ int main()
 
         // america
         // hail
-        // cheking ;
+        // cheking 
         printf("NO CURLIES k:%d", s);
 
     
-    for (int o = 0; o < 10; o++) {
+    for (int o = 0; o < 10; o++) 
     
         // multiple check
         // for() 
@@ -35,13 +40,13 @@ int main()
 
         printf("NO CURLIES %d \n", o);
 
-    }
+    
 
-        for (int a = 0; a < 10; a++)   {
+        for (int a = 0; a < 10; a++)  
                 // indented check
             printf("NO CURLIES %d \n", a);  
 
-        }
+        
         
     for (int p = 0; p < 10; p++) {
 
@@ -53,11 +58,10 @@ int main()
         printf("NO CURLIES %d", p); 
     }
     
-    for (int p = 0; p < 10; p++) { 
+    for (int p = 0; p < 10; p++) // I am
 
         printf("NO CURLIES %d", p); 
-    }
-
+    
     for (int p = 0; p < 10; p++) 
 
 
