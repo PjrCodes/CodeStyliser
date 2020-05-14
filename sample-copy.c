@@ -74,7 +74,14 @@ int main()
         printf("NO CURLIES %d", b);
     }
   
+    if() {
+
+    } else {
+
+    }
+    else {
         
+    }
     // TINEE ERROR: (comment Iam disappears)
     for (int p = 0; p < 10; p++) {
 
@@ -97,3 +104,4 @@ int main()
 }
 
 
+ 

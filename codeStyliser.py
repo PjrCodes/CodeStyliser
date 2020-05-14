@@ -260,9 +260,19 @@ def styliseCode(fileToEdit):
         
         # ---------------------------------------------------------------------------
         # find else conditions
-        ifConditionIndex = line.find("else")
-        if ifConditionIndex == firstCharIndex:
+        startingCurlyBraceIndex = line.find("}")
+        startingAtElseIndex = line.find("else")
+        lineStartsOnBrace = False;
+        if startingCurlyBraceIndex == firstCharIndex:
+            # line starts on a }
+            lineStartsOnBrace = True
+        if lineStartsOnBrace and line[startingCurlyBraceIndex:].find("else") != -1:
+            # we have a line with an } and an else after it
+            print("ELSE DETECTED")
+            # process else
+        if startingAtElseIndex == firstCharIndex and lineStartsOnBrace == False:
             print("Else detected")
+            # process else
         # --------------------------------------------------------------------------- 
 
     # write lines back to fileToEdit
