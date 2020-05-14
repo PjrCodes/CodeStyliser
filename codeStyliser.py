@@ -7,7 +7,7 @@ import re
 import os
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.9-alpha"
+VERSION_NUMBER = "0.0.9.1-alpha"
 NEW_CHANGES = " added recursive folder searching and stylising"
 
 def getFirstCharacterIndex(str):
@@ -381,7 +381,8 @@ else:
 
         for filename in files:
             file_path = os.path.join(root, filename)
-            if filename.find(".c") != -1:
+            fileExtension = filename.split(".",1)
+            if fileExtension == "c":
                 with open(file_path, "r+") as fileToStyle:
                     print("Stylising code in " + filename +  "(full path: " + file_path + ")")
                     styliseCode(fileToStyle)
