@@ -54,7 +54,6 @@ def styliseCode(fileToEdit):
                 # next line is not a comment/ space, must find openBrace
                 openCurlyBraceOnNxtLine = lines[nextLineIndex].find("{")
                 # if no OpenCurlyBrace, this line HAS to be the statement line, so } must be on next line
-                closingBraceLineIndex = nextLineIndex + 1
                 
             
             if openCurlyBraceIndex == -1 and openCurlyBraceOnNxtLine == -1:
@@ -66,12 +65,25 @@ def styliseCode(fileToEdit):
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
                 spaces = " " * forLoopIndex
-                print(closingBraceLineIndex)
-                if lines[closingBraceLineIndex].isspace():
-                    addClosingBraceLine = spaces + "}\n"
+                
+                checkForSemiColonIndex = lineIndex + 1
+                while lines[checkForSemiColonIndex].find(";") == -1:
+                    # line has no semicolon
+                    checkForSemiColonIndex = checkForSemiColonIndex + 1
                 else:
+                    # line has a semicolon
+                    print(lines[checkForSemiColonIndex])
+                    # we must add closing brace on nxt line:
+                    closingBraceLineIndex = checkForSemiColonIndex + 1
+            
+
+                if lines[closingBraceLineIndex].isspace():
+                    del lines[closingBraceLineIndex]
+                    addClosingBraceLine = "\n"+spaces + "}\n"
+                else:
+                    lines.insert(closingBraceLineIndex, " ")
                     addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
-                del lines[closingBraceLineIndex]
+                
                 lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
     fileToEdit.seek(0)
