@@ -1,8 +1,10 @@
 # Copyright (c) 2020 Pranjal Rastogi
+ #!/usr/local/bin/python3
+ # python 3.7.7 64 bit
 import sys
 import re
-SINGLELINE_COMMENT_PATTERN = r"\/\/.*"
-
+SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
+matchSingleLineComments = re.compile(SINGLELINE_COMMENT_PATTERN, re.DOTALL)
 def styliseCode(fileToEdit):
     
     # so that first line's index is 0
@@ -15,28 +17,27 @@ def styliseCode(fileToEdit):
         lineIndex = lineIndex + 1
 
         # search for comments
-        comment = re.search(SINGLELINE_COMMENT_PATTERN, line)
-        multiLineComment = line.find("/*")
+        comment = matchSingleLineComments.match(line)
         if (comment):
-            # found a comment that starts with //, see only before //
+            # found a Single line comment
             line = line[:comment.start()]
-        elif multiLineComment != -1:
-            #found a comment that starts with /*
+        # elif multiLineComment != -1:
+        #     #found a comment that starts with /*
             
-            # check if comment ends on same line
-            sameLineClose = line.find("*/")
-            if sameLineClose != -1:
-                # comment ends on same line, see only before /*
-                line = line[:multiLineComment]
-            else:
-                # comment doesnt end on same line, check through subsequent lines for */
-                commentCheckerIndex = lineIndex + 1 
-                while lines[commentCheckerIndex].find("*/") == -1:
-                    # did not find */, still in comment
-                    commentCheckerIndex = commentCheckerIndex + 1
-                else: 
-                    # found */, this line is when comment ends
-                    line = line[commentCheckerIndex + 1]
+        #     # check if comment ends on same line
+        #     sameLineClose = line.find("*/")
+        #     if sameLineClose != -1:
+        #         # comment ends on same line, see only before /*
+        #         line = line[:multiLineComment]
+        #     else:
+        #         # comment doesnt end on same line, check through subsequent lines for */
+        #         commentCheckerIndex = lineIndex + 1 
+        #         while lines[commentCheckerIndex].find("*/") == -1:
+        #             # did not find */, still in comment
+        #             commentCheckerIndex = commentCheckerIndex + 1
+        #         else: 
+        #             # found */, this line is when comment ends
+        #             line = line[commentCheckerIndex + 1]
     
         # find for loops
         forLoopIndex = line.find("for")

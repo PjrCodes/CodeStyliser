@@ -3,16 +3,9 @@ int main()
 {
     printf("I AM HELLO WOELD");
     // asds
-    /* asdoisadois
-    asdoiasod
-    asdioiasod
-    */
-   /* for (int)
-   print(sads);
-   */
-    for (int i = 0; i < 10; i++)   {
+    
+    for (int i = 0; i < 10; i++)
         printf("I AM I");   
-    }
          // as
 
     for (int j = 0; j < 10; j++) {
@@ -49,6 +42,7 @@ int main()
             printf("NO CURLIES %d \n", a);  
 
         }
+        
     for (int p = 0; p < 10; p++) {
 
         printf("NO CURLIES %d", p); 
