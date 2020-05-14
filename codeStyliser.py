@@ -262,7 +262,7 @@ def styliseCode(fileToEdit):
         # find else conditions
         startingCurlyBraceIndex = line.find("}")
         startingAtElseIndex = line.find("else")
-        lineStartsOnBrace = False;
+        lineStartsOnBrace = False
         if startingCurlyBraceIndex == firstCharIndex:
             # line starts on a }
             lineStartsOnBrace = True
