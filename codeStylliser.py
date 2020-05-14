@@ -132,6 +132,49 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         # find if conditions
         ifConditionIndex = line.find("if")
+        openParenthCheckIf = line[ifConditionIndex:].find("(")
+        if ifConditionIndex != -1 and openParenthCheckIf != -1:
+            # found a while loop
+            print("\nIF CONDITION found at " + str(lineIndex + 1) + ":" + str(whileLoopIndex))
+            
+            # check for OPEN curly Brace on THE SAME LINE as While loop.
+            openCurlyBraceIndex = line.find("{")
+            if openCurlyBraceIndex == -1:
+                # no { on same ln
+                # check for Open brace on next few lines:
+                nextLineIndex = lineIndex + 1
+                while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
+                    # next line is a singleLineComment OR a space, we must skip it
+                    nextLineIndex =  nextLineIndex + 1
+                else:
+                    # next line is not a comment/ space, must find openBrace
+                    if (lines[nextLineIndex].find("{") == -1):
+                        # no open curly braces found
+                        print("No open brace on same line or next line, adding curly braces")
+                        # add open CURLY on same line
+                        toAddLine = line[:-1] + " {\n" # line:-1 removes the last char
+                        del lines[lineIndex]
+                        lines.insert(lineIndex, toAddLine) # add toAddLine to currentLine
+                        
+                        # check for semicolons to add Closing brace
+                        checkForSemiColonIndex = lineIndex + 1
+                        while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
+                            # line has no semicolon or it is a comment
+                            checkForSemiColonIndex = checkForSemiColonIndex + 1
+                        else:
+                            # line has a semicolon and is NOT a comment
+                            # we must add closing brace on nxt line:
+                            closingBraceLineIndex = checkForSemiColonIndex + 1
+                        
+                        # add closing braces at closingBraceLine (inserting a new ln)
+                        spaces = " " * ifConditionIndex # add indent
+                        # if lines[closingBraceLineIndex].isspace():
+                        #     del lines[closingBraceLineIndex]
+                        #     addClosingBraceLine = "\n"+spaces + "}\n"
+                        # else:
+                        lines.insert(closingBraceLineIndex, " ")
+                        addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
+                        lines.insert(closingBraceLineIndex, addClosingBraceLine)
         # will also search for #if, not implementing!
     # write lines back to fileToEdit
     fileToEdit.seek(0)
