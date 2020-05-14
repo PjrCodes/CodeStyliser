@@ -73,8 +73,8 @@ int main()
     while(b < 1) {
         printf("NO CURLIES %d", b);
     }
- 
-
+  
+        
     // TINEE ERROR: (comment Iam disappears)
     for (int p = 0; p < 10; p++) {
 
