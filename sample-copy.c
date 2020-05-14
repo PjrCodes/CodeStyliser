@@ -12,6 +12,9 @@ int main()
     // for (int i = 0; i < 10; i++)
     //     printf("I AM I");   
          // as
+    /* for
+    amaizng as
+    adodso */
 
     for (int j = 0; j < 10; j++) {
         // check

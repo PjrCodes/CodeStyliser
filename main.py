@@ -151,10 +151,14 @@ def openFile():
 print("Welcome to CodeStyliser, Made in python 3.7.7 64-Bit, please use correct Intrepreter")
 print("Made by Pranjal Rastogi")
 print("Adds curly braces {} for all for loops/ while loops in (.c) files")
-
-FILE_NAME = input(
-    'Please enter file name to be edited(File must be in same directory as main.py): ')
-FILE_NAME = "sample-copy.c"
+if (len(sys.argv) == 1):
+    FILE_NAME = input('Please enter file name to be edited(File must be in same directory as main.py): ')
+elif (len(sys.argv) == 2):
+    FILE_NAME = sys.argv[1]
+else:
+    print("Usage: python3.7 main.py [filename]")
+    print("File name is optional")
+    
 if FILE_NAME.find(".c") == -1:
     print("error, must be C file")
     sys.exit()
