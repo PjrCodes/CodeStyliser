@@ -42,11 +42,12 @@ int main()
         
     for (int p = 0; 
     p < 10;
-     p++) 
+     p++)  {
     
     
         printf("NO CURLIES %d", p); 
-    
+    }
+     
 
     for (int p = 0; p < 10; p++) { /* this should work */
 
@@ -55,13 +56,14 @@ int main()
     
     
     
-    for (int p = 0; p < 10; p++) 
+    for (int p = 0; p < 10; p++)  {
 
 
     // check
-    { 
+    
         printf("NO CURLIES %d", p); 
     }
+     
     int a = 0
     while(a < 1) {
         printf("NO CURLIES %d", a); 
@@ -78,7 +80,19 @@ int main()
 
         printf("NO CURLIES %d", p); 
     }
- 
+#ifdef
+    if (b < 0 &&
+#else 
+    if(b > 0 &&
+#endif
+        dance == 3)
+        "DANCE"
+
+    for (int p = 0; p < 10; p++) 
+
+        printf("NO CURLIES %d", p); 
+    
+
 }
 
 

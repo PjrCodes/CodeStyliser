@@ -4,7 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.5-alpha"
+VERSION_NUMBER = "0.0.6-alpha"
 
 def styliseCode(fileToEdit):
     
@@ -16,34 +16,12 @@ def styliseCode(fileToEdit):
     
     for line in lines:
         lineIndex = lineIndex + 1
-
         # search for comments
         comment = re.search(SINGLELINE_COMMENT_PATTERN,line)
         if (comment):
             # found a Single line comment
             line = line[:comment.start()]
-        """ 
-        elif multiLineComment != -1:
-            #found a comment that starts with /*
-            
-            # check if comment ends on same line
-            sameLineClose = line.find("*/")
-            if sameLineClose != -1:
-                # comment ends on same line, see only before /*
-                line = line[:multiLineComment]
-            else:
-                # comment doesnt end on same line, check through subsequent lines for */
-                commentCheckerIndex = lineIndex + 1 
-                while lines[commentCheckerIndex].find("*/") == -1:
-                    # did not find */, still in comment
-                    commentCheckerIndex = commentCheckerIndex + 1
-                else: 
-                    # found */, this line is when comment ends
-                    line = line[commentCheckerIndex + 1]
-        """
-    
         firstCharIndex = len(line) - len(line.lstrip())
-
         # find for loops
         forLoopIndex = line.find("for")
         # openParenthCheckFor = line[forLoopIndex:].find("(")
@@ -227,16 +205,25 @@ def styliseCode(fileToEdit):
                 # we must find till len(allOpenParenth) = closeParenth count
                 nxtLnIndex = lineIndex + 1
                 while closeParenthNo != openParenthNo:
-                    newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
-                    newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
-                    openParenthNo = len(newOpenParenth) + openParenthNo
-                    closeParenthNo = len(newCloseParenth) + closeParenthNo
-                    nxtLnIndex = nxtLnIndex + 1
+                    ifChecker = lines[nxtLnIndex].find("if")
+                    firstCharOfNxtLn = len(lines[nxtLnIndex]) - len(lines[nxtLnIndex].lstrip())
+                    if ifChecker == firstCharOfNxtLn:
+                        # another if has been found before () number got equal, Cancel life
+                        print("INVALIDITY")
+                        break
+                        # BREAK AND KILL THIS FOR LOOP ITERATION
+                    else:
+                        newOpenParenth = re.findall(r"\(", lines[nxtLnIndex])
+                        newCloseParenth = re.findall(r"\)", lines[nxtLnIndex])
+                        openParenthNo = len(newOpenParenth) + openParenthNo
+                        closeParenthNo = len(newCloseParenth) + closeParenthNo
+                        nxtLnIndex = nxtLnIndex + 1
                 else:
                     # closeParenthNo = openParenthNo
                     # nxtLnIndex must be where openCurlyBrace should be.
                     # check for OPEN curly Brace on THE SAME LINE as if condition
                     openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
+                continue
             else:
                 isOnSameLine = True
                 openCurlyBraceIndex = line.find("{")
@@ -286,8 +273,10 @@ def styliseCode(fileToEdit):
                         lines.insert(closingBraceLineIndex, " ")
                         addClosingBraceLine = lines[closingBraceLineIndex][:-1] + spaces +"}\n"
                         lines.insert(closingBraceLineIndex, addClosingBraceLine)
-        # will also search for #if, not implementing!
+        
+
     # write lines back to fileToEdit
+
     fileToEdit.seek(0)
     fileToEdit.writelines(lines)
 
@@ -320,3 +309,24 @@ if FILE_NAME.find(".c") == -1:
     sys.exit()
 else:
     openFile()
+
+
+""" 
+elif multiLineComment != -1:
+    #found a comment that starts with /*
+    
+    # check if comment ends on same line
+    sameLineClose = line.find("*/")
+    if sameLineClose != -1:
+        # comment ends on same line, see only before /*
+        line = line[:multiLineComment]
+    else:
+        # comment doesnt end on same line, check through subsequent lines for */
+        commentCheckerIndex = lineIndex + 1 
+        while lines[commentCheckerIndex].find("*/") == -1:
+            # did not find */, still in comment
+            commentCheckerIndex = commentCheckerIndex + 1
+        else: 
+            # found */, this line is when comment ends
+            line = line[commentCheckerIndex + 1]
+"""
