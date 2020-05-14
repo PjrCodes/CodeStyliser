@@ -4,6 +4,7 @@
 import sys
 import re
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
+VERSION_NUMBER = "0.0.2"
 
 def styliseCode(fileToEdit):
     
@@ -149,6 +150,7 @@ def openFile():
         sys.exit()
 
 print("Welcome to CodeStyliser, Made in python 3.7.7 64-Bit, please use correct Intrepreter")
+print("VERSION NUMBER: " + VERSION_NUMBER)
 print("Made by Pranjal Rastogi")
 print("Adds curly braces {} for all for loops/ while loops in (.c) files")
 if (len(sys.argv) == 1):
@@ -158,7 +160,7 @@ elif (len(sys.argv) == 2):
 else:
     print("Usage: python3.7 main.py [filename]")
     print("File name is optional")
-    
+
 if FILE_NAME.find(".c") == -1:
     print("error, must be C file")
     sys.exit()
