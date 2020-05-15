@@ -5,16 +5,17 @@
 import sys
 import re
 import os
+import utils
 
 #TODO: same line for/ while/ if
 #TODO: error handler
-#TODO: FIX FAILLING AT CARRAIGE RETURN (CRLF/ ctrlM/ \r\n/ \r)
-#TODO: by OPENING IN BINARY MODE AND CONVERTING all \r\n into \n
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
 VERSION_NUMBER = "0.0.9.4-alpha"
 NEW_CHANGES = " added recursive folder searching and stylising, fixed extension"
+WINDOWS_LINE_ENDING = b'\r\n'
+UNIX_LINE_ENDING = b'\n'
 
 def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
@@ -374,41 +375,56 @@ def styliseCode(fileToEdit):
 
     fileToEdit.seek(0)
     fileToEdit.writelines(lines)
+    fileToEdit.close()
 
 
-if (len(sys.argv) != 2):
-    print("Usage: python3.7 codeStyliser.py [DIRECTORY_NAME]")
-    print("Directory Name must be mentioned")
-    sys.exit()
-else:
-    DIR_NAME = sys.argv[1]
-    print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
-    print("Made by Pranjal Rastogi")
-    print("Made for python 3.7.7 64-Bit")
-    print("NEW CHANGES IN ver" + VERSION_NUMBER + NEW_CHANGES)
-    print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
+def main():
+    if (len(sys.argv) != 2):
+        print("Usage: python3.7 codeStyliser.py [DIRECTORY_NAME]")
+        print("DIRECTORY_NAME IS REQUIRED")
+        sys.exit()
+    else:
+        DIR_NAME = sys.argv[1]
+        print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
+        print("Made by Pranjal Rastogi")
+        print("Made for python 3.7.7 64-Bit")
+        print("NEW CHANGES IN ver" + VERSION_NUMBER + NEW_CHANGES)
+        print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
 
-    for root, subdirs, files in os.walk(DIR_NAME):
+        for root, subdirs, files in os.walk(DIR_NAME):
 
-        for filename in files:
-            file_path = os.path.join(root, filename)
-            fileExtension = filename.split(".",1)
-            if len(fileExtension) != 2:
-                continue
-            fileExt = fileExtension[1]
-            if fileExt == "c":
-                try:
-                    with open(file_path, "r+") as fileToStyle:
-                        styliseCode(fileToStyle)
-                except:
-                    e = sys.exc_info()[0]
-                    print("error: "+ str(e) + " at file name: " + filename + "File open error")
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                fileExtension = filename.split(".",1)
+                if len(fileExtension) != 2:
                     continue
-            else:
-                continue
-               
-    print("Done for all files, exit")
+                fileExt = fileExtension[1]
+                if fileExt == "c":
+                    try:
+                        with open(file_path, 'rb') as open_file:
+                            content = open_file.read()
+                            content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+                        with open(file_path, 'wb') as open_file:
+                            open_file.write(content)
+                            open_file.close()
+                    except:
+                        e = sys.exc_info()[0]
+                        print("error: " + str(e) + " at file name: " + filename + " while changing line endings")
+                        continue
+                    try:
+                        with open(file_path, "r+") as fileToStyle:
+                            styliseCode(fileToStyle)
+                    except:
+                        e = sys.exc_info()[0]
+                        print("error: "+ str(e) + " at file name: " + filename + " while opening file")
+                        continue
+                else:
+                    continue
+                
+        print("Done for all files, now exitting")
 
+if __name__ == "__main__":
+    main()
 
 
 
