@@ -11,7 +11,7 @@ import utils as utils
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.0.9.6-alpha"
+VERSION_NUMBER = "0.1.0-alpha"
 NEW_CHANGES = " fixed failure 5 and failure 1"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
