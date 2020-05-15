@@ -26,7 +26,6 @@ def getFirstCharacterIndex(str):
 
 def checkForParentheses(line, lineIndex, lines):
     openParenthNo = len(re.findall(r"\(", line))
-    print(openParenthNo)
     closeParenthNo = len(re.findall(r"\)", line))
 
     if openParenthNo != closeParenthNo:
