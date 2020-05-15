@@ -15,37 +15,6 @@ macros.. there are some macros in cfiles also. like conffileapi.c
 //          }
 
 
-// failure 4:
-
-
-//     ifc = 0;
-//     iflist->count = 0; 
-//     //dasoiods
-//      if                    (adoiosd adoisd) // asdo;
-
-
-//       //sadoiosdaos;
-//      adasd; //adsiuid;
-   
-
-
-
-// failure 6:
-//              }
-// -            if(epd_stack == US_STACK_EPD)
-// +            if(epd_stack == US_STACK_EPD) {
-//                  len += 2; /* Increase the len to remove the WSMP ethertype */
-// -            else
-// +            else {
-//                  len += sizeof(lpd); /* Increate len to remove LPD header */
-//              recv_data->length = ret - len;
-// -            recv_data->data = buffer + len;
-// +            }
-// +             }
-// +             recv_data->data = buffer + len;
-//              return SV2X_RADIOSTATUS_SUCCESS;
-//          }
-//      }
 
 // failure 7:
 // +    if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs); {
