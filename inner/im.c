@@ -3,17 +3,6 @@ int main()
 {
    
    
-   
-   // if(
-
-
-   // )  else // ads
-   
-   //    //adsadas
-   //    //*dsadsadoiod*/
-   //   ads;
-    
-   
     /// FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
 failure 2.
 macros.. there are some macros in cfiles also. like conffileapi.c
@@ -26,38 +15,15 @@ macros.. there are some macros in cfiles also. like conffileapi.c
 //          }
 
 
-// failure 4:
-// -    ifc = 0;
-// -    iflist->count = 0;
-// -
-// +    ifc = 0; {
-// +    iflist->count = 0; {
-// +    }
-// + 
-
-failure 5:
+failure 4:
+-    ifc = 0;
+-    iflist->count = 0;
+-
++    ifc = 0; {
++    iflist->count = 0; {
++    }
 
 
-if (apsdop == asd)  
-   asds; //adsooads; 
-
-
-// -    if (p_wsm_ind->datarate == 0)
-// +    if (p_wsm_ind->datarate == 0) {
-//          p_wsm_ind->datarate = 12;//rx_params.datarate;
-
-// -    if (p_wsm_ind->datarate < MAX_RATE_NUMBER)
-// +    if (p_wsm_ind->datarate < MAX_RATE_NUMBER) {
-//          p_wsm_ind->dot11prate = rateTable[p_wsm_ind->datarate];
-// -    else
-// +    }
-// +     }
-// +     }
-// +     else {
-//          p_wsm_ind->dot11prate = p_wsm_ind->datarate;
-// -
-// +    }
-// + 
 
 // failure 6:
 //              }
