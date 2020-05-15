@@ -8,14 +8,27 @@ failure 2:
 macros.. there are some macros in cfiles also. like conffileapi.c
 
 failure 3:
-   //   for (parse_data=data; parse_data->param_name; parse_data++)
-   //       switch(parse_data->param_type) {
-   //          defailt: 
-   //          assadpods;
-   //          dsoid:
-   //          dsd;
-   //       } // THese are detected as {} for the for
-   // fix: /// FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
+      // for (parse_data=data; parse_data->param_name; parse_data++)
+
+
+
+
+      // //dasooi //apsodsp /*daiod*/
+      // /*liodoosdi //aodod*/ 
+
+      //    switch(parse_data->param_type) {
+      //       defailt: 
+      //       assadpods;
+      //       dsoid:
+      //       dsd;
+      //    } // THese are detected as {} for the for
+
+/* sad
+adsd
+asdds */ sdioisdoapois aoiposaiopidaipo iosdaipdispaipodpoaspi
+ 
+
+fix: FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
 
 
 
@@ -25,9 +38,9 @@ failure 7: sameln error
 
 
 failure 8: multiline comment error (leave commented)
-/* tries to add {} for such things also:
-   for //()
-*/
+tries to add {} for such things also:
+   for ()
+
 
 failure 9:
 //  #if (TEST_CODE & ENABLE_DNPW_APP)
@@ -44,20 +57,3 @@ failure 9:
 
 
 
-
-
-
-
-
-// warn 1: i think it because of wherever tab has been used.
-// @@ -252,18 +262,20 @@ static int savari_gps_info_recv_msg(struct timeval *sent_tstamp,
-
-//          memset(buf, 0, sizeof(buf));
-//      }
-//           bytes = recvfrom(nw_ctx->sock, buf, sizeof(buf), 0, NULL, NULL);
-// -       if (bytes < 0)
-// +       if (bytes < 0) {
-//              return -1;
-// -
-// + }
-// + 

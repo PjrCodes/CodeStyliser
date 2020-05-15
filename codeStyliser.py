@@ -29,7 +29,7 @@ def styliseCode(fileToEdit):
             currentLineIsComment = False
             firstCharIndex = utils.getFirstCharacterIndex(line)
             # search for comments
-            trimmedCommentResult = utils.trimComment(line)
+            trimmedCommentResult = utils.trimComment(line, lineIndex, lines)
             line = trimmedCommentResult.line
             if trimmedCommentResult.hasComment == True:
                 currentLineIsComment = True
@@ -76,7 +76,7 @@ def styliseCode(fileToEdit):
                         checkForSemiColonIndex = lineIndex + 1
                     else:
                         nxtLnTrimComment = utils.trimComment(
-                            lines[nxtLnIndex - 1])
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                         if nxtLnTrimComment.hasComment:
                             toAddLine = nxtLnTrimComment.line[:-1] + \
                                 " { " + nxtLnTrimComment.comment + "\n"
@@ -135,7 +135,7 @@ def styliseCode(fileToEdit):
                         checkForSemiColonIndex = lineIndex + 1
                     else:
                         nxtLnTrimComment = utils.trimComment(
-                            lines[nxtLnIndex - 1])
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                         if nxtLnTrimComment.hasComment:
                             toAddLine = nxtLnTrimComment.line[:-1] + \
                                 " { " + nxtLnTrimComment.comment + "\n"
@@ -194,7 +194,7 @@ def styliseCode(fileToEdit):
                         checkForSemiColonIndex = lineIndex + 1
                     else:
                         nxtLnTrimComment = utils.trimComment(
-                            lines[nxtLnIndex - 1])
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                         if nxtLnTrimComment.hasComment:
                             toAddLine = nxtLnTrimComment.line[:-1] + \
                                 " { " + nxtLnTrimComment.comment + "\n"
@@ -262,7 +262,7 @@ def styliseCode(fileToEdit):
                         checkForSemiColonIndex = lineIndex + 1
                     else:
                         nxtLnTrimComment = utils.trimComment(
-                            lines[nxtLnIndex - 1])
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                         if nxtLnTrimComment.hasComment:
                             toAddLine = nxtLnTrimComment.line[:-1] + \
                                 " { " + nxtLnTrimComment.comment + "\n"

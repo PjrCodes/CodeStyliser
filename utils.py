@@ -5,7 +5,7 @@
 
 import re
 
-SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
+SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
 
 
 class lineWithComment:
@@ -16,11 +16,30 @@ class lineWithComment:
         self.comment = comment
 
 
-def trimComment(line):
-    searchForComment = re.search(SINGLELINE_COMMENT_PATTERN, line)
-    if (searchForComment):
-        # found a comment
-        return lineWithComment(line[:searchForComment.start()], True, searchForComment.group())
+def trimComment(line, lineNo, lines):
+    searchForSingleLineComment = re.search(SINGLELINE_COMMENT_PATTERN, line)
+    if (searchForSingleLineComment):
+        if searchForSingleLineComment.group()[0:2] == "/*":
+            # keep searching for */
+            sameLineEnd = line.find("*/")
+            if sameLineEnd != -1:
+                # ends on same line
+                # comment = searchForSingleLineComment.group()
+                return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group())
+            else:
+                # iterate for line in lines till we get */
+                index = lineNo + 1
+                while True:
+                    multiCommentEnd = lines[index].find("*/")
+                    if multiCommentEnd != -1:
+                        # multi line comment has ended
+                        return lineWithComment("AMERICA",True,"ad")
+                    else:
+                        # no multi line comment end founf
+                        index = index + 1
+                    
+        # found a single line comment of type //
+        return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group())
     else:
         # no comment
         return lineWithComment(line, False, None)
@@ -67,7 +86,7 @@ def checkForParentheses(line, lineIndex, lines):
 def checkForOpenBrace(nextLineIndex, lines):
 
     while True:
-        lineWithoutComment = trimComment(lines[nextLineIndex])
+        lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
         if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
             # line has comment or is blank
             if lineWithoutComment.line.find("{") != -1:
@@ -84,7 +103,7 @@ def checkForOpenBrace(nextLineIndex, lines):
 
 def getNextSemiColonLine(index, lines):
     while True:
-        lineWithoutComment = trimComment(lines[index])
+        lineWithoutComment = trimComment(lines[index], index, lines)
         semiColonIndex = lineWithoutComment.line.find(";")
         if semiColonIndex == -1:
             # the line without Comment has NO semicolon
