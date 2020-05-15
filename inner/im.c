@@ -6,20 +6,24 @@ int main()
     pd();
  }
  
-    if()  {
+    if()   {
     pd();
     }
-     else if() {
+     
+     else if()  {
     xd;
-    }
+     }
+     
      else() {
     sp;
     }
 
-    if()
+    if()  {
       printf(asdasd
          asdas);
-         asdsd
+    }
+     
+          asdsd
          asdsad
 
       if()

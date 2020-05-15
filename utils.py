@@ -1,14 +1,17 @@
 # utils
 import re
 
+SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
+
+def getFirstCharacterIndex(str):
+    return len(str) - len(str.lstrip())
+
 def checkForParentheses(line, lineIndex, lines):
     openParenthNo = len(re.findall(r"\(", line))
     closeParenthNo = len(re.findall(r"\)", line))
 
     if openParenthNo != closeParenthNo:
-        isOnSameLine = False
         # the line doesnt have same amt of close and open parentheses
-
         nxtLnIndex = lineIndex + 1
 
         while closeParenthNo != openParenthNo:
@@ -23,11 +26,18 @@ def checkForParentheses(line, lineIndex, lines):
         else:
             # closeParenthNo = openParenthNo
             # check for OpenCurlyBrace on same line as (condition)
-            openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
-        continue
+            return (False, nxtLnIndex)
+        return None
     else:
-        openCurlyBraceIndex = line.find("{")
-        isOnSameLine = True
+       
+        return (True,)
+
+def checkForOpenBrace(nextLineIndex, lines):
+    while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
+        # next line is a singleLineComment OR a space, we must skip it
+        nextLineIndex =  nextLineIndex + 1
+    else:
+        return lines[nextLineIndex].find("{")
 
 
 if __name__ == "__main__":
