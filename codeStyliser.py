@@ -9,8 +9,8 @@ import os
 import utils as utils
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.2-alpha"
-NEW_CHANGES = "fixed failure 6"
+VERSION_NUMBER = "0.1.3-alpha"
+NEW_CHANGES = "fixed failure 11"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 
@@ -84,7 +84,7 @@ def styliseCode(fileToEdit):
                             toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
-                        checkForSemiColonIndex = nxtLnIndex + 1
+                        checkForSemiColonIndex = nxtLnIndex
 
                     # check for semicolons to add Closing brace
                     closingBraceLineIndex = utils.getNextSemiColonLine(
@@ -143,7 +143,7 @@ def styliseCode(fileToEdit):
                             toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
-                        checkForSemiColonIndex = nxtLnIndex + 1
+                        checkForSemiColonIndex = nxtLnIndex
 
                     # check for semicolons to add Closing brace
                     closingBraceLineIndex = utils.getNextSemiColonLine(
@@ -202,7 +202,7 @@ def styliseCode(fileToEdit):
                             toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
-                        checkForSemiColonIndex = nxtLnIndex + 1
+                        checkForSemiColonIndex = nxtLnIndex
                     # check for semicolons to add Closing brace
                     closingBraceLineIndex = utils.getNextSemiColonLine(
                         checkForSemiColonIndex, lines) + 1
@@ -270,7 +270,7 @@ def styliseCode(fileToEdit):
                             toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
-                        checkForSemiColonIndex = nxtLnIndex + 1
+                        checkForSemiColonIndex = nxtLnIndex
 
                     # check for closng brace
 
