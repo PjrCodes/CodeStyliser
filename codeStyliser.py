@@ -23,21 +23,28 @@ def styliseCode(fileToEdit):
     fileToEdit.seek(0)
     lines = fileToEdit.readlines()
 
-    for line in lines:
-        try:
+    while lineIndex < (len(lines) - 1):
+
+        # try:
             lineIndex = lineIndex + 1
+            line = lines[lineIndex]
             currentLineIsComment = False
             firstCharIndex = utils.getFirstCharacterIndex(line)
+
+
             # search for comments
             trimmedCommentResult = utils.trimComment(line, lineIndex, lines)
             line = trimmedCommentResult.line
-            if trimmedCommentResult.hasComment == True:
+            if trimmedCommentResult.hasComment == True and trimmedCommentResult.isMultiline == False:
                 currentLineIsComment = True
                 commentOfCurrentLine = trimmedCommentResult.comment
-
-            # ---------------------------------------------------------------------------
-
-            # utils.checkOpenParenthese(line, lineIndex, lines)
+            elif trimmedCommentResult.isMultiline == True:
+                currentLineIsComment = trimmedCommentResult.hasComment
+                commentOfCurrentLine = "" #TODO: change
+                # if comment, jump
+                line = trimmedCommentResult.line
+                lineIndex = trimmedCommentResult.multiLineJumpIndex + 1
+                print(lineIndex)
 
             # ---------------------------------------------------------------------------
 
@@ -288,11 +295,11 @@ def styliseCode(fileToEdit):
 
             # ---------------------------------------------------------------------------
 
-        except:
-            e = sys.exc_info()[0]
-            print("error: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1))
-            continue
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("error: " + str(e) + " in file name: " +
+        #           fileToEdit.name + " around line " + str(lineIndex + 1))
+        #     continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -337,14 +344,14 @@ def main():
                         print("error: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
-                    try:
-                        with open(file_path, "r+") as fileToStyle:
-                            styliseCode(fileToStyle)
-                    except:
-                        e = sys.exc_info()[0]
-                        print("error: " + str(e) + " at file name: " +
-                              filename + " while opening file")
-                        continue
+                    # try:
+                    with open(file_path, "r+") as fileToStyle:
+                        styliseCode(fileToStyle)
+                    # except:
+                        # e = sys.exc_info()[0]
+                        # print("error: " + str(e) + " at file name: " +
+                        #       filename + " while opening file")
+                        # continue
                 else:
                     continue
 

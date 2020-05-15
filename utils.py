@@ -10,10 +10,12 @@ SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
 
 class lineWithComment:
 
-    def __init__(self, line, hasComment, comment):
+    def __init__(self, line, hasComment, comment, isMultiline, multiLineJumpIndex):
         self.line = line
         self.hasComment = hasComment
         self.comment = comment
+        self.isMultiline = isMultiline
+        self.multiLineJumpIndex = multiLineJumpIndex
 
 
 def trimComment(line, lineNo, lines):
@@ -25,7 +27,7 @@ def trimComment(line, lineNo, lines):
             if sameLineEnd != -1:
                 # ends on same line
                 # comment = searchForSingleLineComment.group()
-                return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group())
+                return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group(),False, None)
             else:
                 # iterate for line in lines till we get */
                 index = lineNo + 1
@@ -33,16 +35,16 @@ def trimComment(line, lineNo, lines):
                     multiCommentEnd = lines[index].find("*/")
                     if multiCommentEnd != -1:
                         # multi line comment has ended
-                        return lineWithComment("AMERICA",True,"ad")
+                        return lineWithComment(lines[index][(multiCommentEnd + 2):],True,None,True, index)
                     else:
-                        # no multi line comment end founf
+                        # no multi line comment end found
                         index = index + 1
                     
         # found a single line comment of type //
-        return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group())
+        return lineWithComment(line[:searchForSingleLineComment.start()], True, searchForSingleLineComment.group(),False, None)
     else:
         # no comment
-        return lineWithComment(line, False, None)
+        return lineWithComment(line, False, None, False, None)
 
 
 def getFirstCharacterIndex(str):
@@ -86,6 +88,7 @@ def checkForParentheses(line, lineIndex, lines):
 def checkForOpenBrace(nextLineIndex, lines):
 
     while True:
+        #TODO: handle multiline
         lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
         if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
             # line has comment or is blank
@@ -95,6 +98,9 @@ def checkForOpenBrace(nextLineIndex, lines):
             elif not lineWithoutComment.line.isspace():
                 break
             nextLineIndex = nextLineIndex + 1
+        elif lineWithoutComment.hasComment == True and lineWithoutComment.isMultiline == True:
+            # line is a multiline comment
+            nextLineIndex = lineWithoutComment.multiLineJumpIndex
         else:
             break
 
@@ -102,9 +108,13 @@ def checkForOpenBrace(nextLineIndex, lines):
 
 
 def getNextSemiColonLine(index, lines):
+    #TODO: handle multiline
     while True:
         lineWithoutComment = trimComment(lines[index], index, lines)
-        semiColonIndex = lineWithoutComment.line.find(";")
+        if lineWithoutComment.isMultiline == True:
+            semiColonIndex = lines[lineWithoutComment.multiLineJumpIndex].find(";")
+        else:
+            semiColonIndex = lineWithoutComment.line.find(";")
         if semiColonIndex == -1:
             # the line without Comment has NO semicolon
             index = index + 1
