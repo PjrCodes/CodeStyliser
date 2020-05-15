@@ -9,8 +9,8 @@ import os
 import utils as utils
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.3-alpha"
-NEW_CHANGES = "fixed failure 11"
+VERSION_NUMBER = "0.1.4-alpha"
+NEW_CHANGES = "fixed failure 10"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 
@@ -54,7 +54,7 @@ def styliseCode(fileToEdit):
                 elif checkParenthResult[0] == False:
                     isOnSameLine = checkParenthResult[0]
                     nxtLnIndex = checkParenthResult[1]
-                    nextLineIndex = nxtLnIndex + 1
+                    nextLineIndex = nxtLnIndex
                     openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
                 elif checkParenthResult[0] == True:
                     isOnSameLine = checkParenthResult[0]
@@ -113,7 +113,7 @@ def styliseCode(fileToEdit):
                 elif checkParenthResult[0] == False:
                     isOnSameLine = checkParenthResult[0]
                     nxtLnIndex = checkParenthResult[1]
-                    nextLineIndex = nxtLnIndex + 1
+                    nextLineIndex = nxtLnIndex
                     openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
                 elif checkParenthResult[0] == True:
                     isOnSameLine = checkParenthResult[0]
@@ -172,7 +172,7 @@ def styliseCode(fileToEdit):
                 elif checkParenthResult[0] == False:
                     isOnSameLine = checkParenthResult[0]
                     nxtLnIndex = checkParenthResult[1]
-                    nextLineIndex = nxtLnIndex + 1
+                    nextLineIndex = nxtLnIndex
                     openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
                 elif checkParenthResult[0] == True:
                     isOnSameLine = checkParenthResult[0]
@@ -240,7 +240,7 @@ def styliseCode(fileToEdit):
                 elif checkParenthResult[0] == False:
                     isOnSameLine = checkParenthResult[0]
                     nxtLnIndex = checkParenthResult[1]
-                    nextLineIndex = nxtLnIndex + 1
+                    nextLineIndex = nxtLnIndex
                     openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
                 elif checkParenthResult[0] == True:
                     isOnSameLine = checkParenthResult[0]
@@ -308,9 +308,10 @@ def main():
     else:
         DIR_NAME = sys.argv[1]
         print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
+        print("\t with changes: " + NEW_CHANGES)
+        print("----")
         print("Made by Pranjal Rastogi")
         print("Made for python 3.7.7 64-Bit")
-        print("NEW CHANGES IN ver" + VERSION_NUMBER + ": " + NEW_CHANGES)
         print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
 
         print("\t STARTING")

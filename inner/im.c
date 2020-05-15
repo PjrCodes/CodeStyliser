@@ -40,13 +40,6 @@ failure 9:
    fix: if next line (after bracket complete) has "#", then cancel life.
 
 
-// failure 10: //DO NOW
-//      if (hvCam->positional_accuracy.semi_minor_axis_accuracy ==
-//                                      SemiAxisLength_unavailable)
-//                                      {
-//          bsm->positionalaccuracy[1] =  ETSI_SEMI_MIN_CONF_NAV;
-//       }
-      
 
 
 
