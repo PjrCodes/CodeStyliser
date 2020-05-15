@@ -27,7 +27,7 @@ def styliseCode(fileToEdit):
     lines = fileToEdit.readlines()
     
     for line in lines:
-        # try:
+        try:
             lineIndex = lineIndex + 1
             currentLineIsComment = False
             firstCharIndex = utils.getFirstCharacterIndex(line)
@@ -260,11 +260,11 @@ def styliseCode(fileToEdit):
             # --------------------------------------------------------------------------- 
 
 
-        # except:
-        #     e = sys.exc_info()[0]
-        #     print("error: "+ str(e) + " at file name: " + fileToEdit.name)
-        #     print("line number: " + str(lineIndex + 1))
-        #     continue
+        except:
+            e = sys.exc_info()[0]
+            print("error: "+ str(e) + " at file name: " + fileToEdit.name)
+            print("line number: " + str(lineIndex + 1))
+            continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -305,13 +305,13 @@ def main():
                         e = sys.exc_info()[0]
                         print("error: " + str(e) + " at file name: " + filename + " while changing line endings")
                         continue
-                    # try:
-                    with open(file_path, "r+") as fileToStyle:
-                        styliseCode(fileToStyle)
-                    # except:
-                    #     e = sys.exc_info()[0]
-                    #     print("error: "+ str(e) + " at file name: " + filename + " while opening file")
-                    #     continue
+                    try:
+                        with open(file_path, "r+") as fileToStyle:
+                            styliseCode(fileToStyle)
+                    except:
+                        e = sys.exc_info()[0]
+                        print("error: "+ str(e) + " at file name: " + filename + " while opening file")
+                        continue
                 else:
                     continue
                 
