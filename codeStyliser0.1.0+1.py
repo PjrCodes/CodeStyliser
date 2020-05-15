@@ -11,8 +11,8 @@ import utils as utils
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.0+1-alpha"
-NEW_CHANGES = " fixed failure 5 and failure 1"
+VERSION_NUMBER = "0.1.1-alpha"
+NEW_CHANGES = "fixed failure 5 and failure 1"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 
@@ -37,6 +37,10 @@ def styliseCode(fileToEdit):
             if trimmedCommentResult.hasComment == True:
                 currentLineIsComment = True
                 commentOfCurrentLine = trimmedCommentResult.comment
+
+            # ---------------------------------------------------------------------------
+
+            # utils.checkOpenParenthese(line, lineIndex, lines)
 
             # ---------------------------------------------------------------------------
 
@@ -150,7 +154,7 @@ def styliseCode(fileToEdit):
             ifConditionIndex = line.find("if")
             if ifConditionIndex == firstCharIndex:
                 # found an if comndion
-
+                # check if it is and if
                 # we must now skip over all parentheses to find the end of the (condition)
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(line, lineIndex, lines)
@@ -172,7 +176,7 @@ def styliseCode(fileToEdit):
                     # add open CURLY on same line
                     if isOnSameLine:
                         if currentLineIsComment:
-                            toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
+                            toAddLine = line[:-1] + " { " + commentOfCurrentLine + "\n"
                         else:
                             toAddLine = line[:-1] + " {\n"
                         del lines[lineIndex]
@@ -188,9 +192,7 @@ def styliseCode(fileToEdit):
                         lines.insert(nxtLnIndex - 1, toAddLine)
                         checkForSemiColonIndex = nxtLnIndex + 1
                     # check for semicolons to add Closing brace
-                    print(checkForSemiColonIndex)
                     closingBraceLineIndex = utils.getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
-                    print(closingBraceLineIndex)
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     spaces = " " * ifConditionIndex 
                     lines.insert(closingBraceLineIndex, " ")
@@ -262,8 +264,7 @@ def styliseCode(fileToEdit):
 
         except:
             e = sys.exc_info()[0]
-            print("error: "+ str(e) + " at file name: " + fileToEdit.name)
-            print("line number: " + str(lineIndex + 1))
+            print("error: "+ str(e) + " in file name: " + fileToEdit.name + " around line " + str(lineIndex + 1))
             continue
 
     # write lines back to fileToEdit
@@ -282,9 +283,10 @@ def main():
         print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
         print("Made by Pranjal Rastogi")
         print("Made for python 3.7.7 64-Bit")
-        print("NEW CHANGES IN ver" + VERSION_NUMBER + NEW_CHANGES)
+        print("NEW CHANGES IN ver" + VERSION_NUMBER + ": " + NEW_CHANGES)
         print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
-
+        
+        print("\t STARTING")
         for root, subdirs, files in os.walk(DIR_NAME):
 
             for filename in files:

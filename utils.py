@@ -26,6 +26,7 @@ def getFirstCharacterIndex(str):
 
 def checkForParentheses(line, lineIndex, lines):
     openParenthNo = len(re.findall(r"\(", line))
+    print(openParenthNo)
     closeParenthNo = len(re.findall(r"\)", line))
 
     if openParenthNo != closeParenthNo:
@@ -34,8 +35,11 @@ def checkForParentheses(line, lineIndex, lines):
 
         while closeParenthNo != openParenthNo:
             forChecker = lines[nxtLnIndex].find("for")
+            ifChecker = lines[nxtLnIndex].find("if")
+            whileChecker = lines[nxtLnIndex].find("while")
+            elseChecker = lines[nxtLnIndex].find("else")
             firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
-            if forChecker == firstCharOfNxtLn:
+            if forChecker == firstCharOfNxtLn or ifChecker == firstCharOfNxtLn or whileChecker == firstCharOfNxtLn or elseChecker == firstCharOfNxtLn:
                 # another for has been found before () number got equal, Cancel case
                 break
             openParenthNo = len(re.findall(r"\(", lines[nxtLnIndex])) + openParenthNo
@@ -43,10 +47,13 @@ def checkForParentheses(line, lineIndex, lines):
             nxtLnIndex = nxtLnIndex + 1
         else:
             # closeParenthNo = openParenthNo
+            if openParenthNo == 0:
+                return None
             return (False, nxtLnIndex)
         return None
     else:
-       
+        if openParenthNo == 0:
+            return None
         return (True,)
 
 def checkForOpenBrace(nextLineIndex, lines):
@@ -67,9 +74,7 @@ def checkForOpenBrace(nextLineIndex, lines):
     return lineWithoutComment.line.find("{")
 
 def getNextSemiColonLine(index, lines):
-    print("EAMJD")
     while True:
-        print(index)
         lineWithoutComment = trimComment(lines[index])
         semiColonIndex = lineWithoutComment.line.find(";")
         if semiColonIndex == -1:

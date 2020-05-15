@@ -15,13 +15,18 @@ macros.. there are some macros in cfiles also. like conffileapi.c
 //          }
 
 
-failure 4:
--    ifc = 0;
--    iflist->count = 0;
--
-+    ifc = 0; {
-+    iflist->count = 0; {
-+    }
+// failure 4:
+
+
+//     ifc = 0;
+//     iflist->count = 0; 
+//     //dasoiods
+//      if                    (adoiosd adoisd) // asdo;
+
+
+//       //sadoiosdaos;
+//      adasd; //adsiuid;
+   
 
 
 
