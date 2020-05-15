@@ -50,21 +50,39 @@ def checkForParentheses(line, lineIndex, lines):
         return (True,)
 
 def checkForOpenBrace(nextLineIndex, lines):
-    invalidLine = True
-    while invalidLine:
+
+    while True:
         lineWithoutComment = trimComment(lines[nextLineIndex])
-        if lineWithoutComment.hasComment == True:
-            if lines[nextLineIndex].isspace():
-                nextLineIndex =  nextLineIndex + 1
-                invalidLine = True
-            else:
-                # line is normal, and not invalid
-                invalidLine = False
+        if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
+            # line has comment or is blank
+            if lineWithoutComment.line.find("{") != -1:
+                # if the line before comment has {, become happy
+                break
+            elif not lineWithoutComment.line.isspace():
+                break
+            nextLineIndex = nextLineIndex + 1
         else:
-            invalidLine = False
-        
-    else:
-        return lineWithoutComment.line.find("{")
+            break
+
+    return lineWithoutComment.line.find("{")
+
+def getNextSemiColonLine(index, lines):
+    print("EAMJD")
+    while True:
+        print(index)
+        lineWithoutComment = trimComment(lines[index])
+        semiColonIndex = lineWithoutComment.line.find(";")
+        if semiColonIndex == -1:
+            # the line without Comment has NO semicolon
+            index = index + 1
+        else:
+            #line has a semicolon and is NOT a comment
+            break
+    return index
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ def styliseCode(fileToEdit):
     lines = fileToEdit.readlines()
     
     for line in lines:
-        try:
+        # try:
             lineIndex = lineIndex + 1
             currentLineIsComment = False
             firstCharIndex = utils.getFirstCharacterIndex(line)
@@ -59,6 +59,7 @@ def styliseCode(fileToEdit):
                     nextLineIndex = lineIndex + 1
                     openCurlyBraceIndex = line.find("{")
 
+
                 if openCurlyBraceIndex == -1 and utils.checkForOpenBrace(nextLineIndex, lines) == -1:
                     # no { on same ln and on subsequent lines
 
@@ -72,18 +73,17 @@ def styliseCode(fileToEdit):
                         lines.insert(lineIndex, toAddLine)
                         checkForSemiColonIndex = lineIndex + 1
                     else:
-                        toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                        nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1])
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line[:-1] + " { " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
                         checkForSemiColonIndex = nxtLnIndex + 1
 
                     # check for semicolons to add Closing brace
-                    while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
-                        # line has no semicolon or it is a comment
-                        checkForSemiColonIndex = checkForSemiColonIndex + 1
-                    else:
-                        # line has a semicolon and is NOT a comment
-                        closingBraceLineIndex = checkForSemiColonIndex + 1
+                    closingBraceLineIndex = utils.getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
                     
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     spaces = " " * forLoopIndex 
@@ -126,18 +126,17 @@ def styliseCode(fileToEdit):
                         lines.insert(lineIndex, toAddLine)
                         checkForSemiColonIndex = lineIndex + 1
                     else:
-                        toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                        nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1])
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line[:-1] + " { " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
                         checkForSemiColonIndex = nxtLnIndex + 1
 
                     # check for semicolons to add Closing brace
-                    while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
-                        # line has no semicolon or it is a comment
-                        checkForSemiColonIndex = checkForSemiColonIndex + 1
-                    else:
-                        # line has a semicolon and is NOT a comment
-                        closingBraceLineIndex = checkForSemiColonIndex + 1
+                    closingBraceLineIndex = utils.getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
                     
                     # add closing braces at closingBraceLine (inserting a new ln), with indentation
                     spaces = " " * whileLoopIndex
@@ -171,7 +170,7 @@ def styliseCode(fileToEdit):
                     # no { on same ln and on subsequent lines
                     
                     # add open CURLY on same line
-                    if (isOnSameLine):
+                    if isOnSameLine:
                         if currentLineIsComment:
                             toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
@@ -180,19 +179,18 @@ def styliseCode(fileToEdit):
                         lines.insert(lineIndex, toAddLine)
                         checkForSemiColonIndex = lineIndex + 1
                     else:
-                        toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                        nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1])
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line[:-1] + " { " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
                         checkForSemiColonIndex = nxtLnIndex + 1
                     # check for semicolons to add Closing brace
-                    
-                    while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
-                        # line has no semicolon or it is a comment
-                        checkForSemiColonIndex = checkForSemiColonIndex + 1
-                    else:
-                        # line has a semicolon and is NOT a comment
-                        closingBraceLineIndex = checkForSemiColonIndex + 1
-                    
+                    print(checkForSemiColonIndex)
+                    closingBraceLineIndex = utils.getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
+                    print(closingBraceLineIndex)
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     spaces = " " * ifConditionIndex 
                     lines.insert(closingBraceLineIndex, " ")
@@ -229,7 +227,7 @@ def styliseCode(fileToEdit):
                     # no { on same ln or on subsequent lines
 
                     # add open CURLY on same line
-                    if (isOnSameLine):
+                    if isOnSameLine:
                         if currentLineIsComment:
                             toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
@@ -238,19 +236,18 @@ def styliseCode(fileToEdit):
                         lines.insert(lineIndex, toAddLine)
                         checkForSemiColonIndex = lineIndex + 1
                     else:
-                        toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
+                        nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1])
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line[:-1] + " { " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:-1] + " {\n"
                         del lines[nxtLnIndex - 1]
                         lines.insert(nxtLnIndex - 1, toAddLine)
                         checkForSemiColonIndex = nxtLnIndex + 1
-                    # check for semicolons to add Closing brace
-                    
-                    while lines[checkForSemiColonIndex].find(";") == -1 or re.search(SINGLELINE_COMMENT_PATTERN,lines[checkForSemiColonIndex]):
-                        # line has no semicolon or it is a comment
-                        checkForSemiColonIndex = checkForSemiColonIndex + 1
-                    else:
-                        # line has a semicolon and is NOT a comment
-                        closingBraceLineIndex = checkForSemiColonIndex + 1
-                    
+
+                    # check for closng brace
+
+                    closingBraceLineIndex = utils.getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     if lineStartsOnBrace:
                         spaces = " " * startingCurlyBraceIndex
@@ -263,11 +260,11 @@ def styliseCode(fileToEdit):
             # --------------------------------------------------------------------------- 
 
 
-        except:
-            e = sys.exc_info()[0]
-            print("error: "+ str(e) + " at file name: " + fileToEdit.name)
-            print(sys.exc_info()[1])
-            continue
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("error: "+ str(e) + " at file name: " + fileToEdit.name)
+        #     print("line number: " + str(lineIndex + 1))
+        #     continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -308,13 +305,13 @@ def main():
                         e = sys.exc_info()[0]
                         print("error: " + str(e) + " at file name: " + filename + " while changing line endings")
                         continue
-                    try:
-                        with open(file_path, "r+") as fileToStyle:
-                            styliseCode(fileToStyle)
-                    except:
-                        e = sys.exc_info()[0]
-                        print("error: "+ str(e) + " at file name: " + filename + " while opening file")
-                        continue
+                    # try:
+                    with open(file_path, "r+") as fileToStyle:
+                        styliseCode(fileToStyle)
+                    # except:
+                    #     e = sys.exc_info()[0]
+                    #     print("error: "+ str(e) + " at file name: " + filename + " while opening file")
+                    #     continue
                 else:
                     continue
                 
