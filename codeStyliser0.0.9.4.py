@@ -8,7 +8,6 @@ import os
 import utils as utils
 
 #TODO: same line for/ while/ if
-#TODO: error handler
 #TODO: utf-8
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
@@ -31,14 +30,13 @@ def styliseCode(fileToEdit):
         try:
             lineIndex = lineIndex + 1
             currentLineIsComment = False
-            # search for comments
-            comment = re.search(SINGLELINE_COMMENT_PATTERN,line)
-            if (comment):
-                # found a Single line comment
-                currentLinesComment = line[comment.start():]
-                line = line[:comment.start()]
-                currentLineIsComment = True
             firstCharIndex = utils.getFirstCharacterIndex(line)
+            # search for comments
+            trimmedCommentResult = utils.trimComment(line)
+            line = trimmedCommentResult.line
+            if trimmedCommentResult.hasComment == True:
+                currentLineIsComment = True
+                commentOfCurrentLine = trimmedCommentResult.comment
 
             # ---------------------------------------------------------------------------
 
@@ -66,9 +64,8 @@ def styliseCode(fileToEdit):
 
                     # add brace
                     if isOnSameLine:
-
                         if currentLineIsComment:
-                            toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
                             toAddLine = line[:-1] + " {\n"
                         del lines[lineIndex]
@@ -122,7 +119,7 @@ def styliseCode(fileToEdit):
                     # add braces                        
                     if isOnSameLine:
                         if currentLineIsComment:
-                            toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
                             toAddLine = line[:-1] + " {\n"
                         del lines[lineIndex]
@@ -176,7 +173,7 @@ def styliseCode(fileToEdit):
                     # add open CURLY on same line
                     if (isOnSameLine):
                         if currentLineIsComment:
-                            toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
                             toAddLine = line[:-1] + " {\n"
                         del lines[lineIndex]
@@ -234,7 +231,7 @@ def styliseCode(fileToEdit):
                     # add open CURLY on same line
                     if (isOnSameLine):
                         if currentLineIsComment:
-                            toAddLine = line[:-1] + " { " + currentLinesComment[:-1] + "\n"
+                            toAddLine = line[:-1] + " { " + commentOfCurrentLine[:-1] + "\n"
                         else:
                             toAddLine = line[:-1] + " {\n"
                         del lines[lineIndex]

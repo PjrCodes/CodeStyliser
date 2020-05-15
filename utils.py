@@ -3,6 +3,24 @@ import re
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
 
+class lineWithComment:
+
+    def __init__(self, line, hasComment, comment):
+        self.line = line
+        self.hasComment = hasComment
+        self.comment = comment
+
+def trimComment(line):
+    searchForComment = re.search(SINGLELINE_COMMENT_PATTERN, line)
+    if (searchForComment):
+        # found a comment
+        return lineWithComment(line[:searchForComment.start()], True, searchForComment.group())
+    else:
+        # no comment
+        return lineWithComment(line, False, None)
+
+
+
 def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
 
@@ -25,7 +43,6 @@ def checkForParentheses(line, lineIndex, lines):
             nxtLnIndex = nxtLnIndex + 1
         else:
             # closeParenthNo = openParenthNo
-            # check for OpenCurlyBrace on same line as (condition)
             return (False, nxtLnIndex)
         return None
     else:
@@ -33,11 +50,21 @@ def checkForParentheses(line, lineIndex, lines):
         return (True,)
 
 def checkForOpenBrace(nextLineIndex, lines):
-    while re.search(SINGLELINE_COMMENT_PATTERN,lines[nextLineIndex]) or lines[nextLineIndex].isspace():
-        # next line is a singleLineComment OR a space, we must skip it
-        nextLineIndex =  nextLineIndex + 1
+    invalidLine = True
+    while invalidLine:
+        lineWithoutComment = trimComment(lines[nextLineIndex])
+        if lineWithoutComment.hasComment == True:
+            if lines[nextLineIndex].isspace():
+                nextLineIndex =  nextLineIndex + 1
+                invalidLine = True
+            else:
+                # line is normal, and not invalid
+                invalidLine = False
+        else:
+            invalidLine = False
+        
     else:
-        return lines[nextLineIndex].find("{")
+        return lineWithoutComment.line.find("{")
 
 
 if __name__ == "__main__":
