@@ -9,8 +9,8 @@ import os
 import utils as utils
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.4-alpha"
-NEW_CHANGES = "fixed failure 10"
+VERSION_NUMBER = "0.1.5-alpha"
+NEW_CHANGES = "fixed failure N2"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 
@@ -44,7 +44,6 @@ def styliseCode(fileToEdit):
                 # if comment, jump
                 line = trimmedCommentResult.line
                 lineIndex = trimmedCommentResult.multiLineJumpIndex + 1
-                print(lineIndex)
 
             # ---------------------------------------------------------------------------
 

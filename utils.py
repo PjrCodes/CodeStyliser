@@ -95,20 +95,19 @@ def checkForOpenBrace(nextLineIndex, lines):
             if lineWithoutComment.line.find("{") != -1:
                 # if the line before comment has {, become happy
                 break
-            elif not lineWithoutComment.line.isspace():
-                break
+            elif lineWithoutComment.isMultiline == True:
+                # go after multiline comments
+                nextLineIndex = lineWithoutComment.multiLineJumpIndex
+                if lineWithoutComment.line.find("{") != -1:
+                    break
             nextLineIndex = nextLineIndex + 1
-        elif lineWithoutComment.hasComment == True and lineWithoutComment.isMultiline == True:
             # line is a multiline comment
-            nextLineIndex = lineWithoutComment.multiLineJumpIndex
         else:
             break
-
     return lineWithoutComment.line.find("{")
 
 
 def getNextSemiColonLine(index, lines):
-    #TODO: handle multiline
     while True:
         lineWithoutComment = trimComment(lines[index], index, lines)
         if lineWithoutComment.isMultiline == True:

@@ -22,46 +22,13 @@ fix: FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line afte
 
 failure N1:
 // for(
-// /*sp*/ )
+//  /*sp*/ )
 // /* iam
 // mulrt
 // ooppp*/
 //    asd;
 
-failure N2 "FATAL":
-
-for() {
-   sdp;
-}
-
-for(
-
-) 
-/*dosio
-*/ 
-{
-sdp;
-}
-
-for()
-/*sd
-*/
-{
-   s;
-}
-
-
-for()
-//oasido
-
-{
-   sd;
-}
-
-
-/* asd */
-// for()
-// as;
+ 
 
 
 failure 7: sameln error
@@ -70,13 +37,15 @@ failure 7: sameln error
 
 
 failure 9:
-//  #if (TEST_CODE & ENABLE_DNPW_APP)
-//    if (TRUE && dnpw_d->cur_veh) // adds here
-//  #else
-//      if  ((rv->rv_d.delta_heading <= (D_ZERO + dnpw_cfg->max_delta_heading) ||
-//          (rv->rv_d.delta_heading >= (D_360 - dnpw_cfg->max_delta_heading))) &&
-
-//  #endif
+ #if (TEST_CODE & ENABLE_DNPW_APP)
+   if (TRUE && dnpw_d->cur_veh)
+ #else
+     if  ((rv->rv_d.delta_heading <= (D_ZERO + dnpw_cfg->max_delta_heading) ||
+         (rv->rv_d.delta_heading >= (D_360 - dnpw_cfg->max_delta_heading))) &&
+ 
+   
+    
+ //  #endif
    fix: if next line (after bracket complete) has "#", then cancel life.
 
 
