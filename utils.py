@@ -58,7 +58,6 @@ def checkForParentheses(line, lineIndex, lines):
     if openParenthNo != closeParenthNo:
         # the line doesnt have same amt of close and open parentheses
         nxtLnIndex = lineIndex + 1
-
         while closeParenthNo != openParenthNo:
             forChecker = lines[nxtLnIndex].find("for")
             ifChecker = lines[nxtLnIndex].find("if")
@@ -121,6 +120,23 @@ def getNextSemiColonLine(index, lines):
             # line has a semicolon and is NOT a comment
             break
     return index
+
+def checkForHash(index, lines):
+    index = index + 1
+    while True:
+        lineWithoutComment = trimComment(lines[index], index, lines)
+        if lineWithoutComment.hasComment == True or lines[index].isspace():
+            # line has comment or is blank
+            if lineWithoutComment.isMultiline == True:
+                # go after multiline comments
+                if lineWithoutComment.line.find("#") != -1:
+                    break
+                index = lineWithoutComment.multiLineJumpIndex
+                
+            index = index + 1
+        else:
+            break
+    return lineWithoutComment.line.find("#")
 
 
 if __name__ == "__main__":

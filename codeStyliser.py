@@ -9,8 +9,8 @@ import os
 import utils as utils
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.5-alpha"
-NEW_CHANGES = "fixed failure N2"
+VERSION_NUMBER = "0.1.6-alpha"
+NEW_CHANGES = "fixed failure 9"
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 
@@ -51,7 +51,10 @@ def styliseCode(fileToEdit):
             forLoopIndex = line.find("for")
             if forLoopIndex == firstCharIndex:
                 # found a for loop
-
+                hasHash = utils.checkForHash(lineIndex, lines)
+                if hasHash != -1:
+                    # has hash
+                    continue
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
                     line, lineIndex, lines)
@@ -110,7 +113,10 @@ def styliseCode(fileToEdit):
             whileLoopIndex = line.find("while")
             if whileLoopIndex == firstCharIndex:
                 # found a while loop
-
+                hasHash = utils.checkForHash(lineIndex, lines)
+                if hasHash != -1:
+                    # has hash
+                    continue
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
                     line, lineIndex, lines)
@@ -168,8 +174,11 @@ def styliseCode(fileToEdit):
             ifConditionIndex = line.find("if")
             if ifConditionIndex == firstCharIndex:
                 # found an if comndion
-                # check if it is and if
-                # we must now skip over all parentheses to find the end of the (condition)
+                # FIND "#" in the NEXT FEW LINES:
+                hasHash = utils.checkForHash(lineIndex, lines)
+                if hasHash != -1:
+                    # has hash
+                    continue
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
                     line, lineIndex, lines)
@@ -232,7 +241,10 @@ def styliseCode(fileToEdit):
                 # process else
 
                 # we must now skip over all parentheses to find the end of the (condition)
-
+                hasHash = utils.checkForHash(lineIndex, lines)
+                if hasHash != -1:
+                    # has hash
+                    continue
                 if line.find("if") != -1:
                     # line is else if
                     checkParenthResult = utils.checkForParentheses(

@@ -36,17 +36,14 @@ failure 7: sameln error
 //     else           f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs); 
 
 
-failure 9:
- #if (TEST_CODE & ENABLE_DNPW_APP)
-   if (TRUE && dnpw_d->cur_veh)
- #else
-     if  ((rv->rv_d.delta_heading <= (D_ZERO + dnpw_cfg->max_delta_heading) ||
-         (rv->rv_d.delta_heading >= (D_360 - dnpw_cfg->max_delta_heading))) &&
- 
+failure 9: code keeps trying to search for matching (), it never stops.
+workaround fix: if next line (after bracket complete) has "#", then cancel life.
+//  #if (TEST_CODE & ENABLE_DNPW_APP)
+   if (TRUE && dnpw_d->cur_veh)  
+   #if <sdo>
+
    
-    
- //  #endif
-   fix: if next line (after bracket complete) has "#", then cancel life.
+       
 
 
 
