@@ -8,18 +8,12 @@ import re
 import os
 import utils as utils
 
-SINGLELINE_COMMENT_PATTERN = r"(\/\*.*?\*\/)|(\/\/[^\n]*)"
-VERSION_NUMBER = "0.1.6-alpha"
-NEW_CHANGES = "fixed failure 9"
-WINDOWS_LINE_ENDING = b'\r\n'
-UNIX_LINE_ENDING = b'\n'
-
 
 def styliseCode(fileToEdit):
-
+    
     # so that first line's index is 0
     lineIndex = -1
-
+    
     fileToEdit.seek(0)
     lines = fileToEdit.readlines()
 
@@ -72,7 +66,7 @@ def styliseCode(fileToEdit):
 
                 if openCurlyBraceIndex == -1 and utils.checkForOpenBrace(nextLineIndex, lines) == -1:
                     # no { on same ln and on subsequent lines
-
+                    changedLines = changedLines + 1
                     # add brace
                     if isOnSameLine:
                         if currentLineIsComment:
@@ -134,7 +128,7 @@ def styliseCode(fileToEdit):
 
                 if openCurlyBraceIndex == -1 and utils.checkForOpenBrace(nextLineIndex, lines) == -1:
                     # no { on same ln on same line or subsequent lines
-
+                    changedLines = changedLines + 1
                     # add braces
                     if isOnSameLine:
                         if currentLineIsComment:
@@ -196,7 +190,7 @@ def styliseCode(fileToEdit):
 
                 if openCurlyBraceIndex == -1 and utils.checkForOpenBrace(nextLineIndex, lines) == -1:
                     # no { on same ln and on subsequent lines
-
+                    changedLines = changedLines + 1
                     # add open CURLY on same line
                     if isOnSameLine:
                         if currentLineIsComment:
@@ -267,7 +261,7 @@ def styliseCode(fileToEdit):
 
                 if openCurlyBraceIndex == -1 and utils.checkForOpenBrace(nextLineIndex, lines) == -1:
                     # no { on same ln or on subsequent lines
-
+                    changedLines = changedLines + 1
                     # add open CURLY on same line
                     if isOnSameLine:
                         if currentLineIsComment:
@@ -319,6 +313,20 @@ def styliseCode(fileToEdit):
 
 
 def main():
+    VERSION_NUMBER = "0.1.6+1-alpha"
+    NEW_CHANGES = "fixed failure 9"
+    KNOWN_BUGS = """
+    \tfailure 2: macros.. there are some macros in cfiles also. like conffileapi.c
+    \tfailure 3: Keyword after detected loop/condition
+    \tfailure N1: comment in ()
+    \tfailure 7: code written on sameline( semicolon on same ln )
+    """
+    WINDOWS_LINE_ENDING = b'\r\n'
+    UNIX_LINE_ENDING = b'\n'
+    changedLines = 0
+    changedFiles = 0
+
+
     if (len(sys.argv) != 2):
         print("Usage: python3.7 codeStyliser.py [DIRECTORY_NAME]")
         print("DIRECTORY_NAME IS REQUIRED")
@@ -326,13 +334,11 @@ def main():
     else:
         DIR_NAME = sys.argv[1]
         print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
-        print("\t with changes: " + NEW_CHANGES)
-        print("----")
-        print("Made by Pranjal Rastogi")
-        print("Made for python 3.7.7 64-Bit")
-        print("Will add curly braces where they are supposed to be for all (.C) files in " + DIR_NAME)
-
-        print("\t STARTING")
+        print("\twith changes: " + NEW_CHANGES)
+        print("known bugs: " + KNOWN_BUGS)
+        print("Made by Pranjal Rastogi, for and in Python 3.7.7 64Bit")
+        print("Fixing code in (.c) files under " + DIR_NAME)
+        print("-STARTING-")
         for root, subdirs, files in os.walk(DIR_NAME):
 
             for filename in files:
@@ -357,16 +363,18 @@ def main():
                         continue
                     # try:
                     with open(file_path, "r+") as fileToStyle:
+                        print("stylising " + filename)
                         styliseCode(fileToStyle)
+                        changedFiles = changedFiles + 1
                     # except:
-                        # e = sys.exc_info()[0]
-                        # print("error: " + str(e) + " at file name: " +
-                        #       filename + " while opening file")
-                        # continue
+                        e = sys.exc_info()[0]
+                        print("error: " + str(e) + " at file name: " +
+                              filename + " while opening file")
+                        continue
                 else:
                     continue
-
-        print("Done for all files, now exitting")
+        print("added braces: " + str(changedLines) + " times in " + str(changedLines))
+        print("Done for all files, now exiting")
 
 
 if __name__ == "__main__":

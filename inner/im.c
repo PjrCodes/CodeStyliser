@@ -16,8 +16,6 @@ failure 3:
       //       dsoid:
       //       dsd;
       //    } // THese are detected as {} for the for
- 
-
 fix: FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
 
 failure N1:
@@ -28,21 +26,11 @@ failure N1:
 // ooppp*/
 //    asd;
 
- 
-
-
 failure 7: sameln error
-//     if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs); 
-//     else           f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs); 
+   //  if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs); 
+   //  else           f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs); 
 
 
-failure 9: code keeps trying to search for matching (), it never stops.
-workaround fix: if next line (after bracket complete) has "#", then cancel life.
-//  #if (TEST_CODE & ENABLE_DNPW_APP)
-   if (TRUE && dnpw_d->cur_veh)  
-   #if <sdo>
-
-   
        
 
 
