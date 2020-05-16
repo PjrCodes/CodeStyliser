@@ -1,30 +1,31 @@
 #include <stdio.h>
 int main()
 {
+
+else { pop; } //as
+
+
+KEYWORD IGNORE FAIL CONDITION, As; must be ddetected. IT MUST BE DIRECTLY AFTER.
+// else if() as;
+
+// for() 
+// as;
  
 
-// for(
-// )
-// /*sdo*/
-// saps;
 
+KEYWORD IGNORE FAILING CONDITION: if we remove //AS;, it works
+// for()
+//    asp; //AS;
+
+// if() {
+//    a;
+// }
  
-  
-// failure 2:
-// macros.. there are some macros in cfiles also. like conffileapi.c
 
 
-failure N1:
-
-
-for(
- ) {
- asd;
-}
-    
-
-
-
-
+{
+//    a;
+// }
+ 
 
 

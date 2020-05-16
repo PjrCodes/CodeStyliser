@@ -1,2 +1,11 @@
 if searchForSingleLinecomment.start = /*
 startsearchingfor */
+
+# semicolon found on same line
+if currentLineIsComment:
+    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:-1] + " } " + commentOfCurrentLine + "\n"
+else:
+    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:-1] + " }\n"
+del lines[lineIndex]
+lines.insert(lineIndex, toAddLine)
+continue

@@ -83,7 +83,7 @@ def checkForParentheses(line, lineIndex, lines):
 
 def checkForOpenBrace(nextLineIndex, lines):
 
-    while nextLineIndex < (len(lines)-1):
+    while nextLineIndex < (len(lines)):
         lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
         if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
             # line has comment or is blank
@@ -104,7 +104,7 @@ def checkForOpenBrace(nextLineIndex, lines):
 
 def getNextSemiColonLine(index, lines):
     
-    while index < (len(lines) - 1):
+    while index < (len(lines)):
         lineWithoutComment = trimComment(lines[index], index, lines)
         if lineWithoutComment.isMultiline == True:
             semiColonIndex = lines[lineWithoutComment.multiLineJumpIndex].find(";")
@@ -120,7 +120,7 @@ def getNextSemiColonLine(index, lines):
 
 def checkForHash(index, lines):
     index = index + 1
-    while index < (len(lines)-1):
+    while index < (len(lines)):
         lineWithoutComment = trimComment(lines[index], index, lines)
         if lineWithoutComment.hasComment == True or lines[index].isspace():
             # line has comment or is blank
@@ -138,7 +138,7 @@ def checkForHash(index, lines):
 def hasKeyword(index, lines):
     # return True if we find a keyword after the thingy.
     index = index + 1 # start check from one line next
-    while index < (len(lines) - 1):
+    while index < (len(lines)):
         # loop through till file ends
         lineNoComment = trimComment(lines[index], index, lines)
         if lineNoComment.isMultiline == True:
