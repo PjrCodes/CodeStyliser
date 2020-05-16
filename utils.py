@@ -1,7 +1,15 @@
-# Copyright (c) 2020 Pranjal Rastogi
 #!/usr/local/bin/python3
+# Copyright (c) 2020 Pranjal Rastogi All Rights Reserved
+# This code cannot be copied. Violators will be prosecuted.
+# ---
+# code styliser program
+# ---
 # Made in python 3.7.7 64 bit, please use only this version
-# utilities for CodeStyliser
+# ---
+# utils.py
+# utils for Codestyliser.py
+# ---
+# DO NOT RE-DISTRIBUTE
 
 import re
 
@@ -135,30 +143,49 @@ def checkForHash(index, lines):
             break
     return lineWithoutComment.line.find("#")
 
-def hasKeyword(index, lines):
-    # return True if we find a keyword after the thingy.
-    index = index + 1 # start check from one line next
-    while index < (len(lines)):
-        # loop through till file ends
-        lineNoComment = trimComment(lines[index], index, lines)
-        if lineNoComment.isMultiline == True:
-            # it is multiline comment
-            # we must jump index, but also check keywords
-            for keyword in KEYWORDS:
-                if lineNoComment.line.find(keyword) != -1:
-                    return True
-                else:
-                    continue
-            index = lineNoComment.multiLineJumpIndex
-        elif lineNoComment.hasComment or lines[index].isspace():
-            index = index + 1
-        else:
-            for keyword in KEYWORDS:
-                if lineNoComment.line.find(keyword) != -1:
-                    return True
-                else:
-                    continue
-            return False
+
+
+""" 
+THE FOLLOWING CODE DONT WORK. COMMENTING
+"""
+# def hasKeyword(index, lines):
+
+#     #TODO: Fix, DOESNT WORK!!!
+#     # return True if we find a keyword IMMEDIATELY after the keyword.
+#     # current line index = index, so index has the first keyword
+#     index = index + 1 # start check from one line next
+#     while index < (len(lines)):
+#         # loop through till file ends
+#         lineNoComment = trimComment(lines[index], index, lines)
+#         if lineNoComment.isMultiline == True:
+#             # it is multiline comment
+#             # we must jump index, but also check keywords  
+#             for keyword in KEYWORDS:
+#                 if lineNoComment.line.find(keyword) != -1:
+#                     return True
+#                 else:
+#                     # keyword not found, after Multiline Comment!
+#                     index = lineNoComment.multiLineJumpIndex
+#             index = lineNoComment.multiLineJumpIndex
+#         elif lineNoComment.hasComment and lineNoComment.isMultiline == False:
+#             # line has comment, we must check for the space before line
+#             for keyword in KEYWORDS:
+#                 if lineNoComment.line.find(keyword) != -1:
+#                     return True
+#                 else:
+#                     # line has no keyword
+#                     index = index + 1
+#         elif lines[index].isspace():
+#             index = index + 1
+#             continue
+#         else:
+#             for keyword in KEYWORDS:
+#                 if lineNoComment.line.find(keyword) != -1:
+#                     return True
+#                 else:
+#                     continue
+#             return False
+#     return False
 
 
 if __name__ == "__main__":

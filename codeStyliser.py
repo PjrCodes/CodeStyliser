@@ -1,7 +1,15 @@
-# Copyright (c) 2020 Pranjal Rastogi
 #!/usr/local/bin/python3
+# Copyright (c) 2020 Pranjal Rastogi All Rights Reserved
+# This code cannot be copied. Violators will be prosecuted.
+# ---
+# code styliser program
+# ---
 # Made in python 3.7.7 64 bit, please use only this version
-# code Styliser- run this file
+# ---
+# codeStyliser.py
+# code Styliser, starting point
+# ---
+# DO NOT RE-DISTRIBUTE
 
 import sys
 import re
@@ -19,7 +27,7 @@ def styliseCode(fileToEdit):
 
     while lineIndex < (len(lines) - 1):
 
-        # try:
+        try:
             lineIndex = lineIndex + 1
             line = lines[lineIndex]
             currentLineIsComment = False
@@ -39,7 +47,6 @@ def styliseCode(fileToEdit):
                 lineIndex = trimmedCommentResult.multiLineJumpIndex + 1
 
             # ---------------------------------------------------------------------------
-
             # find for loops
             forLoopIndex = line.find("for")
             if forLoopIndex == firstCharIndex:
@@ -50,9 +57,11 @@ def styliseCode(fileToEdit):
                     print("hash ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
                     continue
                 # check for keyword
-                if utils.hasKeyword(lineIndex, lines) == True:
-                    print("keyword ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-                    continue
+                # print(utils.hasKeyword(lineIndex, lines))
+                # if utils.hasKeyword(lineIndex, lines) == True:
+                #     print("keyword ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+                #     continue
+                
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
                     line, lineIndex, lines)
@@ -154,9 +163,10 @@ def styliseCode(fileToEdit):
                     print("hash ignore: ignored While loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
                     continue
                 # check for keyword
-                if utils.hasKeyword(lineIndex, lines) == True:
-                    print("keyword ignore: ignored While loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-                    continue
+                # print(utils.hasKeyword(lineIndex, lines))
+                # if utils.hasKeyword(lineIndex, lines) == True:
+                #     print("keyword ignore: ignored While loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+                #     continue
 
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
@@ -253,9 +263,10 @@ def styliseCode(fileToEdit):
                     print("hash ignore: ignored if condition at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
                     continue
                 # check for keyword
-                if utils.hasKeyword(lineIndex, lines) == True:
-                    print("keyword ignore: ignored if Condition at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-                    continue
+                # print(utils.hasKeyword(lineIndex, lines))
+                # if utils.hasKeyword(lineIndex, lines) == True:
+                #     print("keyword ignore: ignored if Condition at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+                #     continue
                 # we must now skip over all parentheses to find the end of the (condition)
                 checkParenthResult = utils.checkForParentheses(
                     line, lineIndex, lines)
@@ -358,9 +369,10 @@ def styliseCode(fileToEdit):
                     print("hash ignore: ignored else/ else if at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
                     continue
                 # check for keyword
-                if utils.hasKeyword(lineIndex, lines) == True:
-                    print("keyword ignore: ignored else/ else if at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-                    continue
+                # print(utils.hasKeyword(lineIndex, lines))
+                # if utils.hasKeyword(lineIndex, lines) == True:
+                #     print("keyword ignore: ignored else/ else if at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+                #     continue
                 if line.find("if") != -1:
                     # line is else if
                     isElseIf = True
@@ -504,12 +516,12 @@ def styliseCode(fileToEdit):
 
             # ---------------------------------------------------------------------------
 
-        # except:
-        #     e = sys.exc_info()[0]
-        #     print("runtime error: " + str(e) + " in file name: " +
-        #           fileToEdit.name + " around line " + str(lineIndex + 1), end = "")
-        #     print(", Most likely a syntax error in the C file.")
-        #     continue
+        except:
+            e = sys.exc_info()[0]
+            print("runtime error: " + str(e) + " in file name: " +
+                  fileToEdit.name + " around line " + str(lineIndex + 1), end = "")
+            print(", Most likely a syntax error in the C file.")
+            continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -520,12 +532,12 @@ def styliseCode(fileToEdit):
 
 def main():
     VERSION_NUMBER = "0.1.9-alpha"
-    NEW_CHANGES = "fixed sameline error"
+    NEW_CHANGES = "REMOVED KEYWORD IGNORE"
     KNOWN_BUGS = """
-    \tfailure 2: macros.. there are some macros in cfiles also. like conffileapi.c
-    \tfailure NO-1: comment in ()
-    \twarn NEWLN-ERR: if no new line, code fails
-    \tFATAL ERROR: Keyword ignore doesnt work as expected
+    \t\tfailure 2: macros.. there are some macros in cfiles also. like conffileapi.c
+    \t\tfailure NO-1: comment in ()
+    \t\twarn NEWLN-ERR: if no new line at end of file, code fails
+    \t\tFATAL ERROR: KEYWORD IGNORE DOESNT WORK AS EXPECTED
     """
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
@@ -541,12 +553,13 @@ def main():
         linesEdited = 0
         print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
         print("\twith changes: " + NEW_CHANGES)
-        print("\tand with amazing bugs: " + KNOWN_BUGS)
+        print("\tand with the BEST INSECTS: " + KNOWN_BUGS)
         print("Made by Pranjal Rastogi, for and in Python 3.7.7 64Bit")
         print("Fixing code in (.c) files under " + DIR_NAME + "\n")
-        print("Giving 1 second to read above things")
-        time.sleep(1)
-        print("started...")
+        print("sleeping for 3 seconds")
+        time.sleep(3)
+        
+        print("===== STARTING... =====")
         for root, subdirs, files in os.walk(DIR_NAME):
 
             for filename in files:
@@ -570,18 +583,19 @@ def main():
                         print("runtime error: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
-                    # try:
-                    with open(file_path, "r+") as fileToStyle:
-                        linesEdited = styliseCode(fileToStyle)  + linesEdited
-                    # except:
-                    #     e = sys.exc_info()[0]
-                    #     print("runtime error: " + str(e) + " at file name: " +
-                    #           filename + " while opening file")
-                    #     continue
+                    try:
+                        with open(file_path, "r+") as fileToStyle:
+                            linesEdited = styliseCode(fileToStyle)  + linesEdited
+                    except:
+                        e = sys.exc_info()[0]
+                        print("runtime error: " + str(e) + " at file name: " +
+                              filename + " while opening file")
+                        continue
                 else:
                     continue
+        print("======= SUMMARY =======")
         print("Added braces " + str(linesEdited) + " times in " +  str(fileNo) + " files")
-        print("Done for all files, now exiting")
+        print("======== ENDED ========")
 
 
 if __name__ == "__main__":
