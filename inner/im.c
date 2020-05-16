@@ -2,33 +2,42 @@
 int main()
 {
  
-failure 2:
-macros.. there are some macros in cfiles also. like conffileapi.c
+// for()   {
+//    ps;
+// }
+ 
 
-failure 3:
-      // for (parse_data=data; parse_data->param_name; parse_data++)
-      // //dasooi //apsodsp /*daiod*/
-      // /*liodoosdi //aodod*/ 
+// if() {
+// as;
+// }
+   
+// failure 2:
+// macros.. there are some macros in cfiles also. like conffileapi.c
 
-      //    switch(parse_data->param_type) {
-      //       defailt: 
-      //       assadpods;
-      //       dsoid:
-      //       dsd;
-      //    } // THese are detected as {} for the for
-fix: FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
+// failure 3:
+//       // for (parse_data=data; parse_data->param_name; parse_data++)
+//       // //dasooi //apsodsp /*daiod*/
+//       // /*liodoosdi //aodod*/ 
 
-failure N1:
-// for(
-//  /*sp*/ )
-// /* iam
-// mulrt
-// ooppp*/
-//    asd;
+//       //    switch(parse_data->param_type) {
+//       //       defailt: 
+//       //       assadpods;
+//       //       dsoid:
+//       //       dsd;
+//       //    } // THese are detected as {} for the for
+// fix: FOR, IF, WHILE, DO, SWITCH, if this is the FIRST charecter of nxt Line after a loop/ condition/ blaha bla, Then IGNORE.  
 
-failure 7: sameln error
-   //  if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs); 
-   //  else           f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs); 
+// failure N1:
+// // for(
+// //  /*sp*/ )
+// // /* iam
+// // mulrt
+// // ooppp*/
+// //    asd;
+
+// failure 7: sameln error
+//    //  if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs); 
+//    //  else           f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs); 
 
 
        

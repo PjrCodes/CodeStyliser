@@ -6,7 +6,7 @@
 import re
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
-
+KEYWORDS = ['for', 'while', 'do', 'switch', 'if', 'else']
 
 class lineWithComment:
 
@@ -59,14 +59,11 @@ def checkForParentheses(line, lineIndex, lines):
         # the line doesnt have same amt of close and open parentheses
         nxtLnIndex = lineIndex + 1
         while closeParenthNo != openParenthNo:
-            forChecker = lines[nxtLnIndex].find("for")
-            ifChecker = lines[nxtLnIndex].find("if")
-            whileChecker = lines[nxtLnIndex].find("while")
-            elseChecker = lines[nxtLnIndex].find("else")
             firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
-            if forChecker == firstCharOfNxtLn or ifChecker == firstCharOfNxtLn or whileChecker == firstCharOfNxtLn or elseChecker == firstCharOfNxtLn:
-                # another for has been found before () number got equal, Cancel case
-                break
+            for keyword in KEYWORDS:
+                if lines[nxtLnIndex].find(keyword) == firstCharOfNxtLn:
+                    # another for has been found before () number got equal, Cancel case
+                    break
             openParenthNo = len(re.findall(
                 r"\(", lines[nxtLnIndex])) + openParenthNo
             closeParenthNo = len(re.findall(
@@ -86,8 +83,7 @@ def checkForParentheses(line, lineIndex, lines):
 
 def checkForOpenBrace(nextLineIndex, lines):
 
-    while True:
-        #TODO: handle multiline
+    while nextLineIndex < (len(lines)-1):
         lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
         if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
             # line has comment or is blank
@@ -107,7 +103,8 @@ def checkForOpenBrace(nextLineIndex, lines):
 
 
 def getNextSemiColonLine(index, lines):
-    while True:
+    
+    while index < (len(lines) - 1):
         lineWithoutComment = trimComment(lines[index], index, lines)
         if lineWithoutComment.isMultiline == True:
             semiColonIndex = lines[lineWithoutComment.multiLineJumpIndex].find(";")
@@ -123,7 +120,7 @@ def getNextSemiColonLine(index, lines):
 
 def checkForHash(index, lines):
     index = index + 1
-    while True:
+    while index < (len(lines)-1):
         lineWithoutComment = trimComment(lines[index], index, lines)
         if lineWithoutComment.hasComment == True or lines[index].isspace():
             # line has comment or is blank
@@ -134,9 +131,34 @@ def checkForHash(index, lines):
                 index = lineWithoutComment.multiLineJumpIndex
                 
             index = index + 1
-        else:
+        else: 
             break
     return lineWithoutComment.line.find("#")
+
+def hasKeyword(index, lines):
+    # return True if we find a keyword after the thingy.
+    index = index + 1 # start check from one line next
+    while index < (len(lines) - 1):
+        # loop through till file ends
+        lineNoComment = trimComment(lines[index], index, lines)
+        if lineNoComment.isMultiline == True:
+            # it is multiline comment
+            # we must jump index, but also check keywords
+            for keyword in KEYWORDS:
+                if lineNoComment.line.find(keyword) != -1:
+                    return True
+                else:
+                    continue
+            index = lineNoComment.multiLineJumpIndex
+        elif lineNoComment.hasComment or lines[index].isspace():
+            index = index + 1
+        else:
+            for keyword in KEYWORDS:
+                if lineNoComment.line.find(keyword) != -1:
+                    return True
+                else:
+                    continue
+            return False
 
 
 if __name__ == "__main__":
