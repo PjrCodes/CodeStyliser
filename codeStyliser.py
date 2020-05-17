@@ -27,7 +27,7 @@ def styliseCode(fileToEdit):
 
     while lineIndex < (len(lines) - 1):
 
-        try:
+        # try:
             lineIndex = lineIndex + 1
             line = lines[lineIndex]
             currentLineIsComment = False
@@ -41,7 +41,7 @@ def styliseCode(fileToEdit):
                 commentOfCurrentLine = trimmedCommentResult.comment
             elif trimmedCommentResult.isMultiline == True:
                 currentLineIsComment = trimmedCommentResult.hasComment
-                commentOfCurrentLine = "" #TODO: change
+                commentOfCurrentLine = "" #TODO: change 
                 # if comment, jump
                 line = trimmedCommentResult.line
                 lineIndex = trimmedCommentResult.multiLineJumpIndex + 1
@@ -50,6 +50,7 @@ def styliseCode(fileToEdit):
             # find for loops
             forLoopIndex = line.find("for")
             if forLoopIndex == firstCharIndex:
+
                 # found a for loop
                 hasHash = utils.checkForHash(lineIndex, lines)
                 if hasHash != -1:
@@ -93,24 +94,24 @@ def styliseCode(fileToEdit):
                     if isOnSameLine:
                         if line[lastCloseParenthIndex:].isspace():
                             if currentLineIsComment:
-                                toAddLine = line.strip() + \
+                                toAddLine = line.rstrip() + \
                                     " { " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line.strip() + " {\n"
+                                toAddLine = line.rstrip() + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
                         elif line[lastCloseParenthIndex:].find(";") != -1:
                             # semicolon found on same line
                             if currentLineIsComment:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " } " + commentOfCurrentLine + "\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in for in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     else:
@@ -118,24 +119,24 @@ def styliseCode(fileToEdit):
                             nxtLnTrimComment = utils.trimComment(
                                 lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line.strip() + \
+                                toAddLine = nxtLnTrimComment.line.rstrip() + \
                                     " { " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1].strip() + " {\n"
+                                toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             checkForSemiColonIndex = nxtLnIndex
                         elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
                             nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].strip() + " } " + nxtLnTrimComment.comment + "\n"
+                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in for  in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
 
@@ -146,9 +147,8 @@ def styliseCode(fileToEdit):
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     spaces = " " * forLoopIndex
 
-                    lines.insert(closingBraceLineIndex, " ")
-                    addClosingBraceLine = lines[closingBraceLineIndex][:-
-                                                                       1] + spaces + "}\n"
+                    lines.insert(closingBraceLineIndex, "\n")
+                    addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
                     lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
             # ---------------------------------------------------------------------------
@@ -193,24 +193,24 @@ def styliseCode(fileToEdit):
                     if isOnSameLine:
                         if line[lastCloseParenthIndex:].isspace():
                             if currentLineIsComment:
-                                toAddLine = line.strip() + \
+                                toAddLine = line.rstrip() + \
                                     " { " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line.strip() + " {\n"
+                                toAddLine = line.rstrip() + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
                         elif line[lastCloseParenthIndex:].find(";") != -1:
                             # semicolon found on same line
                             if currentLineIsComment:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " } " + commentOfCurrentLine + "\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in WHEEL in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     else:
@@ -218,24 +218,24 @@ def styliseCode(fileToEdit):
                             nxtLnTrimComment = utils.trimComment(
                                 lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line.strip() + \
+                                toAddLine = nxtLnTrimComment.line.rstrip() + \
                                     " { " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1].strip() + " {\n"
+                                toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             checkForSemiColonIndex = nxtLnIndex
                         elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
                             nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].strip() + " } " + nxtLnTrimComment.comment + "\n"
+                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in wheelie in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
 
@@ -245,9 +245,8 @@ def styliseCode(fileToEdit):
 
                     # add closing braces at closingBraceLine (inserting a new ln), with indentation
                     spaces = " " * whileLoopIndex
-                    lines.insert(closingBraceLineIndex, " ")
-                    addClosingBraceLine = lines[closingBraceLineIndex][:-
-                                                                       1] + spaces + "}\n"
+                    lines.insert(closingBraceLineIndex, "\n")
+                    addClosingBraceLine =  lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
                     lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
             # ---------------------------------------------------------------------------
@@ -293,10 +292,10 @@ def styliseCode(fileToEdit):
                     if isOnSameLine:
                         if line[lastCloseParenthIndex:].isspace():
                             if currentLineIsComment:
-                                toAddLine = line.strip() + \
+                                toAddLine = line.rstrip() + \
                                     " { " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line.strip() + " {\n"
+                                toAddLine = line.rstrip() + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
@@ -304,14 +303,14 @@ def styliseCode(fileToEdit):
                         elif line[lastCloseParenthIndex:].find(";") != -1:
                             # semicolon found on same line
                             if currentLineIsComment:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " } " + commentOfCurrentLine + "\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in IF condition in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     else:
@@ -319,24 +318,24 @@ def styliseCode(fileToEdit):
                             nxtLnTrimComment = utils.trimComment(
                                 lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line.strip() + \
+                                toAddLine = nxtLnTrimComment.line.rstrip() + \
                                     " { " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1].strip() + " {\n"
+                                toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             checkForSemiColonIndex = nxtLnIndex
                         elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
                             nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].strip() + " } " + nxtLnTrimComment.comment + "\n"
+                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             continue
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in IF condition in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     # check for semicolons to add Closing brace
@@ -344,9 +343,8 @@ def styliseCode(fileToEdit):
                         checkForSemiColonIndex, lines) + 1
                     # add closing braces at closingBraceLine (inserting a new ln) with indentation
                     spaces = " " * ifConditionIndex
-                    lines.insert(closingBraceLineIndex, " ")
-                    addClosingBraceLine = lines[closingBraceLineIndex][:-
-                                                                       1] + spaces + "}\n"
+                    lines.insert(closingBraceLineIndex, "\n")
+                    addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
                     lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
             # ---------------------------------------------------------------------------
@@ -411,19 +409,19 @@ def styliseCode(fileToEdit):
                     if isOnSameLine:
                         if line[lastCloseParenthIndex:].isspace() and isElseIf:
                             if currentLineIsComment:
-                                toAddLine = line.strip() + \
+                                toAddLine = line.rstrip() + \
                                     " { " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line.strip() + " {\n"
+                                toAddLine = line.rstrip() + " {\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             checkForSemiColonIndex = lineIndex + 1
                         elif line[lastCloseParenthIndex:].find(";") != -1 and isElseIf:
                             # add braces around {}
                             if currentLineIsComment:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " } " + commentOfCurrentLine + "\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                             else:
-                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[lineIndex]
                             lines.insert(lineIndex, toAddLine)
                             continue
@@ -434,23 +432,23 @@ def styliseCode(fileToEdit):
                                # semicolon found on same line
                                # not an else if
                                 if currentLineIsComment:
-                                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " } " + commentOfCurrentLine + "\n"
+                                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                                 else:
-                                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].strip() + " }\n"
+                                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
                                 del lines[lineIndex]
                                 lines.insert(lineIndex, toAddLine)
                                 continue
                             else:
                                 if currentLineIsComment:
-                                    toAddLine = line.strip() + \
+                                    toAddLine = line.rstrip() + \
                                         " { " + commentOfCurrentLine + "\n"
                                 else:
-                                    toAddLine = line.strip() + " {\n"
+                                    toAddLine = line.rstrip() + " {\n"
                                 del lines[lineIndex]
                                 lines.insert(lineIndex, toAddLine)
                                 checkForSemiColonIndex = lineIndex + 1
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in else IF/ else condition in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     else:
@@ -458,19 +456,19 @@ def styliseCode(fileToEdit):
                             nxtLnTrimComment = utils.trimComment(
                                 lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line.strip() + \
+                                toAddLine = nxtLnTrimComment.line.rstrip() + \
                                     " { " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1].strip() + " {\n"
+                                toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             checkForSemiColonIndex = nxtLnIndex
                         elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1 and isElseIf:
                             nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                             if nxtLnTrimComment.hasComment:
-                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].strip() + " } " + nxtLnTrimComment.comment + "\n"
+                                toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                             else:
-                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].strip() + " }\n"
+                                toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                             del lines[nxtLnIndex - 1]
                             lines.insert(nxtLnIndex - 1, toAddLine)
                             continue
@@ -479,9 +477,9 @@ def styliseCode(fileToEdit):
                             if lastSemiColonIndex != -1:
                                 nxtLnTrimComment = utils.trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                                 if nxtLnTrimComment.hasComment:
-                                    toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].strip() + " } " + nxtLnTrimComment.comment + "\n"
+                                    toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                                 else:
-                                    toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].strip() + " }\n"
+                                    toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                                 del lines[nxtLnIndex - 1]
                                 lines.insert(nxtLnIndex - 1, toAddLine)
                                 continue
@@ -489,15 +487,15 @@ def styliseCode(fileToEdit):
                                 nxtLnTrimComment = utils.trimComment(
                                     lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                                 if nxtLnTrimComment.hasComment:
-                                    toAddLine = nxtLnTrimComment.line.strip() + \
+                                    toAddLine = nxtLnTrimComment.line.rstrip() + \
                                         " { " + nxtLnTrimComment.comment + "\n"
                                 else:
-                                    toAddLine = lines[nxtLnIndex - 1].strip() + " {\n"
+                                    toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                                 del lines[nxtLnIndex - 1]
                                 lines.insert(nxtLnIndex - 1, toAddLine)
                                 checkForSemiColonIndex = nxtLnIndex
                         else:
-                            print("I AM A CANCELLLE!" + str(lineIndex) + "::" + fileToEdit.name)
+                            print("macro w/o brace or syntatical error in else if/ else condition in " + fileToEdit.name + " at line " + str(lineIndex))
                             linesEdited = linesEdited - 1
                             continue
                     # check for closng brace
@@ -509,19 +507,18 @@ def styliseCode(fileToEdit):
                         spaces = " " * startingCurlyBraceIndex
                     elif not lineStartsOnBrace:
                         spaces = " " * startingAtElseIndex
-                    lines.insert(closingBraceLineIndex, " ")
-                    addClosingBraceLine = lines[closingBraceLineIndex][:-
-                                                                       1] + spaces + "}\n"
+                    lines.insert(closingBraceLineIndex, "\n")
+                    addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
                     lines.insert(closingBraceLineIndex, addClosingBraceLine)
 
             # ---------------------------------------------------------------------------
 
-        except:
-            e = sys.exc_info()[0]
-            print("runtime error: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1), end = "")
-            print(", Most likely a syntax error in the C file.")
-            continue
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("runtime error: " + str(e) + " in file name: " +
+        #           fileToEdit.name + " around line " + str(lineIndex + 1), end = "")
+        #     print(", Most likely a syntax error in the C file.")
+        #     continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -532,7 +529,7 @@ def styliseCode(fileToEdit):
 
 def main():
     VERSION_NUMBER = "0.1.9-alpha"
-    NEW_CHANGES = "REMOVED KEYWORD IGNORE"
+    NEW_CHANGES = "REMOVED KEYWORD IGNORE, fixed indent error"
     KNOWN_BUGS = """
     \t\tfailure 2: macros.. there are some macros in cfiles also. like conffileapi.c
     \t\tfailure NO-1: comment in ()
@@ -583,14 +580,14 @@ def main():
                         print("runtime error: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
-                    try:
-                        with open(file_path, "r+") as fileToStyle:
-                            linesEdited = styliseCode(fileToStyle)  + linesEdited
-                    except:
-                        e = sys.exc_info()[0]
-                        print("runtime error: " + str(e) + " at file name: " +
-                              filename + " while opening file")
-                        continue
+                    # try:
+                    with open(file_path, "r+") as fileToStyle:
+                        linesEdited = styliseCode(fileToStyle)  + linesEdited
+                    # except:
+                    #     e = sys.exc_info()[0]
+                    #     print("runtime error: " + str(e) + " at file name: " +
+                    #           filename + " while opening file")
+                    #     continue
                 else:
                     continue
         print("======= SUMMARY =======")

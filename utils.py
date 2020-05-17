@@ -43,7 +43,7 @@ def trimComment(line, lineNo, lines):
                     multiCommentEnd = lines[index].find("*/")
                     if multiCommentEnd != -1:
                         # multi line comment has ended
-                        return lineWithComment(lines[index][(multiCommentEnd + 2):],True,None,True, index)
+                        return lineWithComment(lines[index - 1][(multiCommentEnd + 2):],True,None,True, index - 1)
                     else:
                         # no multi line comment end found
                         index = index + 1
