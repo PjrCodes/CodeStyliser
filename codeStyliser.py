@@ -318,7 +318,7 @@ def main():
     \t\terr DETECTION-ERROR: if the keyword is part of something else and it has (), it is detected as keyword, forall() as;
     \t\terr SEMICOLON-DETECTOR: some kind of error, please check, very weird, cant repro
     \t\t\t (VERY WEIRD ERROR!!)
-    \t\t ONLY 11 ERRORS
+    \t\tONLY 11 ERRORS
     """
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
@@ -350,7 +350,7 @@ def main():
                     continue
                 fileExt = fileExtension[1]
                 if fileExt == "c":
-                    print ("writing ...", end="\r", flush=True)
+                    print ("working ...", end="\r", flush=True)
                     time.sleep(0.2)
                     fileNo = fileNo + 1
                     try:
