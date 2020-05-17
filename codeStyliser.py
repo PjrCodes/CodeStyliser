@@ -43,7 +43,7 @@ def styliseCode(fileToEdit):
             trimmedCommentResult = utils.trimComment(line, lineIndex, lines)
             line = trimmedCommentResult.line
 
-            print(str(lineIndex) + "@@@" + fileToEdit.name + "\t" + line)
+            # print(str(lineIndex) + "@@@" + fileToEdit.name + "\t" + line)
 
             if trimmedCommentResult.hasComment == True and trimmedCommentResult.isMultiline == False:
                 currentLineIsComment = True
@@ -59,7 +59,6 @@ def styliseCode(fileToEdit):
             else:
                 print("FATAL error in comment checking, at line " +
                     str(lineIndex) + " file: " + fileToEdit.name)
-            print(commentOfCurrentLine)
 
             # ---------------------------------------------------------------------------
             # find for loops
@@ -303,19 +302,29 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.9-alpha"
-    NEW_CHANGES = "REMOVED KEYWORD IGNORE, fixed indent error"
+    VERSION_NUMBER = "0.1.9.2-alpha"
+    NEW_CHANGES = "slight refactor"
     KNOWN_BUGS = """
-    \t\tfailure 2: macros.. there are some macros in cfiles also. like conffileapi.c
-    \t\tfailure NO-1: comment in ()
-    \t\twarn NEWLN-ERR: if no new line at end of file, code fails
-    \t\tFATAL ERROR: KEYWORD IGNORE DOESNT WORK AS EXPECTED
+    \t\terr 2: MACRO-error:  } added after \\
+    \t\terr 3: SAME-LINE-PARENTHESES-error: {} added after last ) but must be added after (condition) parentheses
+    \t\terr 5: KEYWORD-error: # error, mustnt add {} if next line after curlyBraceIndexLine has a Preprocesser
+    \t\terr 7: PARENTH_AFTER_FOR_error: even if parenth are not immedieatly after, it gives error
+    \t\terr 6: FUNCTION-error: after function ended, we see some lines added, something to do with double line if
+    \t\t\t (VERY WEIRD ERROR!!)
+    \t\terr N-1: If no endline at end of file, } is added on same line as the last ;
+    \t\terr PREPROCESSER: if there is #if or #endif, ignore that condition/ loop
+    \t\terr PARENTH_IMMEDIATE: not checking if the parentheses are immediately after for, causing detection of func declarations.
+    \t\terr DOUBLE-COMMENT: if there are two comments on same line, one multiline end and one single line, desired result is not achieved, asd*/ for() as;//ads
+    \t\terr DETECTION-ERROR: if the keyword is part of something else and it has (), it is detected as keyword, forall() as;
+    \t\terr SEMICOLON-DETECTOR: some kind of error, please check, very weird, cant repro
+    \t\t\t (VERY WEIRD ERROR!!)
+    \t\t ONLY 11 ERRORS
     """
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
     if (len(sys.argv) != 2):
-        print("Usage: python3.7 codeStyliser.py [DIRECTORY_NAME]")
+        print("Usage: python3.7 codeStyliser.py <DIRECTORY_NAME>")
         print("DIRECTORY_NAME IS REQUIRED")
         sys.exit()
     else:
@@ -326,9 +335,10 @@ def main():
         print("\twith changes: " + NEW_CHANGES)
         print("\tand with the BEST INSECTS: " + KNOWN_BUGS)
         print("Made by Pranjal Rastogi, for and in Python 3.7.7 64Bit")
-        print("Fixing code in (.c) files under " + DIR_NAME + "\n")
-        print("sleeping for 3 seconds")
+        print("Will fix (.c) code for files under " + DIR_NAME)
+        print("you have three seconds to read the above data")
         time.sleep(3)
+        print("\n\n")
 
         print("===== STARTING... =====")
         for root, subdirs, files in os.walk(DIR_NAME):
@@ -340,6 +350,8 @@ def main():
                     continue
                 fileExt = fileExtension[1]
                 if fileExt == "c":
+                    print ("writing ...", end="\r", flush=True)
+                    time.sleep(0.2)
                     fileNo = fileNo + 1
                     try:
                         with open(file_path, 'rb') as open_file:
@@ -364,6 +376,7 @@ def main():
                     #     continue
                 else:
                     continue
+        print("\n")
         print("======= SUMMARY =======")
         print("Added braces " + str(linesEdited) +
               " times in " + str(fileNo) + " files")

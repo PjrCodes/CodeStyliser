@@ -27,9 +27,11 @@ int main()
 
     
 
-        for (int a = 0; a < 10; a++)  
+        for (int a = 0; a < 10; a++) {
                 // indented check
             printf("NO CURLIES %d \n", a);  
+        }
+
 
         
         
@@ -57,9 +59,11 @@ int main()
 
 
     // TINEE ERROR: (comment Iam disappears)
-    for (int p = 0; p < 10; p++) // I am
+    for (int p = 0; p < 10; p++) { // I am
 
         printf("NO CURLIES %d", p); 
+    }
+
 
 }
 

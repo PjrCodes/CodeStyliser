@@ -2,15 +2,23 @@
 int main()
 {
 
- for() 
+ for() {
     pd();
+ }
 
-    if() 
+
+    if() {
     pd();
-    else if()
+    }
+
+    else if() {
     xd;
-    else()
+    }
+
+    else() {
     sp;
+    }
+
 }
 
 

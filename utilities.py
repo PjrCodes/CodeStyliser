@@ -192,10 +192,11 @@ THE FOLLOWING CODE DONT WORK. COMMENTING
 
 def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, keywordIndex):
     # found a  "KEYWORD"
+    errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
     hasHash = checkForHash(lineIndex, lines)
     if hasHash != -1:
         # has hash
-        print("hash ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+        print("hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
     # check for keyword
     # print(utils.hasKeyword(lineIndex, lines))
@@ -207,7 +208,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
     checkParenthResult = checkForParentheses(
         line, lineIndex, lines)
     if checkParenthResult == None:
-        print("keyword in parenth ignore/ err: ignored for loop at " + str(lineIndex+1) + " in file " + fileToEdit.name)
+        print("keyword in parenth ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
     elif checkParenthResult[0] == False:
         # doesnt end on same line
@@ -250,7 +251,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 lines.insert(lineIndex, toAddLine)
                 return lines
             else:
-                print("macro w/o brace or syntatical error in for in " + fileToEdit.name + " at line " + str(lineIndex))
+                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
         else:
             if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
@@ -274,7 +275,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 return lines
             else:
-                print("macro w/o brace or syntatical error in for  in " + fileToEdit.name + " at line " + str(lineIndex))
+                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
         # check for semicolons to add Closing brace
@@ -291,5 +292,5 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         return lines
 
 if __name__ == "__main__":
-    print("Do not run utilities!!!, run codeStyliserVERSION.py instead!")
+    print("Do not run utilities!!!, run codeStyliser.py instead!")
     sys.exit()
