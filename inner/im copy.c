@@ -11,13 +11,16 @@
 //    {} added after last ) but must be added after (condition) parentheses
 
 
-ERR: 1000
-/*sdaioiou
-oids*/ else
-        ls;
+// ERR: 1000
+// /*sdaioiou
+// oids*/ else
+//         ls;
 
 
-
+if () {
+   as;
+}
+as;
 
 
 // ifal (asdl->sa) asd;
@@ -33,18 +36,6 @@ oids*/ else
 // if (rv->rv_d.dc < dnpw_cfg->samelane_right_edge_mts)))
 //    #endif
 
-
-
-// err 7: PARENTH_AFTER_FOR_error:
-//    even if parenth are not immedieatly after, it gives error
-// fix: check that () are JUST after for. 
-//    * this example also shows SAME-LINE-PARENTHESES-error:
-
-//             foreign_vel = IAV_DRIVE_FOREIGN_VEL(rawmsg);
-
-// you need to check that the ( is just after for. 
-
-
 // err 6: FUNCTION-error:
 //    after function ended, we see some lines added, something to do with double line if
 //    potential problem: to do with insert statement
@@ -56,7 +47,7 @@ oids*/ else
 // asdasdasd[psda]
 //     asdas0>asasd-0ads=.d
 //  )
-asd; //  asdpo; //as-doi-ad()PI@(>)
+//  asdpo; //as-doi-ad()PI@(>)
 // bb_deint_0:
 //    if ( asdd && 
 //    asdo) {
@@ -73,3 +64,14 @@ asd; //  asdpo; //as-doi-ad()PI@(>)
 //             last __LITTLE_ENDIAN__
 // /* adsoi
 // */ commentover;
+
+
+
+
+/* AO
+SOSO
+SOO*/ for()
+            la;
+
+
+

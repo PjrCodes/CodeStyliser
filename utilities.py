@@ -11,7 +11,7 @@
 # utils for Codestyliser.py
 # ---
 #TODO: remove rouge -1
-# TODO: use logger
+#TODO: use logger
 #TODO: use EXCEPTIONS in a SMARTER WAY!!!
 
 import re
@@ -216,7 +216,7 @@ THE FOLLOWING CODE DONT WORK. COMMENTING
 #     return False
 
 
-def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, keywordIndex):
+def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
     # found a  "KEYWORD"
     errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
     hasHash = checkForHash(lineIndex, lines)
@@ -282,98 +282,125 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 lastSemiColonIndex = line.rfind(";")
                 if lastSemiColonIndex != -1:
                 # semicolon found on same line
-                # not an else if
                     if currentLineIsComment:
-                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip(
-                        ) + " } " + commentOfCurrentLine + "\n"
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                        else:
+                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                     else:
-                        toAddLine = line[:lastCloseParenthIndex] + \
-                            " { " + \
-                            line[lastCloseParenthIndex:].rstrip() + \
-                            " }\n"
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
+                    
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
                     return lines
                 else:
                     if currentLineIsComment:
-                        toAddLine = line.rstrip() + \
-                            " { " + commentOfCurrentLine + "\n"
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
+                        else:
+                            toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
                     else:
                         toAddLine = line.rstrip() + " {\n"
+
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
                     checkForSemiColonIndex = lineIndex + 1
+
             elif line[lastCloseParenthIndex:].isspace():
+
                 if currentLineIsComment:
-                    toAddLine = line.rstrip() + \
-                        " { " + commentOfCurrentLine + "\n"
+                    if isMultiline:
+                        toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
+                    else:
+                        toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
                 else:
                     toAddLine = line.rstrip() + " {\n"
+
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine)
                 checkForSemiColonIndex = lineIndex + 1
+
             elif line[lastCloseParenthIndex:].find(";") != -1:
                 # semicolon found on same line
                 if currentLineIsComment:
-                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
+                    if isMultiline:
+                        toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } "+ "\n"
+                    else:
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
                 else:
                     toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
+
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine)
                 return lines
+
             else:
-                
                 print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
         else:
             if not isElseIf and KEYWORD == "else -":
                 lastSemiColonIndex = line.rfind(";")
                 if lastSemiColonIndex != -1:
-                    nxtLnTrimComment = trimComment(
-                        lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+
                     if nxtLnTrimComment.hasComment:
-                        toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip(
-                        ) + " } " + nxtLnTrimComment.comment + "\n"
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
+                    
                     else:
-                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + \
-                            " { " + lines[nxtLnIndex -
-                                        1][lastCloseParenthIndex:].rstrip() + " }\n"
+                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex -1][lastCloseParenthIndex:].rstrip() + " }\n"
+
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     return lines
+
                 else:
-                    nxtLnTrimComment = trimComment(
-                        lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                    if nxtLnTrimComment.hasComment:
-                        toAddLine = nxtLnTrimComment.line.rstrip() + \
-                            " { " + nxtLnTrimComment.comment + "\n"
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+
+                    if nxtLnTrimComment.hasComment: 
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\n"
                     else:
-                        toAddLine = lines[nxtLnIndex -
-                                        1].rstrip() + " {\n"
+                        toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
+                        
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     checkForSemiColonIndex = nxtLnIndex
+
             elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
                 
                 nxtLnTrimComment = trimComment(
                     lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                if nxtLnTrimComment.hasComment:
-                    toAddLine = nxtLnTrimComment.line.rstrip() + \
-                        " { " + nxtLnTrimComment.comment + "\n"
+                if nxtLnTrimComment.hasComment: 
+                    if nxtLnTrimComment.isMultiline:
+                        toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
+                    else:
+                        toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\n"
                 else:
                     toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
+
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 checkForSemiColonIndex = nxtLnIndex
+
             elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
                 nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                 if nxtLnTrimComment.hasComment:
-                    toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
+                    if nxtLnTrimComment.isMultiline:
+                        toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                    else:
+                        toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                 else:
                     toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
+                
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 return lines
+
             else:
                 print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
@@ -385,8 +412,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         # add closing braces at closingBraceLine (inserting a new ln) with indentation
         spaces = " " * keywordIndex
 
-        lines.insert(closingBraceLineIndex, "\n")
-        addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
+        lines.insert(closingBraceLineIndex, "")
+        addClosingBraceLine = spaces + "}\n"
         lines.insert(closingBraceLineIndex, addClosingBraceLine)
         return lines
 

@@ -33,40 +33,44 @@ def styliseCode(fileToEdit):
         # try:
             # increment line count
             lineIndex = lineIndex + 1
-            # current line
-            line = lines[lineIndex]
-            # print(str(lineIndex) + "\t" + line, end="")
             currentLineIsComment = False
-
-            firstCharIndex = utils.getFirstCharacterIndex(line)
-
+            isMultiline = False
+            commentOfCurrentLine = ""
             # search for comments
-            trimmedCommentResult = utils.trimComment(line, lineIndex, lines)
+            trimmedCommentResult = utils.trimComment(lines[lineIndex], lineIndex, lines)
             line = trimmedCommentResult.line
-
-            # print(str(lineIndex) + "@@@" + fileToEdit.name + "\t" + line)
 
             if trimmedCommentResult.hasComment == True and trimmedCommentResult.isMultiline == False:
                 currentLineIsComment = True
                 commentOfCurrentLine = trimmedCommentResult.comment
             elif trimmedCommentResult.isMultiline == True:
+                isMultiline = trimmedCommentResult.isMultiline
                 currentLineIsComment = trimmedCommentResult.hasComment
                 commentOfCurrentLine = trimmedCommentResult.comment
                 # if comment, jump
                 lineIndex = trimmedCommentResult.multiLineJumpIndex
+                line = trimmedCommentResult.line
             elif trimmedCommentResult.hasComment == False:
                 currentLineIsComment = False
+                isMultiline = False
                 commentOfCurrentLine = trimmedCommentResult.comment
             else:
                 print("FATAL error in comment checking, at line " +
                     str(lineIndex) + " file: " + fileToEdit.name)
+                continue
 
+            firstCharIndex = utils.getFirstCharacterIndex(line)
             # ---------------------------------------------------------------------------
             # find for loops
-            forLoopIndex = line.find("for")
+            forLoopMatch = re.search(r"\b(for)\b", line)
+            if forLoopMatch:
+                forLoopIndex = forLoopMatch.start()
+            else:
+                forLoopIndex = -1
+
             if forLoopIndex == firstCharIndex:
                 forLoopHandler = utils.handleKeyword(KEYWORD="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=forLoopIndex)
+                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline,keywordIndex=forLoopIndex)
                 if forLoopHandler == None:
                     continue
                 else:
@@ -76,10 +80,15 @@ def styliseCode(fileToEdit):
             # ---------------------------------------------------------------------------
 
             # find while loops
-            whileLoopIndex = line.find("while")
+            whileLoopMatch = re.search(r"\b(while)\b", line)
+            if whileLoopMatch:
+                whileLoopIndex = whileLoopMatch.start()
+            else:
+                whileLoopIndex = -1
+            
             if whileLoopIndex == firstCharIndex:
                 whileLoopHandler = utils.handleKeyword(KEYWORD="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex)
+                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
                 if whileLoopHandler == None:
                     continue
                 else:
@@ -89,10 +98,15 @@ def styliseCode(fileToEdit):
             # ---------------------------------------------------------------------------
 
             # find if conditions
-            ifConditionIndex = line.find("if")
+            ifConditionMatch = re.search(r"\b(if)\b", line)
+            if ifConditionMatch:
+                ifConditionIndex = ifConditionMatch.start()
+            else:
+                ifConditionIndex = -1
+
             if ifConditionIndex == firstCharIndex:
                 ifConditionHandler = utils.handleKeyword(KEYWORD="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex)
+                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
                 if ifConditionHandler == None:
                     continue
                 else:
@@ -102,22 +116,30 @@ def styliseCode(fileToEdit):
             # ---------------------------------------------------------------------------
             # find else conditions
             startingCurlyBraceIndex = line.find("}")
-            startingAtElseIndex = line.find("else")
+            elseConditionMatch = re.search(r"\b(else)\b", line)
+            if elseConditionMatch:
+                startingElseIndex = elseConditionMatch.start()
+            else:
+                startingElseIndex = -1
             lineStartsOnBrace = False
             if startingCurlyBraceIndex == firstCharIndex:
                 # line starts on a }
                 lineStartsOnBrace = True
-            if (lineStartsOnBrace and line[startingCurlyBraceIndex:].find("else") != -1) or (startingAtElseIndex == firstCharIndex and lineStartsOnBrace == False):
+            
+            if lineStartsOnBrace and startingElseIndex != -1:
                 # we have a line with an } and an else after it
                 # process else
-                
-                if lineStartsOnBrace:
-                    elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex)
+                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                                                currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
+                if elseConditionHandler == None:
+                    continue
                 else:
-                    elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingAtElseIndex)
-
+                    lines = elseConditionHandler
+                    linesEdited = linesEdited + 1
+            elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
+                # we have an else
+                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                                                currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
                 else:
