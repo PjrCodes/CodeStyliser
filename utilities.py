@@ -351,7 +351,14 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                     
                     else:
                         toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex -1][lastCloseParenthIndex:].rstrip() + " }\n"
+                    
 
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                        return None
+                
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     return lines
@@ -367,6 +374,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                     else:
                         toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
                         
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                        return None
+
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     checkForSemiColonIndex = nxtLnIndex
@@ -383,6 +396,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 else:
                     toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
 
+                hasHash = checkForHash(nxtLnIndex - 1, lines)
+                if hasHash != -1:
+                    # has hash
+                    print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
+
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 checkForSemiColonIndex = nxtLnIndex
@@ -395,8 +414,14 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                     else:
                         toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
                 else:
-                    toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
+                   toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
                 
+                hasHash = checkForHash(nxtLnIndex - 1, lines)
+                if hasHash != -1:
+                    # has hash
+                    print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
+
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 return lines
@@ -410,7 +435,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
             checkForSemiColonIndex, lines) + 1
 
         # add closing braces at closingBraceLine (inserting a new ln) with indentation
-        spaces = " " * keywordIndex
+        if isMultiline:
+            spaces = " " * (keywordIndex + len(commentOfCurrentLine))
+
+        else:
+            spaces = " " * keywordIndex
 
         lines.insert(closingBraceLineIndex, "")
         addClosingBraceLine = spaces + "}\n"
