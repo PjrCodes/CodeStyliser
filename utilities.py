@@ -1,15 +1,16 @@
 #!/usr/local/bin/python3
 # Copyright (c) 2020 Pranjal Rastogi All Rights Reserved
-# This code cannot be copied. Violators will be prosecuted.
+# Do not copy this code.
+# DO NOT RE-DISTRIBUTE
 # ---
-# code styliser program
+# THE codeStyliser Utility
 # ---
-# Made in python 3.7.7 64 bit, please use only this version
+# Made in python 3.7.7 64 bit, use only this version
 # ---
 # utils.py
 # utils for Codestyliser.py
 # ---
-# DO NOT RE-DISTRIBUTE
+
 
 import re
 import sys
@@ -193,103 +194,274 @@ THE FOLLOWING CODE DONT WORK. COMMENTING
 def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, keywordIndex):
     # found a  "KEYWORD"
     errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
-    hasHash = checkForHash(lineIndex, lines)
-    if hasHash != -1:
-        # has hash
-        print("hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-        return None
-    # check for keyword
-    # print(utils.hasKeyword(lineIndex, lines))
-    # if utils.hasKeyword(lineIndex, lines) == True:
-    #     print("keyword ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-    #     continue
-    
-    # we must now skip over all parentheses to find the end of the (condition)
-    checkParenthResult = checkForParentheses(
-        line, lineIndex, lines)
-    if checkParenthResult == None:
-        print("keyword in parenth ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-        return None
-    elif checkParenthResult[0] == False:
-        # doesnt end on same line
-        isOnSameLine = checkParenthResult[0]
-        nxtLnIndex = checkParenthResult[1]
-        nextLineIndex = nxtLnIndex
-        openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
-        lastCloseParenthIndex = lines[nxtLnIndex - 1].rfind(")")  + 1
-    elif checkParenthResult[0] == True:
-        # ends on same line
-        isOnSameLine = checkParenthResult[0]
-        nextLineIndex = lineIndex + 1
-        openCurlyBraceIndex = line.find("{")
-        lastCloseParenthIndex = line.rfind(")")  + 1
-
-    
-    if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines) == -1:
-        
-        # no { on same ln and on subsequent lines
-
-        # check if it has stuff on same line
-        # add brace
-        if isOnSameLine:
-            if line[lastCloseParenthIndex:].isspace():
-                if currentLineIsComment:
-                    toAddLine = line.rstrip() + \
-                        " { " + commentOfCurrentLine + "\n"
-                else:
-                    toAddLine = line.rstrip() + " {\n"
-                del lines[lineIndex]
-                lines.insert(lineIndex, toAddLine)
-                checkForSemiColonIndex = lineIndex + 1
-            elif line[lastCloseParenthIndex:].find(";") != -1:
-                # semicolon found on same line
-                if currentLineIsComment:
-                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
-                else:
-                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
-                del lines[lineIndex]
-                lines.insert(lineIndex, toAddLine)
-                return lines
-            else:
-                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                return None
+    if KEYWORD == "else -":
+        # we must now skip over all parentheses to find the end of the (condition)
+        hasHash = checkForHash(lineIndex, lines)
+        isElseIf = False
+        if hasHash != -1:
+            # has hash
+            print("hash ignore: ignored else/ else if at " +
+                str(lineIndex + 1) + " in file " + fileToEdit.name)
+            return None
+        # check for keyword
+        # print(utils.hasKeyword(lineIndex, lines))
+        # if utils.hasKeyword(lineIndex, lines) == True:
+        #     print("keyword ignore: ignored else/ else if at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+        #     continue
+        if line.find("if") != -1:
+            # line is else if
+            isElseIf = True
+            checkParenthResult = checkForParentheses(
+                line, lineIndex, lines)
         else:
-            if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
-                nxtLnTrimComment = trimComment(
-                    lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                if nxtLnTrimComment.hasComment:
-                    toAddLine = nxtLnTrimComment.line.rstrip() + \
-                        " { " + nxtLnTrimComment.comment + "\n"
-                else:
-                    toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
-                del lines[nxtLnIndex - 1]
-                lines.insert(nxtLnIndex - 1, toAddLine)
-                checkForSemiColonIndex = nxtLnIndex
-            elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
-                nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                if nxtLnTrimComment.hasComment:
-                    toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
-                else:
-                    toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
-                del lines[nxtLnIndex - 1]
-                lines.insert(nxtLnIndex - 1, toAddLine)
-                return lines
+            # no need to call checkForParentheses
+            isElseIf = False
+            checkParenthResult = (True,)
+
+        if checkParenthResult == None:
+            print("keyword in parenth ignore: ignored else/ else if at " +
+                str(lineIndex+1) + " in file " + fileToEdit.name)
+            return None
+        elif checkParenthResult[0] == False:
+            isOnSameLine = checkParenthResult[0]
+            nxtLnIndex = checkParenthResult[1]
+            nextLineIndex = nxtLnIndex
+            openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
+            if isElseIf:
+                lastCloseParenthIndex = lines[nxtLnIndex -
+                                            1].rfind(")") + 1
             else:
-                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                return None
+                lastCloseParenthIndex = lines[nxtLnIndex -
+                                            1].rfind("e") + 1
+        elif checkParenthResult[0] == True:
+            isOnSameLine = checkParenthResult[0]
+            nextLineIndex = lineIndex + 1
+            openCurlyBraceIndex = line.find("{")
+            if isElseIf:
+                lastCloseParenthIndex = line.rfind(")") + 1
+            else:
+                lastCloseParenthIndex = line.rfind("e") + 1
 
-        # check for semicolons to add Closing brace
-        closingBraceLineIndex = getNextSemiColonLine(
-            checkForSemiColonIndex, lines) + 1
+        if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines) == -1:
+            # no { on same ln or on subsequent lines
+            # add open CURLY on same line
+            if isOnSameLine:
+                if line[lastCloseParenthIndex:].isspace() and isElseIf:
+                    if currentLineIsComment:
+                        toAddLine = line.rstrip() + \
+                            " { " + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line.rstrip() + " {\n"
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    checkForSemiColonIndex = lineIndex + 1
+                elif line[lastCloseParenthIndex:].find(";") != -1 and isElseIf:
+                    # add braces around {}
+                    if currentLineIsComment:
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip(
+                        ) + " } " + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line[:lastCloseParenthIndex] + \
+                            " { " + \
+                            line[lastCloseParenthIndex:].rstrip() + " }\n"
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    return lines
+                elif not isElseIf:
+                    # add braces around {}
+                    lastSemiColonIndex = line.rfind(";")
+                    if lastSemiColonIndex != -1:
+                    # semicolon found on same line
+                    # not an else if
+                        if currentLineIsComment:
+                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip(
+                            ) + " } " + commentOfCurrentLine + "\n"
+                        else:
+                            toAddLine = line[:lastCloseParenthIndex] + \
+                                " { " + \
+                                line[lastCloseParenthIndex:].rstrip() + \
+                                " }\n"
+                        del lines[lineIndex]
+                        lines.insert(lineIndex, toAddLine)
+                        return lines
+                    else:
+                        if currentLineIsComment:
+                            toAddLine = line.rstrip() + \
+                                " { " + commentOfCurrentLine + "\n"
+                        else:
+                            toAddLine = line.rstrip() + " {\n"
+                        del lines[lineIndex]
+                        lines.insert(lineIndex, toAddLine)
+                        checkForSemiColonIndex = lineIndex + 1
+                else:
+                    print("macro w/o brace or syntatical error in else IF/ else condition in " +
+                        fileToEdit.name + " at line " + str(lineIndex))
+                    return None
+            else:
+                if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace() and isElseIf:
+                    nxtLnTrimComment = trimComment(
+                        lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    if nxtLnTrimComment.hasComment:
+                        toAddLine = nxtLnTrimComment.line.rstrip() + \
+                            " { " + nxtLnTrimComment.comment + "\n"
+                    else:
+                        toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    checkForSemiColonIndex = nxtLnIndex
+                elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1 and isElseIf:
+                    nxtLnTrimComment = trimComment(
+                        lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    if nxtLnTrimComment.hasComment:
+                        toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip(
+                        ) + " } " + nxtLnTrimComment.comment + "\n"
+                    else:
+                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + \
+                            " { " + lines[nxtLnIndex -
+                                        1][lastCloseParenthIndex:].rstrip() + " }\n"
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    return None
+                elif not isElseIf:
+                    lastSemiColonIndex = line.rfind(";")
+                    if lastSemiColonIndex != -1:
+                        nxtLnTrimComment = trimComment(
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip(
+                            ) + " } " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + \
+                                " { " + lines[nxtLnIndex -
+                                            1][lastCloseParenthIndex:].rstrip() + " }\n"
+                        del lines[nxtLnIndex - 1]
+                        lines.insert(nxtLnIndex - 1, toAddLine)
+                        return lines
+                    else:
+                        nxtLnTrimComment = trimComment(
+                            lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                        if nxtLnTrimComment.hasComment:
+                            toAddLine = nxtLnTrimComment.line.rstrip() + \
+                                " { " + nxtLnTrimComment.comment + "\n"
+                        else:
+                            toAddLine = lines[nxtLnIndex -
+                                            1].rstrip() + " {\n"
+                        del lines[nxtLnIndex - 1]
+                        lines.insert(nxtLnIndex - 1, toAddLine)
+                        checkForSemiColonIndex = nxtLnIndex
+                else:
+                    print("macro w/o brace or syntatical error in else if/ else condition in " +
+                        fileToEdit.name + " at line " + str(lineIndex))
+                    return None
+            # check for closng brace
+            closingBraceLineIndex = getNextSemiColonLine(
+                checkForSemiColonIndex, lines) + 1
 
-        # add closing braces at closingBraceLine (inserting a new ln) with indentation
-        spaces = " " * keywordIndex
+            # add closing braces at closingBraceLine (inserting a new ln) with indentation
+            spaces = " " * keywordIndex
+            lines.insert(closingBraceLineIndex, "\n")
+            addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
+            lines.insert(closingBraceLineIndex, addClosingBraceLine)
+            return lines
+    else:
+        hasHash = checkForHash(lineIndex, lines)
+        if hasHash != -1:
+            # has hash
+            print("hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+            return None
+        # check for keyword
+        # print(utils.hasKeyword(lineIndex, lines))
+        # if utils.hasKeyword(lineIndex, lines) == True:
+        #     print("keyword ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
+        #     continue
+        
+        # we must now skip over all parentheses to find the end of the (condition)
+        checkParenthResult = checkForParentheses(
+            line, lineIndex, lines)
+        if checkParenthResult == None:
+            print("keyword in parenth ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+            return None
+        elif checkParenthResult[0] == False:
+            # doesnt end on same line
+            isOnSameLine = checkParenthResult[0]
+            nxtLnIndex = checkParenthResult[1]
+            nextLineIndex = nxtLnIndex
+            openCurlyBraceIndex = lines[nxtLnIndex - 1].find("{")
+            lastCloseParenthIndex = lines[nxtLnIndex - 1].rfind(")")  + 1
+        elif checkParenthResult[0] == True:
+            # ends on same line
+            isOnSameLine = checkParenthResult[0]
+            nextLineIndex = lineIndex + 1
+            openCurlyBraceIndex = line.find("{")
+            lastCloseParenthIndex = line.rfind(")")  + 1
 
-        lines.insert(closingBraceLineIndex, "\n")
-        addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
-        lines.insert(closingBraceLineIndex, addClosingBraceLine)
+        
+        if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines) == -1:
+            
+            # no { on same ln and on subsequent lines
 
-        return lines
+            # check if it has stuff on same line
+            # add brace
+            if isOnSameLine:
+                if line[lastCloseParenthIndex:].isspace():
+                    if currentLineIsComment:
+                        toAddLine = line.rstrip() + \
+                            " { " + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line.rstrip() + " {\n"
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    checkForSemiColonIndex = lineIndex + 1
+                elif line[lastCloseParenthIndex:].find(";") != -1:
+                    # semicolon found on same line
+                    if currentLineIsComment:
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    return lines
+                else:
+                    print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
+            else:
+                if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
+                    nxtLnTrimComment = trimComment(
+                        lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    if nxtLnTrimComment.hasComment:
+                        toAddLine = nxtLnTrimComment.line.rstrip() + \
+                            " { " + nxtLnTrimComment.comment + "\n"
+                    else:
+                        toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    checkForSemiColonIndex = nxtLnIndex
+                elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    if nxtLnTrimComment.hasComment:
+                        toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
+                    else:
+                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    return lines
+                else:
+                    print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
+
+            # check for semicolons to add Closing brace
+            closingBraceLineIndex = getNextSemiColonLine(
+                checkForSemiColonIndex, lines) + 1
+
+            # add closing braces at closingBraceLine (inserting a new ln) with indentation
+            spaces = " " * keywordIndex
+
+            lines.insert(closingBraceLineIndex, "\n")
+            addClosingBraceLine = lines[closingBraceLineIndex].rstrip() + spaces + "}\n"
+            lines.insert(closingBraceLineIndex, addClosingBraceLine)
+            return lines
+
+    return None
 
 if __name__ == "__main__":
     print("Do not run utilities!!!, run codeStyliser.py instead!")
