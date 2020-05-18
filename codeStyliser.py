@@ -162,8 +162,8 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.9.3-alpha"
-    NEW_CHANGES = "fixed err 3"
+    VERSION_NUMBER = "0.1.9.5-alpha"
+    NEW_CHANGES = "fixed multiline comment error"
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
@@ -186,7 +186,7 @@ def main():
 
         print("{:=^40}".format(" STARTING... "))
         
-        for root, subdirs, files in os.walk(DIR_NAME):
+        for root, _, files in os.walk(DIR_NAME):
 
             for filename in files:
                 file_path = os.path.join(root, filename)
