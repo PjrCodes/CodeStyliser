@@ -8,9 +8,20 @@
 
  
 // err 3: SAME-LINE-PARENTHESES-error: 
-//    {} added after last ) but must be added after (condition) parenthes
+//    {} added after last ) but must be added after (condition) parentheses
 
-// if ( f->diff ) f->cw = (w0 * w0) * (sampling_time_secs);
+
+ERR: 1000
+/*sdaioiou
+oids*/ else
+        ls;
+
+
+
+
+
+// ifal (asdl->sa) asd;
+
 // else f->cw = (w0 * w0) * (sampling_time_secs * sampling_time_secs);
 // else f->y[f->ny] = current_value;
 

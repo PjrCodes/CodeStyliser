@@ -17,7 +17,7 @@ import re
 import os
 import utilities as utils
 import time
-# TODO: use logger
+
 
 
 def styliseCode(fileToEdit):
@@ -140,23 +140,20 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.9.2-alpha"
-    NEW_CHANGES = "slight refactor"
+    VERSION_NUMBER = "0.1.9.3-alpha"
+    NEW_CHANGES = "fixed err 3"
     KNOWN_BUGS = """
-    \t\terr 2: MACRO-error:  } added after \\
-    \t\terr 3: SAME-LINE-PARENTHESES-error: {} added after last ) but must be added after (condition) parentheses
-    \t\terr 5: KEYWORD-error: # error, mustnt add {} if next line after curlyBraceIndexLine has a Preprocesser
-    \t\terr 7: PARENTH_AFTER_FOR_error: even if parenth are not immedieatly after, it gives error
+    \t\tKnown Issue 1: MACRO-error:  } added after \\
+    \t\tKnown Issue 2: If no endline at end of file, } is added on same line as the last ;
+    \t\tKnown Issue 3: DOUBLE-COMMENT: if there are two comments on same line, one multiline end and one single line, desired result is not achieved, asd*/ for() as;//ads
+    \t\terr 3: SAME-LINE-PARENTHESES-error: {} added after last ) but must be added after (condition) parentheses [[[[[[FIXED]]]]]]
+    \t\terr 5: PREPROCESSOR-error: # error, mustnt add {} if next line after { curlyBraceIndexLine has a Preprocesser
+    \t\terr NEW-1: Keyword after multiline comment not detected.
+    \t\terr 7: PARENTH_AFTER_FOR_error: even if parenth are not immedieatly after, it gives error 
     \t\terr 6: FUNCTION-error: after function ended, we see some lines added, something to do with double line if
     \t\t\t (VERY WEIRD ERROR!!)
-    \t\terr N-1: If no endline at end of file, } is added on same line as the last ;
-    \t\terr PREPROCESSER: if there is #if or #endif, ignore that condition/ loop
-    \t\terr PARENTH_IMMEDIATE: not checking if the parentheses are immediately after for, causing detection of func declarations.
-    \t\terr DOUBLE-COMMENT: if there are two comments on same line, one multiline end and one single line, desired result is not achieved, asd*/ for() as;//ads
-    \t\terr DETECTION-ERROR: if the keyword is part of something else and it has (), it is detected as keyword, forall() as;
-    \t\terr SEMICOLON-DETECTOR: some kind of error, please check, very weird, cant repro
-    \t\t\t (VERY WEIRD ERROR!!)
-    \t\tONLY 11 ERRORS
+    \t\tdouble \\n \\n error:
+    \t\tONLY 5 ERRORS + 3 Known iSsues
     """
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
@@ -178,7 +175,8 @@ def main():
         time.sleep(3)
         print("\n\n")
 
-        print("===== STARTING... =====")
+        print("{:=^40}".format(" STARTING... "))
+        
         for root, subdirs, files in os.walk(DIR_NAME):
 
             for filename in files:
@@ -188,9 +186,14 @@ def main():
                     continue
                 fileExt = fileExtension[1]
                 if fileExt == "c":
+                    
                     print ("working ...", end="\r", flush=True)
                     time.sleep(0.2)
                     fileNo = fileNo + 1
+                    # file_example = open (file_path, "r")
+                    # for line in file_example:
+                    #     print(line)
+                    #     print("HI")
                     try:
                         with open(file_path, 'rb') as open_file:
                             content = open_file.read()
@@ -205,7 +208,7 @@ def main():
                               filename + " while changing line endings")
                         continue
                     # try:
-                    with open(file_path, "r+") as fileToStyle:
+                    with open(file_path, "r+", encoding='utf8') as fileToStyle:
                         linesEdited = styliseCode(fileToStyle) + linesEdited
                     # except:
                     #     e = sys.exc_info()[0]
@@ -215,11 +218,10 @@ def main():
                 else:
                     continue
         print("\n")
-        print("======= SUMMARY =======")
+        print("{:=^40}".format(" SUMMARY "))
         print("Added braces " + str(linesEdited) +
               " times in " + str(fileNo) + " files")
-        print("======== ENDED ========")
-
+        print("{:=^40}".format(" ENDED "))
 
 if __name__ == "__main__":
     main()
