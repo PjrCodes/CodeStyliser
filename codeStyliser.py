@@ -228,8 +228,7 @@ def main():
                     continue
         print("\n")
         print("{:=^40}".format(" SUMMARY "))
-        print("Added braces " + str(linesEdited) +
-              " times in " + str(fileNo) + " files")
+        print("Added braces " + str(linesEdited) + " times in " + str(fileNo) + " files")
         print("{:=^40}".format(" ENDED "))
 
 if __name__ == "__main__":
