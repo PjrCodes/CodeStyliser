@@ -142,19 +142,6 @@ def styliseCode(fileToEdit):
 def main():
     VERSION_NUMBER = "0.1.9.3-alpha"
     NEW_CHANGES = "fixed err 3"
-    KNOWN_BUGS = """
-    \t\tKnown Issue 1: MACRO-error:  } added after \\
-    \t\tKnown Issue 2: If no endline at end of file, } is added on same line as the last ;
-    \t\tKnown Issue 3: DOUBLE-COMMENT: if there are two comments on same line, one multiline end and one single line, desired result is not achieved, asd*/ for() as;//ads
-    \t\terr 3: SAME-LINE-PARENTHESES-error: {} added after last ) but must be added after (condition) parentheses [[[[[[FIXED]]]]]]
-    \t\terr 5: PREPROCESSOR-error: # error, mustnt add {} if next line after { curlyBraceIndexLine has a Preprocesser
-    \t\terr NEW-1: Keyword after multiline comment not detected.
-    \t\terr 7: PARENTH_AFTER_FOR_error: even if parenth are not immedieatly after, it gives error 
-    \t\terr 6: FUNCTION-error: after function ended, we see some lines added, something to do with double line if
-    \t\t\t (VERY WEIRD ERROR!!)
-    \t\tdouble \\n \\n error:
-    \t\tONLY 5 ERRORS + 3 Known iSsues
-    """
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
@@ -168,7 +155,7 @@ def main():
         linesEdited = 0
         print("Welcome to CodeStyliser ver" + VERSION_NUMBER)
         print("\twith changes: " + NEW_CHANGES)
-        print("\tand with the BEST INSECTS: " + KNOWN_BUGS)
+        print("\tand with the BEST INSECTS as on github.com")
         print("Made by Pranjal Rastogi, for and in Python 3.7.7 64Bit")
         print("Will fix (.c) code for files under " + DIR_NAME)
         print("you have three seconds to read the above data")
