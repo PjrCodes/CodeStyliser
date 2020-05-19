@@ -11,11 +11,19 @@ you found a valid condition or loop with all parenthese closed and you are redy 
 MACRO ERROR CHECKING:
 
 search for (#define)'s
-    search if end of this line has \
-        if yes, check if it is a keyword line 
-            if yes, wherever we have to add { check if that line has \
-                if yes, add {  \ instead of only {; find SEMICOLON line (ie, closingBrace line). Check if this line has \
-                    if yes, add } \ to nxtLn
-                    if no, add }
-                if no, then ignore, and dont print
-        if no, ignore, and dont print
+    IF end of this line has \
+        THEN,
+            IF it is a keyword line 
+                THEN, wherever we have to add { 
+                    IF that line has \
+                        THEN, add {  \ instead of only {; 
+                            and find SEMICOLON line (ie, closingBrace line). 
+                            IF this line has \
+                                THEN add } \ to nxtLn
+                                ELSE add }
+                            ENDIF
+                    ELSE, then ignore, and dont print
+                    ENDIF
+            ENDIF
+        ELSE ignore, and dont print
+    ENDIF

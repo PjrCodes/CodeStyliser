@@ -18,7 +18,7 @@ import os
 import utilities as utils
 import time
 
-
+DEFINE_PATTERN = r"#\s*\b(define)\b"
 
 def styliseCode(fileToEdit):
     # lines edited in this file
@@ -55,11 +55,23 @@ def styliseCode(fileToEdit):
                 isMultiline = False
                 commentOfCurrentLine = trimmedCommentResult.comment
             else:
-                print("FATAL error in comment checking, at line " +
+                print("FATAL ERROR: in comment checking, at line " +
                     str(lineIndex) + " file: " + fileToEdit.name)
                 continue
-
+            
             firstCharIndex = utils.getFirstCharacterIndex(line)
+            
+            if re.search(DEFINE_PATTERN, line):
+                isMacro = True
+                if line.rfind("\\") != -1:
+                    # found \ at the back of the line
+                    pass
+                else:
+                    # ignore line
+                    continue 
+            else:
+                isMacro = False
+
             # ---------------------------------------------------------------------------
             # find for loops
             forLoopMatch = re.search(r"\b(for)\b", line)
@@ -70,7 +82,7 @@ def styliseCode(fileToEdit):
 
             if forLoopIndex == firstCharIndex:
                 forLoopHandler = utils.handleKeyword(KEYWORD="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline,keywordIndex=forLoopIndex)
+                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline, keywordIndex=forLoopIndex)
                 if forLoopHandler == None:
                     continue
                 else:
@@ -88,7 +100,7 @@ def styliseCode(fileToEdit):
             
             if whileLoopIndex == firstCharIndex:
                 whileLoopHandler = utils.handleKeyword(KEYWORD="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
+                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
                 if whileLoopHandler == None:
                     continue
                 else:
@@ -106,7 +118,7 @@ def styliseCode(fileToEdit):
 
             if ifConditionIndex == firstCharIndex:
                 ifConditionHandler = utils.handleKeyword(KEYWORD="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
+                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
                 if ifConditionHandler == None:
                     continue
                 else:
@@ -130,7 +142,7 @@ def styliseCode(fileToEdit):
                 # we have a line with an } and an else after it
                 # process else
                 elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
+                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
                 else:
@@ -139,7 +151,7 @@ def styliseCode(fileToEdit):
             elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
                 # we have an else
                 elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
+                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
                 else:
@@ -200,7 +212,8 @@ def main():
                 fileExt = fileExtension[1]
                 if fileExt == "c":
                     
-                    print ("working ...", end = "\r", flush = True)
+                    print ("working ...", end = "", flush = True)
+                    print("\r", end="")
                     time.sleep(0.1)
                     fileNo = fileNo + 1
                     try:
@@ -231,7 +244,8 @@ def main():
         print("\n")
         print("{:=^80}".format(" SUMMARY "))
         print("Please check all macros once again, that is where most of the errors will be.")
-        print("Added braces " + str(linesEdited) + " times in " + str(fileNo) + " files.")
+        print("Added braces %d times in %d files." % (linesEdited, fileNo))
+
         timeInSec = time.gmtime(endTime - startTime).tm_sec
         if timeInSec == 0:
             timeTaken = int(round(endTime - startTime, 3)* 1000)
@@ -239,6 +253,7 @@ def main():
         else:
             timeTaken = timeInSec
             print("{:=^80}".format(f" DONE in {timeTaken} seconds "))
+        
         print("\n")
 
 if __name__ == "__main__":

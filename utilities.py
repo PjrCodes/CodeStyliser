@@ -20,7 +20,7 @@ import sys
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
 OPENBRACE_PATTERN = r"^(\s*\{)|^(\{)"
-KEYWORDS = ['for', 'while', 'do', 'switch', 'if', 'else'] #TODO: convert into patterns
+KEYWORDS = [r'\b(for)\b', r'\b(while)\b', r'\b(do)\b', r'\b(switch)\b', r'\b(if)\b', r'\b(else)\b'] #TODO: convert into patterns
 
 class LineWithComment:
 
@@ -168,7 +168,6 @@ def checkForHash(index, lines):
             index = index + 1
         else:
             break
-
     return lineWithoutComment.line.find("#")
 
 def getNextSemiColonLineIndex(index, lines):
@@ -191,12 +190,12 @@ def getClosingBraceLineIndex(index, lines):
 
     # run operations on line
     keywordLineCheckIndex = index
+    hasKeyword = False
     while keywordLineCheckIndex < (len(lines)):
 
         currentLineWoComment = trimComment(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines)
         line = currentLineWoComment.line
 
-        keywordIndex = 0
         firstCharOfLn = getFirstCharacterIndex(lines[keywordLineCheckIndex])
         if line.isspace():
             if currentLineWoComment.isMultiline:
@@ -211,13 +210,15 @@ def getClosingBraceLineIndex(index, lines):
             if currentLineWoComment.hasComment:
                 # we must check if current ln has keyword
                 for keyword in KEYWORDS:
-                    print(keyword)
-                    if line.find(keyword) == firstCharOfLn:
-                        # we found a keyword
-                        keywordIndex = line.find(keyword)
-                        cont = False
-                        hasKeyword = True
-                        break
+                    keywordCheckRe = re.search(keyword, line)
+                    if  keywordCheckRe:
+                        if keywordCheckRe.start() == firstCharOfLn:
+                            # we found a keyword
+                            cont = False
+                            hasKeyword = True
+                            break
+                        else:
+                            continue
                     else:
                         # didnt find KEYWORD
                         continue
@@ -239,17 +240,23 @@ def getClosingBraceLineIndex(index, lines):
             elif not currentLineWoComment.hasComment:
 
                 for keyword in KEYWORDS:
-                    if line.find(keyword) == firstCharOfLn:
-                        # we found a keyword
-                        keywordIndex = line.find(keyword)
-                        cont = False
-                        hasKeyword = True
-                        break
+                    keywordCheckRe = re.search(keyword, line)
+                    if  keywordCheckRe:
+                        if keywordCheckRe.start() == firstCharOfLn:
+                            # we found a keyword
+                            cont = False
+                            hasKeyword = True
+                            break
+                        else:
+                            cont = False
+                            hasKeyword = False
+                            continue
                     else:
                         # didnt find KEYWORD
                         cont = False
                         hasKeyword = False
                         continue
+                    
                 else:
                     # didnt find any keyword
                     keywordLineCheckIndex += 1
@@ -258,7 +265,7 @@ def getClosingBraceLineIndex(index, lines):
                     continue
                 else:
                     break
-                
+
     if hasKeyword == False:
         # didnt find a keyword
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
@@ -292,7 +299,7 @@ def getClosingBraceLineIndex(index, lines):
             # we must return semicolon index again!
             return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
 
-def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
+def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
     # found a  "KEYWORD"
     errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
     hasHash = checkForHash(lineIndex, lines)
@@ -352,100 +359,184 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
     if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines)[0] == -1:
         
         # no { on same line and on subsequent lines, we must add {} if possible        
-       
+
         if isOnSameLine:
             lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
+            isBackSlashPresent = line.rfind("\\")
+            if isBackSlashPresent != -1:
+                # backSLASH!
+                if lastSemiColonIndex != -1:
+                    # semicolon found on same line
 
-            if line[lastCloseParenthIndex:].isspace():
-                # if there is nothing on line except the keyword()
-                if currentLineIsComment:
-                    if isMultiline:
-                        toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
+                    if currentLineIsComment:
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
+                        else:
+                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
                     else:
-                        toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
-                else:
-                    toAddLine = line.rstrip() + " {\n"
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n" 
 
-                del lines[lineIndex]
-                lines.insert(lineIndex, toAddLine)
-                checkForSemiColonIndex = lineIndex + 1
-
-            elif lastSemiColonIndex != -1:
-                # semicolon found on same line
-
-                if currentLineIsComment:
-                    if isMultiline:
-                        toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
+                    # insert toAddLine and return
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    return lines
+                elif lastSemiColonIndex == -1:
+                    if currentLineIsComment:
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line.rstrip()[:-1] + " { \\" + "\n"
+                        else:
+                            toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\\\n"
                     else:
-                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
+                        toAddLine = line.rstrip()[:-1] + " { \\\n"
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    checkForSemiColonIndex = lineIndex + 1
+
+            elif isBackSlashPresent == -1:
+        
+                if line[lastCloseParenthIndex:].isspace():
+                    # if there is nothing on line except the keyword()
+                    if currentLineIsComment:
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
+                        else:
+                            toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line.rstrip() + " {\n"
+
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    checkForSemiColonIndex = lineIndex + 1
+
+                elif lastSemiColonIndex != -1:
+                    # semicolon found on same line
+
+                    if currentLineIsComment:
+                        if isMultiline:
+                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
+                        else:
+                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
+                    else:
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n" 
+
+                    # insert toAddLine and return
+                    del lines[lineIndex]
+                    lines.insert(lineIndex, toAddLine)
+                    return lines
+
                 else:
-                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n" 
-
-                # insert toAddLine and return
-                del lines[lineIndex]
-                lines.insert(lineIndex, toAddLine)
-                return lines
-
-            else:
-                print("WARN: Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                return None
+                    print("WARN: syntax Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
         else:
             # the (condition) doesnt end on same line
+            isBackSlashPresent = lines[nxtLnIndex - 1].rfind("\\")
             lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
+            if isBackSlashPresent != -1:
+                if lastSemiColonIndex != -1:
+                    # same line semicolon
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
 
-            if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
-                
-                nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                
-                if nxtLnTrimComment.hasComment: 
-                    if nxtLnTrimComment.isMultiline:
-                        toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
+                    if nxtLnTrimComment.hasComment:
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip()[:-1] + " } " + "\\\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\\\n"
                     else:
-                        toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\n"
-                else:
-                    toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
+                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip()[:-1] + " } \\\n"
+                    
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        if lines[nxtLnIndex - 1].find("{") != -1:
+                            # has {
+                            return None
+                        else:
+                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            return None
 
-                hasHash = checkForHash(nxtLnIndex - 1, lines)
-                if hasHash != -1:
-                    # has hash
-                    if lines[nxtLnIndex - 1].find("{") != -1:
-                        # has {
-                        return None
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    return lines
+
+                elif lastSemiColonIndex == -1:
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    
+                    if nxtLnTrimComment.hasComment:
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip()[:-1] + " { " + "\\\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\\\n"
                     else:
-                        print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                        return None
+                        toAddLine = lines[nxtLnIndex - 1].rstrip()[:-1] + " { \\\n"
 
-                del lines[nxtLnIndex - 1]
-                lines.insert(nxtLnIndex - 1, toAddLine)
-                checkForSemiColonIndex = nxtLnIndex
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        if lines[nxtLnIndex - 1].find("{") != -1:
+                            # has {
+                            return None
+                        else:
+                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            return None
 
-            elif lastSemiColonIndex != -1:
-                nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-                
-                if nxtLnTrimComment.hasComment:
-                    if nxtLnTrimComment.isMultiline:
-                        toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    checkForSemiColonIndex = nxtLnIndex
+            elif isBackSlashPresent == -1:
+                if lines[nxtLnIndex - 2].rfind("\\") != -1:
+                    return None
+                if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    
+                    if nxtLnTrimComment.hasComment: 
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\n"
                     else:
-                        toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
-                else:
-                   toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
-                
-                hasHash = checkForHash(nxtLnIndex - 1, lines)
-                if hasHash != -1:
-                    # has hash
-                    if lines[nxtLnIndex - 1].find("{") != -1:
-                        # has {
-                        return None
-                    else:
-                        print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                        return None
+                        toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
 
-                del lines[nxtLnIndex - 1]
-                lines.insert(nxtLnIndex - 1, toAddLine)
-                return lines
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        if lines[nxtLnIndex - 1].find("{") != -1:
+                            # has {
+                            return None
+                        else:
+                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            return None
+
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    checkForSemiColonIndex = nxtLnIndex
+
+                elif lastSemiColonIndex != -1:
+                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                    
+                    if nxtLnTrimComment.hasComment:
+                        if nxtLnTrimComment.isMultiline:
+                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                        else:
+                            toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
+                    else:
+                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex - 1][lastCloseParenthIndex:].rstrip() + " }\n"
+                    
+                    hasHash = checkForHash(nxtLnIndex - 1, lines)
+                    if hasHash != -1:
+                        # has hash
+                        if lines[nxtLnIndex - 1].find("{") != -1:
+                            # has {
+                            return None
+                        else:
+                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            return None
+
+                    del lines[nxtLnIndex - 1]
+                    lines.insert(nxtLnIndex - 1, toAddLine)
+                    return lines
 
             else:
-                print("WARN: Loop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: syntaxLoop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
 
@@ -460,11 +551,22 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
+
+            if lines[closingBraceLineIndex - 1].rfind("\\") != -1:
+                # we found \
+                addClosingBraceLine = spaces + "} \\\n"
+            elif lines[closingBraceLineIndex - 1].rfind("\\") == -1:
+                if lines[closingBraceLineIndex -2].rfind("\\") != -1:
+                    toAddBackSlash = lines[closingBraceLineIndex - 1].rstrip() + " \\\n"
+                    del lines[closingBraceLineIndex - 1]
+                    lines.insert(closingBraceLineIndex - 1, toAddBackSlash)        
+                
+                addClosingBraceLine = spaces + "}\n"
             
             lines.insert(closingBraceLineIndex, "")
-            addClosingBraceLine = spaces + "}\n"
             lines.insert(closingBraceLineIndex, addClosingBraceLine)
             return lines
+
 
 
 if __name__ == "__main__":
