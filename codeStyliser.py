@@ -197,7 +197,7 @@ def main():
                 if fileExt == "c":
                     
                     print ("working ...", end="\r", flush=True)
-                    time.sleep(0.2)
+                    time.sleep(0.1)
                     fileNo = fileNo + 1
                     # file_example = open (file_path, "r")
                     # for line in file_example:
@@ -220,6 +220,8 @@ def main():
                         with open(file_path, "r+") as fileToStyle:
                             linesEdited = styliseCode(fileToStyle) + linesEdited
                     except UnicodeDecodeError as e:
+                        #TODO: CHANGE, TO A SMARTED ENCODING DETECTOR SYSTEM
+                        #TODO: CURRENTLY ASSUMING encoding CHANGES
                         with open(file_path,"r+", encoding="ISO-8859-1") as fileToStyle:
                             linesEdited = styliseCode(fileToStyle) + linesEdited
                         

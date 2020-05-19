@@ -18,7 +18,7 @@ import re
 import sys
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
-KEYWORDS = ['for', 'while', 'do', 'switch', 'if', 'else']
+KEYWORDS = ['for', 'while', 'do', 'switch', 'if', 'else'] #TODO: convert into patterns
 
 class LineWithComment:
 
@@ -235,20 +235,18 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         if line.find("if") != -1:
             # line is else if
             isElseIf = True
-            checkParenthResult = checkForParentheses(
-                line, lineIndex, lines)
+            checkParenthResult = checkForParentheses(line, lineIndex, lines)
         else:
             isElseIf = False
             checkParenthResult = ParenthResult(True, lineIndex, None)
     else:
-        isElseIf = False 
-        checkParenthResult = checkForParentheses(
-            line, lineIndex, lines)
+        isElseIf = False
+        checkParenthResult = checkForParentheses(line, lineIndex, lines)
 
     if checkParenthResult == None:
-        
         print("keyword in parenth ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
+
     elif checkParenthResult.isOnSameLine == False:
         # doesnt end on same line
         isOnSameLine = checkParenthResult.isOnSameLine
@@ -257,7 +255,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
         
         if not isElseIf and KEYWORD == "else -":
-            lastCloseParenthIndex = lines[nxtLnIndex - 1].rfind("e") + 1
+            lastCloseParenthRe = re.search(r"\b(else)\b", lines[nxtLnIndex - 1])
+            if lastCloseParenthRe:
+                lastCloseParenthIndex = lastCloseParenthRe.end()
+            else:
+                lastCloseParenthIndex = -1
         else:
             lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
             
@@ -267,7 +269,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         nextLineIndex = lineIndex + 1
         openCurlyBraceIndex = line[checkParenthResult.lastCloseParenthIndex:].find("{")
         if not isElseIf and KEYWORD == "else -":
-            lastCloseParenthIndex = line.rfind("e") + 1
+            lastCloseParenthRe = re.search(r"\b(else)\b", line)
+            if lastCloseParenthRe:
+                lastCloseParenthIndex = lastCloseParenthRe.end()
+            else:
+                lastCloseParenthIndex = -1
         else:
             lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
     
@@ -277,18 +283,26 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
 
         # check if it has stuff on same line
         # add brace
+       
         if isOnSameLine:
+            lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
+            
+
             if not isElseIf and KEYWORD == "else -":
-                lastSemiColonIndex = line.rfind(";")
+
                 if lastSemiColonIndex != -1:
                 # semicolon found on same line
+                    print("HERE IO")
+                    print(lastCloseParenthIndex)
+                    print(lastSemiColonIndex)
+                    print(line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[lastCloseParenthIndex:]))])
                     if currentLineIsComment:
                         if isMultiline:
-                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
+                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
                         else:
-                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
+                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
                     else:
-                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
                     
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
@@ -320,15 +334,17 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 lines.insert(lineIndex, toAddLine)
                 checkForSemiColonIndex = lineIndex + 1
 
-            elif line[lastCloseParenthIndex:].find(";") != -1:
+            elif lastSemiColonIndex != -1:
+
                 # semicolon found on same line
+
                 if currentLineIsComment:
                     if isMultiline:
-                        toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } "+ "\n"
+                        toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
                     else:
-                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " } " + commentOfCurrentLine + "\n"
+                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
                 else:
-                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:].rstrip() + " }\n"
+                    toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n" 
 
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine)
@@ -339,7 +355,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 return None
         else:
             if not isElseIf and KEYWORD == "else -":
-                lastSemiColonIndex = line.rfind(";")
+                lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
                 if lastSemiColonIndex != -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
 
@@ -386,8 +402,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
 
             elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
                 
-                nxtLnTrimComment = trimComment(
-                    lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                 if nxtLnTrimComment.hasComment: 
                     if nxtLnTrimComment.isMultiline:
                         toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
@@ -431,8 +446,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 return None
 
         # check for semicolons to add Closing brace
-        closingBraceLineIndex = getNextSemiColonLine(
-            checkForSemiColonIndex, lines) + 1
+        closingBraceLineIndex = getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
 
         # add closing braces at closingBraceLine (inserting a new ln) with indentation
         if isMultiline:
