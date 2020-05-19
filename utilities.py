@@ -362,8 +362,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
 
         if isOnSameLine:
             lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
-            isBackSlashPresent = line.rfind("\\")
-            if isBackSlashPresent != -1:
+            isBackSlashPresent = line.rstrip()[-1] == "\\"
+            if isBackSlashPresent:
                 # backSLASH!
                 if lastSemiColonIndex != -1:
                     # semicolon found on same line
@@ -391,8 +391,10 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
                     checkForSemiColonIndex = lineIndex + 1
+                else:
+                    print("err")
 
-            elif isBackSlashPresent == -1:
+            elif not isBackSlashPresent:
         
                 if line[lastCloseParenthIndex:].isspace():
                     # if there is nothing on line except the keyword()
@@ -423,15 +425,16 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
                     return lines
-
                 else:
-                    print("WARN: syntax Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                    return None
+                    print("err")
+            else:
+                print("WARN: syntax Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                return None
         else:
             # the (condition) doesnt end on same line
-            isBackSlashPresent = lines[nxtLnIndex - 1].rfind("\\")
+            isBackSlashPresent = lines[nxtLnIndex - 1].rstrip()[-1] == "\\"
             lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
-            if isBackSlashPresent != -1:
+            if isBackSlashPresent:
                 if lastSemiColonIndex != -1:
                     # same line semicolon
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -482,10 +485,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     checkForSemiColonIndex = nxtLnIndex
-            elif isBackSlashPresent == -1:
-                if lines[nxtLnIndex - 2].rfind("\\") != -1:
+                else:
+                    print("errNOTLINE")
+            elif not isBackSlashPresent:
+                if lines[nxtLnIndex - 2].rstrip()[-1] == "\\":
                     return None
-                if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
+                if lastSemiColonIndex == -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                     
                     if nxtLnTrimComment.hasComment: 
@@ -535,10 +540,10 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     return lines
                 else:
-                    print("WARN: syntaxLoop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    print("errNXTLINE")
                     return None
             else:
-                print("WARN: syntaxLoop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: syntax - Loop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
 
@@ -554,11 +559,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             else:
                 spaces = " " * keywordIndex
 
-            if lines[closingBraceLineIndex - 1].rfind("\\") != -1:
+            if lines[closingBraceLineIndex - 1].rstrip()[-1] == "\\":
                 # we found \
                 addClosingBraceLine = spaces + "} \\\n"
-            elif lines[closingBraceLineIndex - 1].rfind("\\") == -1:
-                if lines[closingBraceLineIndex -2].rfind("\\") != -1:
+            elif lines[closingBraceLineIndex - 1].rstrip()[-1] != "\\":
+                if lines[closingBraceLineIndex - 2].rstrip()[-1] == "\\":
                     toAddBackSlash = lines[closingBraceLineIndex - 1].rstrip() + " \\\n"
                     del lines[closingBraceLineIndex - 1]
                     lines.insert(closingBraceLineIndex - 1, toAddBackSlash)        
