@@ -83,6 +83,22 @@ for()
 ```
 The above error occurs if there is a macro. See above for a description
 
+### ENDLINE-ERROR
+If there is no extra endline at the end of the file, and there is a keyword() at the last or second last line of the file, the indentation of the curly braces is added is wrong.
+```c
+if()
+  as;
+```
+becomes
+ ```c
+ if() {
+  as; }
+ ```
+ if its on the last line of the file\
+ 
+ ### Others
+ There are a few other bugs, please check issues for more details.
+
 ## License
 Copyright (C) Pranjal Rastogi 2020
 
