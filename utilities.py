@@ -292,10 +292,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
 
                 if lastSemiColonIndex != -1:
                 # semicolon found on same line
-                    print("HERE IO")
-                    print(lastCloseParenthIndex)
-                    print(lastSemiColonIndex)
-                    print(line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[lastCloseParenthIndex:]))])
                     if currentLineIsComment:
                         if isMultiline:
                             toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
