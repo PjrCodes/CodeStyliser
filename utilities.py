@@ -99,13 +99,7 @@ def checkForParentheses(line, lineIndex, lines, typeOfParenth):
 
         nxtLnIndex = lineIndex  + 1
         while closeParenthNo != openParenthNo:
-            firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
-            # for keyword in KEYWORDS:
-            #     if lines[nxtLnIndex].find(keyword) == firstCharOfNxtLn:
-            #         # another keyword has been found before () number got equal, Cancel case
-            #         # only happens if Keyword is on next line. Not checking keywords on same line
-            #         return None
-                    
+
             # check for ().
             index = 0
             while index < len(lines[nxtLnIndex]):
@@ -217,6 +211,7 @@ def getClosingBraceLineIndex(index, lines):
             if currentLineWoComment.hasComment:
                 # we must check if current ln has keyword
                 for keyword in KEYWORDS:
+                    print(keyword)
                     if line.find(keyword) == firstCharOfLn:
                         # we found a keyword
                         keywordIndex = line.find(keyword)
@@ -225,12 +220,17 @@ def getClosingBraceLineIndex(index, lines):
                         break
                     else:
                         # didnt find KEYWORD
-                        keywordLineCheckIndex += 1
-                        cont = True
+                        continue
                 else:
+                    # no keyword wasfound
+
                     if currentLineWoComment.isMultiline:
                         keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
                         continue
+                    else:
+                        keywordLineCheckIndex += 1
+                        continue
+                
                 if cont == True:
                     continue
                 else:
@@ -247,14 +247,18 @@ def getClosingBraceLineIndex(index, lines):
                         break
                     else:
                         # didnt find KEYWORD
-                        keywordLineCheckIndex += 1
                         cont = False
                         hasKeyword = False
+                        continue
+                else:
+                    # didnt find any keyword
+                    keywordLineCheckIndex += 1
 
                 if cont == True:
                     continue
                 else:
                     break
+                
     if hasKeyword == False:
         # didnt find a keyword
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
@@ -262,7 +266,6 @@ def getClosingBraceLineIndex(index, lines):
         # here we reach only if it is KEYWORD found
         openCurlyBraceIndex = line.find("{")
         openNextLineCurlyBraceIndex = checkForOpenBrace(keywordLineCheckIndex + 1, lines)
-        print(openNextLineCurlyBraceIndex[1])
         if openCurlyBraceIndex != -1 or openNextLineCurlyBraceIndex[0] != -1:
             # we found open curly brace related to this other keyword
             # we must go on to find the close }
@@ -289,51 +292,6 @@ def getClosingBraceLineIndex(index, lines):
             # we must return semicolon index again!
             return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
 
-    
-
-""" 
-THE FOLLOWING CODE DONT WORK. COMMENTING
-"""
-# def hasKeyword(index, lines):
-
-#     #TODO: Fix, DOESNT WORK!!!
-#     # return True if we find a keyword IMMEDIATELY after the keyword.
-#     # current line index = index, so index has the first keyword
-#     index = index + 1 # start check from one line next
-#     while index < (len(lines)):
-#         # loop through till file ends
-#         lineNoComment = trimComment(lines[index], index, lines)
-#         if lineNoComment.isMultiline == True:
-#             # it is multiline comment
-#             # we must jump index, but also check keywords  
-#             for keyword in KEYWORDS:
-#                 if lineNoComment.line.find(keyword) != -1:
-#                     return True
-#                 else:
-#                     # keyword not found, after Multiline Comment!
-#                     index = lineNoComment.multiLineJumpIndex
-#             index = lineNoComment.multiLineJumpIndex
-#         elif lineNoComment.hasComment and lineNoComment.isMultiline == False:
-#             # line has comment, we must check for the space before line
-#             for keyword in KEYWORDS:
-#                 if lineNoComment.line.find(keyword) != -1:
-#                     return True
-#                 else:
-#                     # line has no keyword
-#                     index = index + 1
-#         elif lines[index].isspace():
-#             index = index + 1
-#             continue
-#         else:
-#             for keyword in KEYWORDS:
-#                 if lineNoComment.line.find(keyword) != -1:
-#                     return True
-#                 else:
-#                     continue
-#             return False
-#     return False
-
-
 def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
     # found a  "KEYWORD"
     errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
@@ -346,11 +304,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         else:
             print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
-    # check for keyword
-    # print(utils.hasKeyword(lineIndex, lines))
-    # if utils.hasKeyword(lineIndex, lines) == True:
-    #     print("keyword ignore: ignored for loop at " + str(lineIndex + 1) + " in file " + fileToEdit.name)
-    #     continue
     
     # we must now skip over all parentheses to find the end of the (condition)
     if KEYWORD == "else -":
@@ -434,13 +387,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 return lines
 
             else:
-                print("WARN: Loop/condition in macro has no brace: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
         else:
             # the (condition) doesnt end on same line
             lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
-            print(lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";"))
-            print(lastCloseParenthIndex)
+
             if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
                 
                 nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -493,7 +445,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 return lines
 
             else:
-                print("WARN: Loop/condition in a macro has no brace: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: Loop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
 

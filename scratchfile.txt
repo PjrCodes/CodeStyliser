@@ -7,4 +7,15 @@ you found a valid condition or loop with all parenthese closed and you are redy 
     -> then, keep storing all {} until you find a close of this like the logic used for ()
     -> once the } is found add your pending }
     -> reset the variable of pending 
-    
+
+MACRO ERROR CHECKING:
+
+search for (#define)'s
+    search if end of this line has \
+        if yes, check if it is a keyword line 
+            if yes, wherever we have to add { check if that line has \
+                if yes, add {  \ instead of only {; find SEMICOLON line (ie, closingBrace line). Check if this line has \
+                    if yes, add } \ to nxtLn
+                    if no, add }
+                if no, then ignore, and dont print
+        if no, ignore, and dont print

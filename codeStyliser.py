@@ -206,23 +206,17 @@ def main():
                     try:
                         with open(file_path, 'rb') as open_file:
                             content = open_file.read()
-                            content = content.replace(
-                                WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+                            content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
                         with open(file_path, 'wb') as open_file:
                             open_file.write(content)
                             open_file.close()
-                    except (KeyboardInterrupt, SystemExit):
-                        print("exiting...")
-                        sys.exit()
                     except:
                         e = sys.exc_info()[0]
                         print("ERROR: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
-                    # try:
-                        # with open(file_path) as f:
-                        #     code = "\n".join(line.rstrip() for line in f)
 
+                    # try:
                     with open(file_path, "r+", encoding="utf-8") as fileToStyle:
                         linesEdited = styliseCode(fileToStyle) + linesEdited
                     # except UnicodeDecodeError as e:
