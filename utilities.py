@@ -10,7 +10,8 @@
 # utils.py
 # utils for Codestyliser.py
 # ---
-#TODO: remove rouge -1
+
+
 #TODO: use logger
 #TODO: use EXCEPTIONS in a SMARTER WAY!!!
 
@@ -113,7 +114,10 @@ def checkForParentheses(line, lineIndex, lines):
             # closeParenthNo = openParenthNo
             if openParenthNo == 0:
                 return None
-            return ParenthResult(False, nxtLnIndex, index - 2) #TODO: WHY is it -2. NO ONE WILL EVER KNOW
+            # not on same line!!!
+            # index is no. of characters seen, so cant return index.
+            closeIndex = lines[nxtLnIndex].find(")")
+            return ParenthResult(False, nxtLnIndex, closeIndex) 
         return None
 
 
@@ -222,7 +226,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
     hasHash = checkForHash(lineIndex, lines)
     if hasHash != -1:
         # has hash
-        print("hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+        if line.find("{") != -1:
+            # has {
+            return None
+        else:
+            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
     # check for keyword
     # print(utils.hasKeyword(lineIndex, lines))
@@ -244,27 +252,23 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         checkParenthResult = checkForParentheses(line, lineIndex, lines)
 
     if checkParenthResult == None:
-        print("keyword in parenth ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+        print("WARN: Keyword in parentheses ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
 
-    elif checkParenthResult.isOnSameLine == False:
-        # doesnt end on same line
+    elif not checkParenthResult.isOnSameLine:
+        # (condition) doesnt end on same line
         isOnSameLine = checkParenthResult.isOnSameLine
         nxtLnIndex = checkParenthResult.lineIndex
         nextLineIndex = nxtLnIndex
         openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
         
         if not isElseIf and KEYWORD == "else -":
-            lastCloseParenthRe = re.search(r"\b(else)\b", lines[nxtLnIndex - 1])
-            if lastCloseParenthRe:
-                lastCloseParenthIndex = lastCloseParenthRe.end()
-            else:
-                lastCloseParenthIndex = -1
+            lastCloseParenthIndex = 0
         else:
-            lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
+            lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 2
             
-    elif checkParenthResult.isOnSameLine == True:
-        # ends on same line
+    else:
+        # (condition) ends on same line
         isOnSameLine = checkParenthResult.isOnSameLine
         nextLineIndex = lineIndex + 1
         openCurlyBraceIndex = line[checkParenthResult.lastCloseParenthIndex:].find("{")
@@ -279,45 +283,14 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
     
     if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines) == -1:
         
-        # no { on same ln and on subsequent lines
-
-        # check if it has stuff on same line
-        # add brace
+        # no { on same line and on subsequent lines, we must add {} if possible
+        
        
         if isOnSameLine:
             lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
-            
 
-            if not isElseIf and KEYWORD == "else -":
-
-                if lastSemiColonIndex != -1:
-                # semicolon found on same line
-                    if currentLineIsComment:
-                        if isMultiline:
-                            toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
-                        else:
-                            toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):] + commentOfCurrentLine + "\n"
-                    else:
-                        toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
-                    
-                    del lines[lineIndex]
-                    lines.insert(lineIndex, toAddLine)
-                    return lines
-                else:
-                    if currentLineIsComment:
-                        if isMultiline:
-                            toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
-                        else:
-                            toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
-                    else:
-                        toAddLine = line.rstrip() + " {\n"
-
-                    del lines[lineIndex]
-                    lines.insert(lineIndex, toAddLine)
-                    checkForSemiColonIndex = lineIndex + 1
-
-            elif line[lastCloseParenthIndex:].isspace():
-
+            if line[lastCloseParenthIndex:].isspace():
+                # if there is nothing on line except the keyword()
                 if currentLineIsComment:
                     if isMultiline:
                         toAddLine = commentOfCurrentLine + line.rstrip() + " { " + "\n"
@@ -331,7 +304,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 checkForSemiColonIndex = lineIndex + 1
 
             elif lastSemiColonIndex != -1:
-
                 # semicolon found on same line
 
                 if currentLineIsComment:
@@ -342,63 +314,23 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 else:
                     toAddLine = line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n" 
 
+                # insert toAddLine and return
                 del lines[lineIndex]
                 lines.insert(lineIndex, toAddLine)
                 return lines
 
             else:
-                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: Loop/condition in macro has no brace: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
         else:
-            if not isElseIf and KEYWORD == "else -":
-                lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
-                if lastSemiColonIndex != -1:
-                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-
-                    if nxtLnTrimComment.hasComment:
-                        if nxtLnTrimComment.isMultiline:
-                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
-                        else:
-                            toAddLine = nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + nxtLnTrimComment.comment + "\n"
-                    
-                    else:
-                        toAddLine = lines[nxtLnIndex - 1][:lastCloseParenthIndex] + " { " + lines[nxtLnIndex -1][lastCloseParenthIndex:].rstrip() + " }\n"
-                    
-
-                    hasHash = checkForHash(nxtLnIndex - 1, lines)
-                    if hasHash != -1:
-                        # has hash
-                        print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                        return None
-                
-                    del lines[nxtLnIndex - 1]
-                    lines.insert(nxtLnIndex - 1, toAddLine)
-                    return lines
-
-                else:
-                    nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
-
-                    if nxtLnTrimComment.hasComment: 
-                        if nxtLnTrimComment.isMultiline:
-                            toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
-                        else:
-                            toAddLine = nxtLnTrimComment.line.rstrip() + " { " + nxtLnTrimComment.comment + "\n"
-                    else:
-                        toAddLine = lines[nxtLnIndex - 1].rstrip() + " {\n"
-                        
-                    hasHash = checkForHash(nxtLnIndex - 1, lines)
-                    if hasHash != -1:
-                        # has hash
-                        print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                        return None
-
-                    del lines[nxtLnIndex - 1]
-                    lines.insert(nxtLnIndex - 1, toAddLine)
-                    checkForSemiColonIndex = nxtLnIndex
-
-            elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
+            # the (condition) doesnt end on same line
+            lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
+            print(lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";"))
+            print(lastCloseParenthIndex)
+            if lines[nxtLnIndex - 1][lastCloseParenthIndex:].isspace():
                 
                 nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                
                 if nxtLnTrimComment.hasComment: 
                     if nxtLnTrimComment.isMultiline:
                         toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line.rstrip() + " { " + "\n"
@@ -410,15 +342,20 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 hasHash = checkForHash(nxtLnIndex - 1, lines)
                 if hasHash != -1:
                     # has hash
-                    print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                    return None
+                    if lines[nxtLnIndex - 1].find("{") != -1:
+                        # has {
+                        return None
+                    else:
+                        print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                        return None
 
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 checkForSemiColonIndex = nxtLnIndex
 
-            elif lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";") != -1:
+            elif lastSemiColonIndex != -1:
                 nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
+                
                 if nxtLnTrimComment.hasComment:
                     if nxtLnTrimComment.isMultiline:
                         toAddLine = nxtLnTrimComment.comment + nxtLnTrimComment.line[:lastCloseParenthIndex] + " { " + nxtLnTrimComment.line[lastCloseParenthIndex:].rstrip() + " } " + "\n"
@@ -430,15 +367,19 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 hasHash = checkForHash(nxtLnIndex - 1, lines)
                 if hasHash != -1:
                     # has hash
-                    print("hash ignore (later): ignored %s loop/ condition at %d in file %s" % errorPrintData)
-                    return None
+                    if lines[nxtLnIndex - 1].find("{") != -1:
+                        # has {
+                        return None
+                    else:
+                        print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                        return None
 
                 del lines[nxtLnIndex - 1]
                 lines.insert(nxtLnIndex - 1, toAddLine)
                 return lines
 
             else:
-                print("macro w/o brace or syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                print("WARN: Loop/condition in a macro has no brace: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
         # check for semicolons to add Closing brace

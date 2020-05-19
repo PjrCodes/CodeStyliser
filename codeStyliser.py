@@ -147,11 +147,10 @@ def styliseCode(fileToEdit):
                     linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
 
-        except IndexError:
+        except:
             e = sys.exc_info()[0]
-            print("FATAL ERROR: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1), end = "")
-            print(", Most likely a syntax error in the C file.")
+            print("ERROR: " + str(e) + " in file name: " +
+                  fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!", end = "")
             continue
 
     # write lines back to fileToEdit
@@ -162,7 +161,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.9.6-alpha "
+    VERSION_NUMBER = "0.1.9.7-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
@@ -179,14 +178,14 @@ def main():
         print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
         print("Copyright (c) Pranjal Rastogi, 2020")
         print("{:=^80}".format(""))
-        print("Will stylise (.c) code for files under " + DIR_NAME)
-        print("WARN: only changes UTF-8 encoded files")
-        print("WARN: changes \"\\r\\n\" to \"\\n\" wherever needed")
+        print("Will stylise code in (.c) files under " + DIR_NAME)
+        print("INFO: only changes UTF-8 encoded files")
+        print("INFO: changes \"\\r\\n\" to \"\\n\" wherever needed")
         print("\n")
         time.sleep(2)
 
 
-        print("{:=^80}".format(" STARTING... "))
+        print("{:=^80}".format(" START "))
         startTime = time.time()
 
         for root, _, files in os.walk(DIR_NAME):
@@ -199,7 +198,7 @@ def main():
                 fileExt = fileExtension[1]
                 if fileExt == "c":
                     
-                    print ("working ...", end="\r", flush=True)
+                    print ("working ...", end = "\r", flush = True)
                     time.sleep(0.1)
                     fileNo = fileNo + 1
                     try:
@@ -212,35 +211,29 @@ def main():
                             open_file.close()
                     except:
                         e = sys.exc_info()[0]
-                        print("runtime error: " + str(e) + " at file name: " +
+                        print("ERROR: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
                     try:
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
                             linesEdited = styliseCode(fileToStyle) + linesEdited
                     except UnicodeDecodeError as e:
-
                         print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file.")
-                        # try:
-                        #     with open(file_path,"r+", encoding="ISO-8859-1") as fileToStyle:
-                        #         linesEdited = styliseCode(fileToStyle) + linesEdited
-                        # except UnicodeDecodeError as e:
-                        #     print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 or an ISO-8859-1 encoded file\n skipping this file.")
-                        #     continue
                         continue
                 else:
                     continue
         endTime = time.time()
         print("\n")
         print("{:=^80}".format(" SUMMARY "))
-        print("Added braces " + str(linesEdited) + " times in " + str(fileNo) + " files")
+        print("Please check all macros once again, that is where most of the errors will be.")
+        print("Added braces " + str(linesEdited) + " times in " + str(fileNo) + " files.")
         timeInSec = time.gmtime(endTime - startTime).tm_sec
         if timeInSec == 0:
             timeTaken = int(round(endTime - startTime, 3)* 1000)
             print("{:=^80}".format(f" DONE in {timeTaken} milliseconds "))
         else:
             timeTaken = timeInSec
-            print("{:=^80}".format(f" DONE in {timeTaken} seconds"))
+            print("{:=^80}".format(f" DONE in {timeTaken} seconds "))
         print("\n")
 
 if __name__ == "__main__":
