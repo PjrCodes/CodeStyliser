@@ -146,3 +146,6 @@ dmypy.json
 
 # ignore inner
 inner/*
+
+# ignore astyle
+astyle/*
