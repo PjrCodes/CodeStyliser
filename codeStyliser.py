@@ -216,14 +216,13 @@ def main():
                         print("runtime error: " + str(e) + " at file name: " +
                               filename + " while changing line endings")
                         continue
-                    # try:
-                    with open(file_path, "r+", encoding='utf8') as fileToStyle:
-                        linesEdited = styliseCode(fileToStyle) + linesEdited
-                    # except:
-                    #     e = sys.exc_info()[0]
-                    #     print("runtime error: " + str(e) + " at file name: " +
-                    #           filename + " while opening file")
-                    #     continue
+                    try:
+                        with open(file_path, "r+") as fileToStyle:
+                            linesEdited = styliseCode(fileToStyle) + linesEdited
+                    except UnicodeDecodeError as e:
+                        with open(file_path,"r+", encoding="ISO-8859-1") as fileToStyle:
+                            linesEdited = styliseCode(fileToStyle) + linesEdited
+                        
                 else:
                     continue
         print("\n")
