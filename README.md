@@ -9,7 +9,7 @@ Currently, it adds curly braces for `for()` and `while()` loops, and `if()`, `el
 
 ## Installation
 
-* Make sure you have Python 3.7.7 64-Bit installed on your device. If this is not done, Install Python3.7.7 from [https://www.python.org](www.python.org)
+* Make sure you have Python 3.7.7 64-Bit installed on your device. If this is not done, Install Python3.7.7 from [python.org](https://www.python.org)
 * This utility has no dependencies. Just download/ clone `utilities.py` AND `codeStyliser.py` into the required directory
 * now, just run `$ python3.7 codeStyliser.py .`
 * And, wait and watch as magic happens!
@@ -33,7 +33,7 @@ if(a == b) {
 
 ## Known issues
 
-Please check [issues](issues) for the latest bugs
+Please check [issues](https://github.com/PjrCodes/CodeStyliser/issues) for the latest bugs
  
 ## License
 Copyright (C) Pranjal Rastogi 2020
