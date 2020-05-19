@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # Copyright (c) 2020 Pranjal Rastogi All Rights Reserved
 # Do not copy this code.
-# DO NOT RE-DISTRIBUTE
+# check LICENSE for more details
 # ---
 # THE codeStyliser Utility
 # ---
@@ -19,6 +19,7 @@ import re
 import sys
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
+OPENBRACE_PATTERN = r"^(\s*\{)|^(\{)"
 KEYWORDS = ['for', 'while', 'do', 'switch', 'if', 'else'] #TODO: convert into patterns
 
 class LineWithComment:
@@ -71,16 +72,21 @@ def getFirstCharacterIndex(str):
     return len(str) - len(str.lstrip())
 
 
-def checkForParentheses(line, lineIndex, lines):
-    
+def checkForParentheses(line, lineIndex, lines, typeOfParenth):
+    if typeOfParenth == "p":
+        startingParenth = '('
+        endingParenth = ')'
+    if typeOfParenth == "b":
+        startingParenth = '{'
+        endingParenth = "}"
     openParenthNo = 0
     closeParenthNo = 0
     index = 0
 
     while index < len(line):
-        if line[index] == '(':
+        if line[index] == startingParenth:
             openParenthNo += 1
-        if line[index] == ')':
+        if line[index] == endingParenth:
             closeParenthNo += 1
         if openParenthNo == closeParenthNo and openParenthNo != 0:
             return ParenthResult(True, lineIndex, index)
@@ -94,18 +100,18 @@ def checkForParentheses(line, lineIndex, lines):
         nxtLnIndex = lineIndex  + 1
         while closeParenthNo != openParenthNo:
             firstCharOfNxtLn = getFirstCharacterIndex(lines[nxtLnIndex])
-            for keyword in KEYWORDS:
-                if lines[nxtLnIndex].find(keyword) == firstCharOfNxtLn:
-                    # another keyword has been found before () number got equal, Cancel case
-                    # only happens if Keyword is on next line. Not checking keywords on same line
-                    return None
+            # for keyword in KEYWORDS:
+            #     if lines[nxtLnIndex].find(keyword) == firstCharOfNxtLn:
+            #         # another keyword has been found before () number got equal, Cancel case
+            #         # only happens if Keyword is on next line. Not checking keywords on same line
+            #         return None
                     
             # check for ().
             index = 0
             while index < len(lines[nxtLnIndex]):
-                if lines[nxtLnIndex][index] == '(':
+                if lines[nxtLnIndex][index] == startingParenth:
                     openParenthNo += 1
-                if lines[nxtLnIndex][index] == ')':
+                if lines[nxtLnIndex][index] == endingParenth:
                     closeParenthNo += 1
                 index += 1
             else:
@@ -116,7 +122,7 @@ def checkForParentheses(line, lineIndex, lines):
                 return None
             # not on same line!!!
             # index is no. of characters seen, so cant return index.
-            closeIndex = lines[nxtLnIndex].find(")")
+            closeIndex = lines[nxtLnIndex].find(endingParenth)
             return ParenthResult(False, nxtLnIndex, closeIndex) 
         return None
 
@@ -125,38 +131,33 @@ def checkForOpenBrace(nextLineIndex, lines):
 
     while nextLineIndex < (len(lines)):
         lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
-        if lineWithoutComment.hasComment == True or lines[nextLineIndex].isspace():
-            # line has comment or is blank
-            if lineWithoutComment.line.find("{") != -1:
-                # if the line before comment has {, become happy
+
+        if lineWithoutComment.hasComment:
+            # line has comment
+            if re.search(OPENBRACE_PATTERN, lineWithoutComment.line):
+                # if the line before comment has {
                 break
-            elif lineWithoutComment.isMultiline == True:
+            if lineWithoutComment.isMultiline == True:
                 # go after multiline comments
                 nextLineIndex = lineWithoutComment.multiLineJumpIndex
-                if lineWithoutComment.line.find("{") != -1:
-                    break
-            nextLineIndex = nextLineIndex + 1
-            # line is a multiline comment
+                continue
+            else:
+                nextLineIndex = nextLineIndex + 1
+                continue
+        elif lineWithoutComment.line.isspace():
+            # line is blank
+            nextLineIndex += 1
+            continue
         else:
+            # line is not blank and isnt a comment
             break
-    return lineWithoutComment.line.find("{")
-
-
-def getNextSemiColonLine(index, lines):
     
-    while index < (len(lines)):
-        lineWithoutComment = trimComment(lines[index], index, lines)
-        if lineWithoutComment.isMultiline == True:
-            semiColonIndex = lines[lineWithoutComment.multiLineJumpIndex].find(";")
-        else:
-            semiColonIndex = lineWithoutComment.line.find(";")
-        if semiColonIndex == -1:
-            # the line without Comment has NO semicolon
-            index = index + 1
-        else:
-            # line has a semicolon and is NOT a comment
-            break
-    return index
+    if re.search(OPENBRACE_PATTERN, lineWithoutComment.line):
+        return (re.search(OPENBRACE_PATTERN, lineWithoutComment.line).end(), nextLineIndex)
+    else:
+        return (-1,None)
+
+    
 
 def checkForHash(index, lines):
     index = index + 1
@@ -171,11 +172,124 @@ def checkForHash(index, lines):
                 index = lineWithoutComment.multiLineJumpIndex
                 
             index = index + 1
-        else: 
+        else:
             break
+
     return lineWithoutComment.line.find("#")
 
+def getNextSemiColonLineIndex(index, lines):
+    semiColonLineIndex = index
+    while semiColonLineIndex < (len(lines)):
+        lineWithoutComment = trimComment(lines[semiColonLineIndex], semiColonLineIndex, lines)
+        if lineWithoutComment.isMultiline == True:
+            semiColonIndex = lines[lineWithoutComment.multiLineJumpIndex].find(";")
+        else:
+            semiColonIndex = lineWithoutComment.line.find(";")
+        if semiColonIndex == -1:
+            # the line without Comment has NO semicolon
+            semiColonLineIndex += 1
+        else:
+            # line has a semicolon and is NOT a comment
+            break
+    return semiColonLineIndex
 
+def getClosingBraceLineIndex(index, lines):
+
+    # run operations on line
+    keywordLineCheckIndex = index
+    while keywordLineCheckIndex < (len(lines)):
+
+        currentLineWoComment = trimComment(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines)
+        line = currentLineWoComment.line
+
+        keywordIndex = 0
+        firstCharOfLn = getFirstCharacterIndex(lines[keywordLineCheckIndex])
+        if line.isspace():
+            if currentLineWoComment.isMultiline:
+                # jump line to after multiline comment
+                keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
+                continue
+            else:
+                keywordLineCheckIndex += 1
+                continue
+
+        elif not line.isspace():
+            if currentLineWoComment.hasComment:
+                # we must check if current ln has keyword
+                for keyword in KEYWORDS:
+                    if line.find(keyword) == firstCharOfLn:
+                        # we found a keyword
+                        keywordIndex = line.find(keyword)
+                        cont = False
+                        hasKeyword = True
+                        break
+                    else:
+                        # didnt find KEYWORD
+                        keywordLineCheckIndex += 1
+                        cont = True
+                else:
+                    if currentLineWoComment.isMultiline:
+                        keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
+                        continue
+                if cont == True:
+                    continue
+                else:
+                    break
+
+            elif not currentLineWoComment.hasComment:
+
+                for keyword in KEYWORDS:
+                    if line.find(keyword) == firstCharOfLn:
+                        # we found a keyword
+                        keywordIndex = line.find(keyword)
+                        cont = False
+                        hasKeyword = True
+                        break
+                    else:
+                        # didnt find KEYWORD
+                        keywordLineCheckIndex += 1
+                        cont = False
+                        hasKeyword = False
+
+                if cont == True:
+                    continue
+                else:
+                    break
+    if hasKeyword == False:
+        # didnt find a keyword
+        return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
+    else:
+        # here we reach only if it is KEYWORD found
+        openCurlyBraceIndex = line.find("{")
+        openNextLineCurlyBraceIndex = checkForOpenBrace(keywordLineCheckIndex + 1, lines)
+        print(openNextLineCurlyBraceIndex[1])
+        if openCurlyBraceIndex != -1 or openNextLineCurlyBraceIndex[0] != -1:
+            # we found open curly brace related to this other keyword
+            # we must go on to find the close }
+            closeCurlyBraceIndex = line.find("}")
+            if closeCurlyBraceIndex == -1:
+                # run the code
+                # search for matchin {}, 
+                    # if match, return that line ki index.
+                    # else, raise, DEATHERROR.
+                if openCurlyBraceIndex == -1:
+                    result = checkForParentheses(lines[openNextLineCurlyBraceIndex[1]], openNextLineCurlyBraceIndex[1], lines, typeOfParenth="b")
+                else:
+                    result = checkForParentheses(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines, typeOfParenth="b")
+                if result == None:
+                    
+                    return None
+                else:
+                    return result.lineIndex
+            else:
+                # same line has the thingy
+                return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
+        else:
+            # we didnt find it.
+            # we must return semicolon index again!
+            return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
+
+    
 
 """ 
 THE FOLLOWING CODE DONT WORK. COMMENTING
@@ -243,13 +357,13 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         if line.find("if") != -1:
             # line is else if
             isElseIf = True
-            checkParenthResult = checkForParentheses(line, lineIndex, lines)
+            checkParenthResult = checkForParentheses(line, lineIndex, lines, "p")
         else:
             isElseIf = False
             checkParenthResult = ParenthResult(True, lineIndex, None)
     else:
         isElseIf = False
-        checkParenthResult = checkForParentheses(line, lineIndex, lines)
+        checkParenthResult = checkForParentheses(line, lineIndex, lines, "p")
 
     if checkParenthResult == None:
         print("WARN: Keyword in parentheses ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
@@ -281,10 +395,10 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
         else:
             lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
     
-    if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines) == -1:
+
+    if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines)[0] == -1:
         
-        # no { on same line and on subsequent lines, we must add {} if possible
-        
+        # no { on same line and on subsequent lines, we must add {} if possible        
        
         if isOnSameLine:
             lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
@@ -382,20 +496,23 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, currentLineIsComm
                 print("WARN: Loop/condition in a macro has no brace: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
-        # check for semicolons to add Closing brace
-        closingBraceLineIndex = getNextSemiColonLine(checkForSemiColonIndex, lines) + 1
 
-        # add closing braces at closingBraceLine (inserting a new ln) with indentation
-        if isMultiline:
-            spaces = " " * (keywordIndex + len(commentOfCurrentLine))
 
+        closingBraceLineIndex = getClosingBraceLineIndex(checkForSemiColonIndex, lines)
+        if closingBraceLineIndex == None:
+            print("FATAL ERROR: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+            return None
         else:
-            spaces = " " * keywordIndex
-
-        lines.insert(closingBraceLineIndex, "")
-        addClosingBraceLine = spaces + "}\n"
-        lines.insert(closingBraceLineIndex, addClosingBraceLine)
-        return lines
+            # add closing braces at closingBraceLine (inserting a new ln) with indentation
+            if isMultiline:
+                spaces = " " * (keywordIndex + len(commentOfCurrentLine))
+            else:
+                spaces = " " * keywordIndex
+            
+            lines.insert(closingBraceLineIndex, "")
+            addClosingBraceLine = spaces + "}\n"
+            lines.insert(closingBraceLineIndex, addClosingBraceLine)
+            return lines
 
 
 if __name__ == "__main__":

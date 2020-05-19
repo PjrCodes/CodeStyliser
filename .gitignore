@@ -149,3 +149,4 @@ inner/*
 
 # ignore astyle
 astyle/*
+aStyleBin

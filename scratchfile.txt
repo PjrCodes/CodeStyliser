@@ -1,1 +1,10 @@
-if () xyz(){};
+
+you found a valid condition or loop with all parenthese closed and you are redy to add a {
+    -> add {
+    -> set a variable that } is pending
+    -> first check that the next non comment and non whitespace is if () etc and also switch
+    -> if it is one of the keywords, then, check if it has curly brace..
+    -> then, keep storing all {} until you find a close of this like the logic used for ()
+    -> once the } is found add your pending }
+    -> reset the variable of pending 
+    
