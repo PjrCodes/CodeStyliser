@@ -534,7 +534,9 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     return lines
-
+                else:
+                    print("WARN: syntaxLoop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                    return None
             else:
                 print("WARN: syntaxLoop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
