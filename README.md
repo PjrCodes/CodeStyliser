@@ -9,7 +9,7 @@ Currently, it adds curly braces for `for()` and `while()` loops, and `if()`, `el
 
 ## Installation
 
-* Make sure you have Python 3.7.7 64-Bit installed on your device. If this is not done, Install Python3.7.7 from [www.python.org](www.python.org)
+* Make sure you have Python 3.7.7 64-Bit installed on your device. If this is not done, Install Python3.7.7 from [python.org](https://www.python.org)
 * This utility has no dependencies. Just download/ clone `utilities.py` AND `codeStyliser.py` into the required directory
 * now, just run `$ python3.7 codeStyliser.py .`
 * And, wait and watch as magic happens!
@@ -33,72 +33,8 @@ if(a == b) {
 
 ## Known issues
 
-### MACRO-ERROR
-```c
-/* MACRO-ERROR */
-// In multiline macros, the {} are added invalidly as they must be added before \. but are added after \.
-
-if()  \
-   s; \
-else asl; \
-
-// Also in this error is this:
-// If the keyword is found at the end of the macro, braces are added invalidly
-
-macro \
-if() {
-... // somewhere later in the file
-statement;
-}
-...
-```
-The above error occurs if there is a macro. See above for a description
-
-### HASH-ERROR
-```c
-/* HASH-ERROR */
-// hash(#) error, {} is added invalidly if there is an preprocesser/ macro after the keyword that has been detected
-
-if (rv->rv_d.dc < dnpw_cfg->samelane_right_edge_mts)))
-   #endif
-```
-The above error occurs if there is a macro. See above for a description
-
-### KEYWORD-ERROR
-```c
-/* KEYWORD-ERROR */
-// Here, for() is ignored, as { } of the switch() are detected as for's {}
-for()
-   switch() {
-      a;
-   }
-
-
-// Here, for() is not ignored, but instead {} are added invalidly
-for()
-  switch()
-  {
-    a;
-  }
-```
-The above error occurs if there is a macro. See above for a description
-
-### ENDLINE-ERROR
-If there is no extra endline at the end of the file, and there is a keyword() at the last or second last line of the file, the indentation of the curly braces is added is wrong.
-```c
-if()
-  as;
-```
-becomes
- ```c
- if() {
-  as; }
- ```
- if its on the last line of the file\
+Please check [issues](https://github.com/PjrCodes/CodeStyliser/issues) for the latest bugs
  
- ### Others
- There are a few other bugs, please check issues for more details.
-
 ## License
 Copyright (C) Pranjal Rastogi 2020
 
