@@ -200,7 +200,6 @@ def getClosingBraceLineIndex(index, lines):
 
         currentLineWoComment = trimComment(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines)
         line = currentLineWoComment.line
-        print(" spinach" + line )
         firstCharOfLn = getFirstCharacterIndex(line)
         if line.isspace() or len(line) == 0:
             if currentLineWoComment.isMultiline:
@@ -208,15 +207,11 @@ def getClosingBraceLineIndex(index, lines):
                 keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
                 continue
             else:
-                print("ISSPACE, NO/ MAYBE COMMENT")
                 keywordLineCheckIndex += 1
                 continue
         else:
-            print(line)
-            print(" I AM A SPACEBAsdsdsdd nOS PACESR")
             if currentLineWoComment.hasComment:
                 if currentLineWoComment.isMultiline:
-                    print("CANCELILLA")
                     for keyword in KEYWORDS:
                         keywordCheckRe = re.search(keyword, line)
                         if  keywordCheckRe:
@@ -242,7 +237,6 @@ def getClosingBraceLineIndex(index, lines):
                 if currentLineWoComment.line.isspace():
                     continue
                 else:
-                    print("GOO0Ds")
                     if line.find("*/") != -1:
                         keywordLineCheckIndex += 1
                     for keyword in KEYWORDS:
@@ -279,11 +273,9 @@ def getClosingBraceLineIndex(index, lines):
                     break
 
             elif not currentLineWoComment.hasComment:
-                print("ADOIOOIOIOIOIOIO")
                 if line.find("*/") != -1:
                     keywordLineCheckIndex += 1
                 line = lines[keywordLineCheckIndex]
-                print(line)
                 if line.isspace():
                     continue
                 else:
@@ -488,7 +480,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
 
             elif not isBackSlashPresent:
                 if lines[lineIndex - 2].rstrip()[-1] == "\\":
-                    print(lastSemiColonIndex)
                     if lastSemiColonIndex == -1:
                         # not semicolon ending
                         return None
@@ -586,7 +577,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     print("errNOTLINE")
             elif not isBackSlashPresent:
                 if lines[nxtLnIndex - 2].rstrip()[-1] == "\\":
-                    print(lastSemiColonIndex)
                     if lastSemiColonIndex == -1:
                         # not semicolon ending
                         return None
