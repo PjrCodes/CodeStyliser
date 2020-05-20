@@ -223,7 +223,6 @@ def getClosingBraceLineIndex(index, lines):
                         continue
                 else:
                     # no keyword wasfound
-
                     if currentLineWoComment.isMultiline:
                         keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
                         continue
@@ -270,11 +269,56 @@ def getClosingBraceLineIndex(index, lines):
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
     else:
         # here we reach only if it is KEYWORD found
-        openCurlyBraceIndex = line.find("{")
-        openNextLineCurlyBraceIndex = checkForOpenBrace(keywordLineCheckIndex + 1, lines)
+        print("NO")
+        if keyword == r"\b(else)\b":
+            if line.find("if") != -1:
+                # line is else if
+                isElseIf = True
+                checkParenthResult = checkForParentheses(line, keywordLineCheckIndex, lines, "p")
+            else:
+                isElseIf = False
+                checkParenthResult = ParenthResult(True, keywordLineCheckIndex, None)
+        else:
+            isElseIf = False
+            checkParenthResult = checkForParentheses(line, keywordLineCheckIndex, lines, "p")
+
+        if checkParenthResult == None:
+            return None
+
+        elif not checkParenthResult.isOnSameLine:
+            # (condition) doesnt end on same line
+            isOnSameLine = checkParenthResult.isOnSameLine
+            nxtLnIndex = checkParenthResult.lineIndex
+            nextLineIndex = nxtLnIndex
+            openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
+            if not isElseIf and keyword == r"\b(else)\b":
+                lastCloseParenthIndex = 0
+            else:
+                lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 2
+                
+        else:
+            # (condition) ends on same line
+            isOnSameLine = checkParenthResult.isOnSameLine
+            nextLineIndex = keywordLineCheckIndex + 1
+            nxtLnIndex = keywordLineCheckIndex + 1
+            openCurlyBraceIndex = line[checkParenthResult.lastCloseParenthIndex:].find("{")
+            if not isElseIf and keyword == r"\b(else)\b":
+                lastCloseParenthRe = re.search(r"\b(else)\b", line)
+                if lastCloseParenthRe:
+                    lastCloseParenthIndex = lastCloseParenthRe.end()
+                else:
+                    lastCloseParenthIndex = -1
+            else:
+                lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
+
+
+        # dont touch me!
+        openNextLineCurlyBraceIndex = checkForOpenBrace(nextLineIndex, lines)
         if openCurlyBraceIndex != -1 or openNextLineCurlyBraceIndex[0] != -1:
             # we found open curly brace related to this other keyword
             # we must go on to find the close }
+            print("CANCEL ME!!")
+            
             closeCurlyBraceIndex = line.find("}")
             if closeCurlyBraceIndex == -1:
                 # run the code
@@ -282,13 +326,18 @@ def getClosingBraceLineIndex(index, lines):
                     # if match, return that line ki index.
                     # else, raise, DEATHERROR.
                 if openCurlyBraceIndex == -1:
+                    print("CANCEL ME!sa!")
                     result = checkForParentheses(lines[openNextLineCurlyBraceIndex[1]], openNextLineCurlyBraceIndex[1], lines, typeOfParenth="b")
                 else:
-                    result = checkForParentheses(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines, typeOfParenth="b")
+                    print("CANCEL MEas!!")
+                    result = checkForParentheses(lines[nxtLnIndex - 1], nxtLnIndex - 1, lines, typeOfParenth="b")
                 if result == None:
-                    
+                    print("CANCELasd ME!!")
                     return None
+
                 else:
+                    print("CANCEL saddsME!!")
+                    print(result.lineIndex)
                     return result.lineIndex
             else:
                 # same line has the thingy
@@ -297,6 +346,9 @@ def getClosingBraceLineIndex(index, lines):
             # we didnt find it.
             # we must return semicolon index again!
             return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
+
+
+
 
 def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
     # found a  "KEYWORD"
@@ -560,12 +612,13 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             if lines[closingBraceLineIndex - 1].rstrip()[-1] == "\\":
                 # we found \
                 addClosingBraceLine = spaces + "} \\\n"
-            elif lines[closingBraceLineIndex - 1].rstrip()[-1] != "\\":
+            elif lines[closingBraceLineIndex - 1].rstrip()[-1] == "\\":
                 if lines[closingBraceLineIndex - 2].rstrip()[-1] == "\\":
                     toAddBackSlash = lines[closingBraceLineIndex - 1].rstrip() + " \\\n"
                     del lines[closingBraceLineIndex - 1]
-                    lines.insert(closingBraceLineIndex - 1, toAddBackSlash)        
-                
+                    lines.insert(closingBraceLineIndex - 1, toAddBackSlash)
+                    addClosingBraceLine = spaces + "}\n"        
+            else:
                 addClosingBraceLine = spaces + "}\n"
             
             lines.insert(closingBraceLineIndex, "")
