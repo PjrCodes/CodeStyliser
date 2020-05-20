@@ -176,7 +176,7 @@ def checkForHash(index, lines):
     return lineWithoutComment.line.find("#")
 
 def getNextSemiColonLineIndex(index, lines):
-    semiColonLineIndex = index + 1
+    semiColonLineIndex = index
     while semiColonLineIndex < (len(lines)):
         lineWithoutComment = trimComment(lines[semiColonLineIndex], semiColonLineIndex, lines)
         if lineWithoutComment.isMultiline == True:
@@ -212,6 +212,7 @@ def getClosingBraceLineIndex(index, lines):
                 keywordLineCheckIndex += 1
                 continue
         else:
+            
             if currentLineWoComment.hasComment:
                 if currentLineWoComment.isMultiline:
                     for keyword in KEYWORDS:
@@ -261,7 +262,7 @@ def getClosingBraceLineIndex(index, lines):
                             continue
                     else:
                         # no keyword was found or line is a statement
-                        print("SUPPOSED TO COME HERE")
+                       
                         if currentLineWoComment.line.isspace() or len(currentLineWoComment.line) == 0:
                             if currentLineWoComment.isMultiline:
                                 keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
@@ -270,7 +271,7 @@ def getClosingBraceLineIndex(index, lines):
                                 keywordLineCheckIndex += 1
                                 continue
                         else:
-                            print("SUPPOSED TO COME HERE")
+                            
                             hasKeyword = False
                             cont = False
                             break
@@ -281,6 +282,7 @@ def getClosingBraceLineIndex(index, lines):
                     break
 
             elif not currentLineWoComment.hasComment:
+                
                 if line.find("*/") != -1:
                     keywordLineCheckIndex += 1
                 line = lines[keywordLineCheckIndex]
@@ -307,8 +309,7 @@ def getClosingBraceLineIndex(index, lines):
                     else:
                         # didnt find any keyword
                         hasKeyword = False
-                        keywordLineCheckIndex += 1
-                        continue
+
                     if cont == True:
                         continue
                     else:
@@ -317,7 +318,6 @@ def getClosingBraceLineIndex(index, lines):
 
     if hasKeyword == False:
         # didnt find a keyword
-        print("CALLED")
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
     else:
         # here we reach only if it is KEYWORD found
@@ -489,10 +489,13 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     print("err")
 
             elif not isBackSlashPresent:
-                if lines[lineIndex - 2][-1] == "\\":
-                    if lastSemiColonIndex == -1:
-                        # not semicolon ending
-                        return None
+                if lines[lineIndex - 2].isspace() or len(lines[lineIndex-2]) == 0:
+                    pass
+                else:
+                    if lines[lineIndex - 2][-1] == "\\":
+                        if lastSemiColonIndex == -1:
+                            # not semicolon ending
+                            return None
                 if line[lastCloseParenthIndex:].isspace():
                     # if there is nothing on line except the keyword()
                     if currentLineIsComment:
@@ -586,11 +589,14 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                 else:
                     print("errNOTLINE")
             elif not isBackSlashPresent:
-
-                if lines[nxtLnIndex - 2][-1] == "\\":
-                    if lastSemiColonIndex == -1:
-                        # not semicolon ending
-                        return None
+                
+                if lines[nxtLnIndex - 2].isspace() or len(lines[nxtLnIndex-2]) == 0:
+                    pass
+                else:
+                    if lines[nxtLnIndex - 2][-1] == "\\":
+                        if lastSemiColonIndex == -1:
+                            # not semicolon ending
+                            return None
                 
                 if lastSemiColonIndex == -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -660,20 +666,21 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
-            print(closingBraceLineIndex)
-            print(lineIndex)
-            if lines[closingBraceLineIndex - 1][-1] == "\\":
-                # we found \
-                addClosingBraceLine = spaces + "} \\\n"
-            elif lines[closingBraceLineIndex - 1][-1] == "\\":
-
-                if lines[closingBraceLineIndex - 2][-1] == "\\":
-                    toAddBackSlash = lines[closingBraceLineIndex - 1].rstrip() + " \\\n"
-                    del lines[closingBraceLineIndex - 1]
-                    lines.insert(closingBraceLineIndex - 1, toAddBackSlash)
-                    addClosingBraceLine = spaces + "}\n"        
-            else:
+            if len(lines[closingBraceLineIndex - 1]):
                 addClosingBraceLine = spaces + "}\n"
+                pass
+            else:
+                if lines[closingBraceLineIndex - 1][-1] == "\\":
+                    # we found \
+                    addClosingBraceLine = spaces + "} \\\n"
+                elif lines[closingBraceLineIndex - 1][-1] == "\\":
+                    if lines[closingBraceLineIndex - 2][-1] == "\\":
+                        toAddBackSlash = lines[closingBraceLineIndex - 1].rstrip() + " \\\n"
+                        del lines[closingBraceLineIndex - 1]
+                        lines.insert(closingBraceLineIndex - 1, toAddBackSlash)
+                        addClosingBraceLine = spaces + "}\n"        
+                else:
+                    addClosingBraceLine = spaces + "}\n"
             
             lines.insert(closingBraceLineIndex, "")
             lines.insert(closingBraceLineIndex, addClosingBraceLine)
