@@ -19,7 +19,7 @@ if(a == b) {
 }
 ```
 
-This utility is written in Python 3.7.7, 64-Bit. Currently, you must have Python 3.7.7, 64-Bit installed on your machine for this utility to work. Check [install](Install) for more details
+This utility is written in Python 3.7.7, 64-Bit. Currently, you must have Python 3.7.7, 64-Bit installed on your machine for this utility to work. Check [install](#Install) for more details
 
 ## Install
 
