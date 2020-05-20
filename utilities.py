@@ -100,15 +100,14 @@ def checkForParentheses(line, lineIndex, lines, typeOfParenth):
         nxtLnIndex = lineIndex  + 1
         while closeParenthNo != openParenthNo:
 
-            # check for ().
-            index = 0
-            while index < len(lines[nxtLnIndex]):
-                if lines[nxtLnIndex][index] == startingParenth:
+            # check for {} on the line
+            for char in lines[nxtLnIndex]:
+                if char == startingParenth:
                     openParenthNo += 1
-                if lines[nxtLnIndex][index] == endingParenth:
+                elif char == endingParenth:
                     closeParenthNo += 1
-                index += 1
             else:
+                # after iterating through line
                 nxtLnIndex += 1
         else:
             # closeParenthNo = openParenthNo
@@ -116,7 +115,7 @@ def checkForParentheses(line, lineIndex, lines, typeOfParenth):
                 return None
             # not on same line!!!
             # index is no. of characters seen, so cant return index.
-            closeIndex = lines[nxtLnIndex].find(endingParenth)
+            closeIndex = lines[nxtLnIndex - 1].find(endingParenth)
             return ParenthResult(False, nxtLnIndex, closeIndex) 
         return None
 
@@ -335,7 +334,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
         nxtLnIndex = checkParenthResult.lineIndex
         nextLineIndex = nxtLnIndex
         openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
-        
         if not isElseIf and KEYWORD == "else -":
             lastCloseParenthIndex = 0
         else:

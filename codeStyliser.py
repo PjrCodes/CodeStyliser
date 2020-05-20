@@ -30,7 +30,7 @@ def styliseCode(fileToEdit):
     lineIndex = -1
     while lineIndex < (len(lines) - 1):
 
-        try:
+        # try:
             # increment line count
             lineIndex = lineIndex + 1
             currentLineIsComment = False
@@ -158,14 +158,14 @@ def styliseCode(fileToEdit):
                     lines = elseConditionHandler
                     linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
-        except (KeyboardInterrupt, SystemExit):
-            print("exiting...")
-            sys.exit()
-        except:
-            e = sys.exc_info()[0]
-            print("ERROR: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!", end = "")
-            continue
+        # except (KeyboardInterrupt, SystemExit):
+        #     print("exiting...")
+        #     sys.exit()
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("ERROR: " + str(e) + " in file name: " +
+        #           fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!", end = "")
+        #     continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -194,7 +194,7 @@ def main():
         print("{:=^80}".format(""))
         print("Will stylise code in (.c) files under " + DIR_NAME)
         print("INFO: only changes UTF-8 encoded files")
-        print("INFO: changes \"\\r\\n\" to \"\\n\" wherever needed")
+        print("INFO: changes \"\\r\\n\" to \"\\n\" for all files")
         print("\n")
         time.sleep(2)
 
@@ -229,15 +229,15 @@ def main():
                               filename + " while changing line endings")
                         continue
 
-                    try:
-                        with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                            linesEdited = styliseCode(fileToStyle) + linesEdited
-                    except UnicodeDecodeError as e:
-                        print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file.")
-                        continue
-                    except (KeyboardInterrupt, SystemExit):
-                        print("exiting...")
-                        sys.exit()
+                    # try:
+                    with open(file_path, "r+", encoding="utf-8") as fileToStyle:
+                        linesEdited = styliseCode(fileToStyle) + linesEdited
+                    # except UnicodeDecodeError as e:
+                    #     print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file.")
+                    #     continue
+                    # except (KeyboardInterrupt, SystemExit):
+                    #     print("exiting...")
+                    #     sys.exit()
                 else:
                     continue
         endTime = time.time()
