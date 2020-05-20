@@ -175,7 +175,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.10.2-BETA "
+    VERSION_NUMBER = "0.1.10.3-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
@@ -210,10 +210,7 @@ def main():
                 if len(fileExtension) != 2:
                     continue
                 fileExt = fileExtension[1]
-                if fileExt == "c" or fileExt == "h":
-
-                    print ("working ...", end = "", flush = True)
-                    print("\r", end="")
+                if fileExt == "c":
                     time.sleep(0.1)
                     fileNo = fileNo + 1
                     try:
@@ -239,6 +236,8 @@ def main():
                         sys.exit()
                 else:
                     continue
+
+
         endTime = time.time()
         print("\n")
         print("{:=^80}".format(" SUMMARY "))

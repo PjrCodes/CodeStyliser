@@ -321,7 +321,7 @@ def getClosingBraceLineIndex(index, lines):
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
     else:
         # here we reach only if it is KEYWORD found
-        if keyword == r"\b(else)\b":
+        if keyword == r"\b(else)\b" or keyword == r"\b(do)\b":
             if line.find("if") != -1:
                 # line is else if
                 isElseIf = True
@@ -341,7 +341,7 @@ def getClosingBraceLineIndex(index, lines):
             nxtLnIndex = checkParenthResult.lineIndex
             nextLineIndex = nxtLnIndex
             openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
-            if not isElseIf and keyword == r"\b(else)\b":
+            if (not isElseIf and keyword == r"\b(else)\b") or (not isElseIf and keyword == r"\b(do)\b"):
                 lastCloseParenthIndex = 0
             else:
                 lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 2
@@ -352,8 +352,14 @@ def getClosingBraceLineIndex(index, lines):
             nextLineIndex = keywordLineCheckIndex + 1
             nxtLnIndex = keywordLineCheckIndex + 1
             openCurlyBraceIndex = line[checkParenthResult.lastCloseParenthIndex:].find("{")
-            if not isElseIf and keyword == r"\b(else)\b":
+            if (not isElseIf and keyword == r"\b(else)\b"):
                 lastCloseParenthRe = re.search(r"\b(else)\b", line)
+                if lastCloseParenthRe:
+                    lastCloseParenthIndex = lastCloseParenthRe.end()
+                else:
+                    lastCloseParenthIndex = -1
+            elif (not isElseIf and keyword == r"\b(do)\b"):
+                lastCloseParenthRe = re.search(r"\b(do)\b", line)
                 if lastCloseParenthRe:
                     lastCloseParenthIndex = lastCloseParenthRe.end()
                 else:
@@ -459,10 +465,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             isBackSlashPresent = line.rstrip()[-1] == "\\"
             if isBackSlashPresent:
                 # backSLASH!
-                print(lastSemiColonIndex)
                 if lastSemiColonIndex != -1:
                     # semicolon found on same line
-                    print(lastSemiColonIndex)
                     if currentLineIsComment:
                         if isMultiline:
                             toAddLine = commentOfCurrentLine + line[:lastCloseParenthIndex] + " { " + line[lastCloseParenthIndex:(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1)] + " } " + line[(lastSemiColonIndex+len(line[:lastCloseParenthIndex])+1):].rstrip() + "\n"
@@ -667,7 +671,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
-            if len(lines[closingBraceLineIndex - 1]) == 0:
+            if len(lines[closingBraceLineIndex - 1].strip()) == 0 or len(lines[closingBraceLineIndex - 2].strip()) == 0:
                 addClosingBraceLine = spaces + "}\n"
                 pass
             else:
