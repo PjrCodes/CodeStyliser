@@ -146,7 +146,7 @@ dmypy.json
 
 # ignore inner
 inner/*
-
+sample.c
 # ignore astyle
 astyle/*
 aStyleBin
