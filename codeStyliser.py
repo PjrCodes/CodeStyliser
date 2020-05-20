@@ -186,7 +186,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.10.4-BETA "
+    VERSION_NUMBER = "0.1.11-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
     isFileGiven = False
@@ -206,7 +206,7 @@ def main():
     print("\n")
     print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
     print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
-    print("Copyright (c) 2020, Pranjal Rastogi\n All rights Reserved")
+    print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
     print("{:=^80}".format(""))
     if isFileGiven:
         print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file")
@@ -293,10 +293,10 @@ def main():
     timeInSec = time.gmtime(endTime - startTime).tm_sec
     if timeInSec == 0:
         timeTaken = int(round(endTime - startTime, 3)* 1000)
-        print(f"Took {timeTaken} milliseconds to add braces {linesEdited} times in {fileNo} files")
+        print(f"Took {timeTaken} milliseconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
     else:
         timeTaken = timeInSec
-        print(f"Took {timeTaken} seconds to add braces {linesEdited} times in {fileNo} files")
+        print(f"Took {timeTaken} seconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
     print("\n")
 
 if __name__ == "__main__":
