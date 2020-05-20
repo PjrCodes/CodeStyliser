@@ -158,13 +158,15 @@ def styliseCode(fileToEdit):
                     lines = elseConditionHandler
                     linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
+        except utils.CommentError:
+            print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {lineIndex+1}, skipping line!!")
+            continue
         except (KeyboardInterrupt, SystemExit):
-            print("exiting...")
             sys.exit()
         except:
             e = sys.exc_info()[0]
-            print("ERROR: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!", end = "")
+            print("FATAL ERROR: " + str(e) + " in file name: " +
+                  fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!")
             continue
 
     # write lines back to fileToEdit
@@ -175,7 +177,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.10.3-BETA "
+    VERSION_NUMBER = "0.1.10.4-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
@@ -187,21 +189,16 @@ def main():
         DIR_NAME = sys.argv[1]
         fileNo = 0
         linesEdited = 0
-        print("\n\n")
+        print("\n")
         print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
         print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
         print("Copyright (C) Pranjal Rastogi, 2020")
         print("{:=^80}".format(""))
-        print("Will stylise code in (.c) and (.h) files under " + DIR_NAME)
-        print("INFO: only changes UTF-8 encoded files")
-        print("INFO: changes \"\\r\\n\" to \"\\n\" for all files")
-        print("\n")
+        print("Will stylise code in C-Source code (.c) files under " + DIR_NAME)
         time.sleep(2)
 
-
-        print("{:=^80}".format(" START "))
         startTime = time.time()
-
+        print("\n" + "{:=^80}".format(" START "))
         for root, _, files in os.walk(DIR_NAME):
 
             for filename in files:
@@ -229,10 +226,10 @@ def main():
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
                             linesEdited = styliseCode(fileToStyle) + linesEdited
                     except UnicodeDecodeError as e:
-                        print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file.")
+                        print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file...")
+                        print(e)
                         continue
                     except (KeyboardInterrupt, SystemExit):
-                        print("exiting...")
                         sys.exit()
                 else:
                     continue
@@ -240,19 +237,13 @@ def main():
 
         endTime = time.time()
         print("\n")
-        print("{:=^80}".format(" SUMMARY "))
-        print("Please check all macros once again, that is where most of the errors will be.")
-        print("Added braces %d times in %d files." % (linesEdited, fileNo))
-
         timeInSec = time.gmtime(endTime - startTime).tm_sec
         if timeInSec == 0:
             timeTaken = int(round(endTime - startTime, 3)* 1000)
-            print("{:=^80}".format(f" DONE in {timeTaken} milliseconds "))
+            print(f"Took {timeTaken} milliseconds to add braces {linesEdited} times in {fileNo} files")
         else:
             timeTaken = timeInSec
-            print("{:=^80}".format(f" DONE in {timeTaken} seconds "))
-        
+            print(f"Took {timeTaken} seconds to add braces {linesEdited} times in {fileNo} files")
         print("\n")
-
 if __name__ == "__main__":
     main()

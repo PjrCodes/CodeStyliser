@@ -20,7 +20,10 @@ import sys
 
 SINGLELINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
 OPENBRACE_PATTERN = r"^(\s*\{)|^(\{)"
-KEYWORDS = [r'\b(for)\b', r'\b(while)\b', r'\b(do)\b', r'\b(switch)\b', r'\b(if)\b', r'\b(else)\b'] #TODO: convert into patterns
+KEYWORDS = [r'\b(for)\b', r'\b(while)\b', r'\b(do)\b', r'\b(switch)\b', r'\b(if)\b', r'\b(else)\b']
+
+class CommentError(Exception):
+    pass
 
 class LineWithComment:
 
@@ -99,7 +102,12 @@ def checkForParentheses(line, lineIndex, lines, typeOfParenth):
 
         nxtLnIndex = lineIndex  + 1
         while closeParenthNo != openParenthNo:
-
+            if nxtLnIndex > (len(lines) - 1):
+                # we never found a parentheses match!
+                # this can only happen if there is syntax error, which there isnt.
+                # We have already ignored Macros where this can happen
+                # so, we must HAVE HIT A COMMENT!
+                raise CommentError
             # check for {} on the line
             for char in lines[nxtLnIndex]:
                 if char == startingParenth:
@@ -324,48 +332,25 @@ def getClosingBraceLineIndex(index, lines):
         if keyword == r"\b(else)\b" or keyword == r"\b(do)\b":
             if line.find("if") != -1:
                 # line is else if
-                isElseIf = True
                 checkParenthResult = checkForParentheses(line, keywordLineCheckIndex, lines, "p")
             else:
-                isElseIf = False
                 checkParenthResult = ParenthResult(True, keywordLineCheckIndex, None)
         else:
-            isElseIf = False
             checkParenthResult = checkForParentheses(line, keywordLineCheckIndex, lines, "p")
         if checkParenthResult == None:
             return None
 
         elif not checkParenthResult.isOnSameLine:
             # (condition) doesnt end on same line
-            isOnSameLine = checkParenthResult.isOnSameLine
             nxtLnIndex = checkParenthResult.lineIndex
             nextLineIndex = nxtLnIndex
             openCurlyBraceIndex = lines[nxtLnIndex - 1][checkParenthResult.lastCloseParenthIndex:].find("{")
-            if (not isElseIf and keyword == r"\b(else)\b") or (not isElseIf and keyword == r"\b(do)\b"):
-                lastCloseParenthIndex = 0
-            else:
-                lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 2
-                
+            
         else:
             # (condition) ends on same line
-            isOnSameLine = checkParenthResult.isOnSameLine
             nextLineIndex = keywordLineCheckIndex + 1
             nxtLnIndex = keywordLineCheckIndex + 1
             openCurlyBraceIndex = line[checkParenthResult.lastCloseParenthIndex:].find("{")
-            if (not isElseIf and keyword == r"\b(else)\b"):
-                lastCloseParenthRe = re.search(r"\b(else)\b", line)
-                if lastCloseParenthRe:
-                    lastCloseParenthIndex = lastCloseParenthRe.end()
-                else:
-                    lastCloseParenthIndex = -1
-            elif (not isElseIf and keyword == r"\b(do)\b"):
-                lastCloseParenthRe = re.search(r"\b(do)\b", line)
-                if lastCloseParenthRe:
-                    lastCloseParenthIndex = lastCloseParenthRe.end()
-                else:
-                    lastCloseParenthIndex = -1
-            else:
-                lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
 
 
         # dont touch me!
@@ -410,7 +395,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             # has {
             return None
         else:
-            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
         return None
     
     # we must now skip over all parentheses to find the end of the (condition)
@@ -427,7 +412,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
         checkParenthResult = checkForParentheses(line, lineIndex, lines, "p")
 
     if checkParenthResult == None:
-        print("WARN: Keyword in parentheses ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+        print("ERROR: While checking parentheses: ignored %s loop/ condition at %d in file %s" % errorPrintData)
         return None
 
     elif not checkParenthResult.isOnSameLine:
@@ -491,7 +476,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     lines.insert(lineIndex, toAddLine)
                     checkForSemiColonIndex = lineIndex + 1
                 else:
-                    print("err")
                     return None
 
             elif not isBackSlashPresent:
@@ -531,10 +515,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     lines.insert(lineIndex, toAddLine)
                     return lines
                 else:
-                    print("err")
                     return None
             else:
-                print("WARN: syntax Loop/condition in macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
         else:
             # the (condition) doesnt end on same line
@@ -561,7 +543,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                             # has {
                             return None
                         else:
-                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             return None
 
                     del lines[nxtLnIndex - 1]
@@ -586,14 +568,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                             # has {
                             return None
                         else:
-                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             return None
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     checkForSemiColonIndex = nxtLnIndex
-                else:
-                    print("errNOTLINE")
             elif not isBackSlashPresent:
                 
                 if lines[nxtLnIndex - 2].isspace() or len(lines[nxtLnIndex-2]) == 0:
@@ -622,7 +602,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                             # has {
                             return None
                         else:
-                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             return None
 
                     del lines[nxtLnIndex - 1]
@@ -647,17 +627,15 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                             # has {
                             return None
                         else:
-                            print("WARN: Hash ignore: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             return None
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
                     return lines
                 else:
-                    print("errNXTLINE")
                     return None
             else:
-                print("WARN: syntax - Loop/condition in a macro has no brace OR a Syntax error: ignored %s loop/ condition at %d in file %s" % errorPrintData)
                 return None
 
 
@@ -693,5 +671,5 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
 
 
 if __name__ == "__main__":
-    print("Do not run utilities!!!, run codeStyliser.py instead!")
+    print("Do not run utilities!, run codeStyliser.py instead!")
     sys.exit()
