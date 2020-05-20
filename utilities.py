@@ -124,12 +124,18 @@ def checkForOpenBrace(nextLineIndex, lines):
 
     while nextLineIndex < (len(lines)):
         lineWithoutComment = trimComment(lines[nextLineIndex], nextLineIndex, lines)
-
         if lineWithoutComment.hasComment:
             # line has comment
-            if re.search(OPENBRACE_PATTERN, lineWithoutComment.line):
-                # if the line before comment has {
-                break
+            if lineWithoutComment.line.isspace():
+                nextLineIndex += 1
+                continue
+            else:
+                if re.search(OPENBRACE_PATTERN, lineWithoutComment.line):
+                    # if the line before comment has {
+                    break
+                else:
+                    # there is something before line, but it is not an open brace
+                    break
             if lineWithoutComment.isMultiline == True:
                 # go after multiline comments
                 nextLineIndex = lineWithoutComment.multiLineJumpIndex
@@ -194,23 +200,51 @@ def getClosingBraceLineIndex(index, lines):
 
         currentLineWoComment = trimComment(lines[keywordLineCheckIndex], keywordLineCheckIndex, lines)
         line = currentLineWoComment.line
-
-        firstCharOfLn = getFirstCharacterIndex(lines[keywordLineCheckIndex])
-        if line.isspace():
+        print(" spinach" + line )
+        firstCharOfLn = getFirstCharacterIndex(line)
+        if line.isspace() or len(line) == 0:
             if currentLineWoComment.isMultiline:
                 # jump line to after multiline comment
                 keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
                 continue
             else:
+                print("ISSPACE, NO/ MAYBE COMMENT")
                 keywordLineCheckIndex += 1
                 continue
-
-        elif not line.isspace():
+        else:
+            print(line)
+            print(" I AM A SPACEBAsdsdsdd nOS PACESR")
             if currentLineWoComment.hasComment:
-                # we must check if current ln has keyword
+                if currentLineWoComment.isMultiline:
+                    print("CANCELILLA")
+                    for keyword in KEYWORDS:
+                        keywordCheckRe = re.search(keyword, line)
+                        if  keywordCheckRe:
+                            if keywordCheckRe.start() == firstCharOfLn:
+                                # we found a keyword
+                                cont = False
+                                hasKeyword = True
+                                break
+                            else:
+                                # keyword not on first char
+                                continue
+                        else:
+                            # didnt find KEYWORD
+                            continue
+                    if cont == True:
+                        continue
+                    else:
+                        keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
+                        break
+                    keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
+                    continue
+
                 if currentLineWoComment.line.isspace():
                     continue
                 else:
+                    print("GOO0Ds")
+                    if line.find("*/") != -1:
+                        keywordLineCheckIndex += 1
                     for keyword in KEYWORDS:
                         keywordCheckRe = re.search(keyword, line)
                         if  keywordCheckRe:
@@ -227,7 +261,7 @@ def getClosingBraceLineIndex(index, lines):
                             continue
                     else:
                         # no keyword was found or line is a statement
-                        if currentLineWoComment.line.isspace():
+                        if currentLineWoComment.line.isspace() or len(currentLineWoComment.line) == 0:
                             if currentLineWoComment.isMultiline:
                                 keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
                                 continue
@@ -245,33 +279,40 @@ def getClosingBraceLineIndex(index, lines):
                     break
 
             elif not currentLineWoComment.hasComment:
-
-                for keyword in KEYWORDS:
-                    keywordCheckRe = re.search(keyword, line)
-                    if  keywordCheckRe:
-                        if keywordCheckRe.start() == firstCharOfLn:
-                            # we found a keyword
-                            cont = False
-                            hasKeyword = True
-                            break
+                print("ADOIOOIOIOIOIOIO")
+                if line.find("*/") != -1:
+                    keywordLineCheckIndex += 1
+                line = lines[keywordLineCheckIndex]
+                print(line)
+                if line.isspace():
+                    continue
+                else:
+                    for keyword in KEYWORDS:
+                        keywordCheckRe = re.search(keyword, line)
+                        if  keywordCheckRe:
+                            if keywordCheckRe.start() == firstCharOfLn:
+                                # we found a keyword
+                                cont = False
+                                hasKeyword = True
+                                break
+                            else:
+                                cont = False
+                                hasKeyword = False
+                                continue
                         else:
+                            # didnt find KEYWORD
                             cont = False
                             hasKeyword = False
                             continue
                     else:
-                        # didnt find KEYWORD
-                        cont = False
-                        hasKeyword = False
+                        # didnt find any keyword
+                        keywordLineCheckIndex += 1
                         continue
-                    
-                else:
-                    # didnt find any keyword
-                    keywordLineCheckIndex += 1
-
-                if cont == True:
-                    continue
-                else:
-                    break
+                    if cont == True:
+                        continue
+                    else:
+                        break
+            
 
     if hasKeyword == False:
         # didnt find a keyword
@@ -289,7 +330,6 @@ def getClosingBraceLineIndex(index, lines):
         else:
             isElseIf = False
             checkParenthResult = checkForParentheses(line, keywordLineCheckIndex, lines, "p")
-
         if checkParenthResult == None:
             return None
 

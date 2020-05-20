@@ -175,7 +175,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.9.8-BETA "
+    VERSION_NUMBER = "0.1.9.9-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
 
