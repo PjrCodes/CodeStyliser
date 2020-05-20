@@ -208,28 +208,37 @@ def getClosingBraceLineIndex(index, lines):
         elif not line.isspace():
             if currentLineWoComment.hasComment:
                 # we must check if current ln has keyword
-                for keyword in KEYWORDS:
-                    keywordCheckRe = re.search(keyword, line)
-                    if  keywordCheckRe:
-                        if keywordCheckRe.start() == firstCharOfLn:
-                            # we found a keyword
-                            cont = False
-                            hasKeyword = True
-                            break
+                if currentLineWoComment.line.isspace():
+                    continue
+                else:
+                    for keyword in KEYWORDS:
+                        keywordCheckRe = re.search(keyword, line)
+                        if  keywordCheckRe:
+                            if keywordCheckRe.start() == firstCharOfLn:
+                                # we found a keyword
+                                cont = False
+                                hasKeyword = True
+                                break
+                            else:
+                                # keyword not on first char
+                                continue
                         else:
+                            # didnt find KEYWORD
                             continue
                     else:
-                        # didnt find KEYWORD
-                        continue
-                else:
-                    # no keyword wasfound
-                    if currentLineWoComment.isMultiline:
-                        keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
-                        continue
-                    else:
-                        keywordLineCheckIndex += 1
-                        continue
-                
+                        # no keyword was found or line is a statement
+                        if currentLineWoComment.line.isspace():
+                            if currentLineWoComment.isMultiline:
+                                keywordLineCheckIndex = currentLineWoComment.multiLineJumpIndex
+                                continue
+                            else:
+                                keywordLineCheckIndex += 1
+                                continue
+                        else:
+                            hasKeyword = False
+                            cont = False
+                            break
+                    
                 if cont == True:
                     continue
                 else:
@@ -269,7 +278,6 @@ def getClosingBraceLineIndex(index, lines):
         return getNextSemiColonLineIndex(index, lines) + 1 # we found semicolon
     else:
         # here we reach only if it is KEYWORD found
-        print("NO")
         if keyword == r"\b(else)\b":
             if line.find("if") != -1:
                 # line is else if
@@ -317,7 +325,6 @@ def getClosingBraceLineIndex(index, lines):
         if openCurlyBraceIndex != -1 or openNextLineCurlyBraceIndex[0] != -1:
             # we found open curly brace related to this other keyword
             # we must go on to find the close }
-            print("CANCEL ME!!")
             
             closeCurlyBraceIndex = line.find("}")
             if closeCurlyBraceIndex == -1:
@@ -326,18 +333,13 @@ def getClosingBraceLineIndex(index, lines):
                     # if match, return that line ki index.
                     # else, raise, DEATHERROR.
                 if openCurlyBraceIndex == -1:
-                    print("CANCEL ME!sa!")
                     result = checkForParentheses(lines[openNextLineCurlyBraceIndex[1]], openNextLineCurlyBraceIndex[1], lines, typeOfParenth="b")
                 else:
-                    print("CANCEL MEas!!")
                     result = checkForParentheses(lines[nxtLnIndex - 1], nxtLnIndex - 1, lines, typeOfParenth="b")
                 if result == None:
-                    print("CANCELasd ME!!")
                     return None
 
                 else:
-                    print("CANCEL saddsME!!")
-                    print(result.lineIndex)
                     return result.lineIndex
             else:
                 # same line has the thingy
