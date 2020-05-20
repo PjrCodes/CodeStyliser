@@ -1,21 +1,10 @@
 # CodeStyliser
 This is the repository for the Code Styliser utility, written by Pranjal Rastogi.
 
-The Code Styliser utility adds curly braces `{}` in all C files `.c` under a directory, wherever needed.
+The Code Styliser utility adds curly braces \[`{}`\] in all C-source \[`.c`\] files and Header \[`.h`\] files under a given directory, wherever needed.
+It adds braces after single line `if()`, `for()`, `while()`, `else`, `else if()` statements.
 
-This utility is written in Python 3.7.7, 64-Bit
-
-Currently, it adds curly braces for `for()` and `while()` loops, and `if()`, `else if()`,`else` conditions.
-
-## Installation
-
-* Make sure you have Python 3.7.7 64-Bit installed on your device. If this is not done, Install Python3.7.7 from [python.org](https://www.python.org)
-* This utility has no dependencies. Just download/ clone `utilities.py` AND `codeStyliser.py` into the required directory
-* now, just run `$ python3.7 codeStyliser.py .`
-* And, wait and watch as magic happens!
-
-## Examples
-An example could be,
+For example,
 
 ```c
 if(a == b)
@@ -30,6 +19,15 @@ if(a == b) {
 }
 ```
 
+This utility is written in Python 3.7.7, 64-Bit. Currently, you must have Python 3.7.7, 64-Bit installed on your machine for this utility to work. Check [install](#Install) for more details
+
+## Install
+
+* Make sure you have Python 3.7.7 64-Bit installed on your device. 
+  * If this is not done, Install Python3.7.7 from [python.org](https://www.python.org)
+* Now, download `utilities.py` and `codeStyliser.py` from releases into the required directory
+
+* now, just run `$ python3.7 codeStyliser.py .` in the desired directory
 
 ## Known issues
 
