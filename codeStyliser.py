@@ -17,6 +17,15 @@ import re
 import os
 import utilities as utils
 import time
+import argparse
+
+parser = argparse.ArgumentParser(description='The Code Styliser Utility,\nCreated by Pranjal Rastogi. Copyright (c) 2020, Pranjal Rastogi\n All rights Reserved')
+group = parser.add_mutually_exclusive_group(required=True)
+
+group.add_argument('-f', '--file', metavar=" file-name", dest="FILE_NAME", help="file name to format", type=str)
+group.add_argument('-d', '--directory', metavar=" directory-name",dest="DIR_NAME", help="directory to format files under", type=str)
+
+
 
 DEFINE_PATTERN = r"#\s*\b(define)\b"
 
@@ -180,27 +189,72 @@ def main():
     VERSION_NUMBER = "0.1.10.4-BETA "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
+    isFileGiven = False
+    args = parser.parse_args()
+    DIR_NAME = args.DIR_NAME
+    FILE_NAME = args.FILE_NAME
+    fileNo = 0
+    linesEdited = 0
 
-    if (len(sys.argv) != 2):
-        print("Usage: python3.7 codeStyliser.py <DIRECTORY_NAME>")
-        print("DIRECTORY_NAME IS REQUIRED")
-        sys.exit()
+    if FILE_NAME != None:
+        isFileGiven = True
     else:
-        DIR_NAME = sys.argv[1]
-        fileNo = 0
-        linesEdited = 0
-        print("\n")
-        print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
-        print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
-        print("Copyright (C) Pranjal Rastogi, 2020")
-        print("{:=^80}".format(""))
+        isFileGiven = False
+
+
+
+    print("\n")
+    print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
+    print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
+    print("Copyright (c) 2020, Pranjal Rastogi\n All rights Reserved")
+    print("{:=^80}".format(""))
+    if isFileGiven:
+        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file")
+    else:
         print("Will stylise code in C-Source code (.c) files under " + DIR_NAME)
-        time.sleep(2)
+    time.sleep(2)
 
-        startTime = time.time()
-        print("\n" + "{:=^80}".format(" START "))
+    startTime = time.time()
+    print("\n" + "{:=^80}".format(" START "))
+    if isFileGiven:
+        file_path = os.path.abspath(FILE_NAME)
+        fileExtension = FILE_NAME.split(".", 1)
+        if len(fileExtension) != 2:
+            print("ERROR, Given file is not a (C) source code file")
+            sys.exit()
+        fileExt = fileExtension[1]
+        if fileExt == "c":
+            try:
+                fileNo += 1
+                with open(file_path, 'rb') as open_file:
+                    content = open_file.read()
+                    content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+                with open(file_path, 'wb') as open_file:
+                    open_file.write(content)
+                    open_file.close()
+                with open(file_path, "r+", encoding="utf-8") as fileToStyle:
+                    linesEdited = styliseCode(fileToStyle) + linesEdited
+            except FileNotFoundError:
+                print(f"ERROR: Given filename, {FILE_NAME} not found!")
+                sys.exit()
+            except FileNotFoundError:
+                print(f"ERROR: Given filename, {FILE_NAME} not found!")
+                sys.exit()
+            except UnicodeDecodeError as e:
+                print("ERROR: while decoding file " + FILE_NAME + " the file is NOT a UTF-8 encoded file, Skipping file...")
+                print(e)
+                sys.exit()
+            except (KeyboardInterrupt, SystemExit):
+                sys.exit()
+            except:
+                e = sys.exc_info()[0]
+                print("ERROR: " + str(e) + " at file name: " + FILE_NAME)
+                sys.exit()
+        else:
+            print("ERROR, Given file is not a (C) source code file")
+            sys.exit()
+    else:
         for root, _, files in os.walk(DIR_NAME):
-
             for filename in files:
                 file_path = os.path.join(root, filename)
                 fileExtension = filename.split(".", 1)
@@ -208,7 +262,6 @@ def main():
                     continue
                 fileExt = fileExtension[1]
                 if fileExt == "c":
-                    time.sleep(0.1)
                     fileNo = fileNo + 1
                     try:
                         with open(file_path, 'rb') as open_file:
@@ -220,7 +273,7 @@ def main():
                     except:
                         e = sys.exc_info()[0]
                         print("ERROR: " + str(e) + " at file name: " +
-                              filename + " while changing line endings")
+                                filename + " while changing line endings")
                         continue
                     try:
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
@@ -235,15 +288,16 @@ def main():
                     continue
 
 
-        endTime = time.time()
-        print("\n")
-        timeInSec = time.gmtime(endTime - startTime).tm_sec
-        if timeInSec == 0:
-            timeTaken = int(round(endTime - startTime, 3)* 1000)
-            print(f"Took {timeTaken} milliseconds to add braces {linesEdited} times in {fileNo} files")
-        else:
-            timeTaken = timeInSec
-            print(f"Took {timeTaken} seconds to add braces {linesEdited} times in {fileNo} files")
-        print("\n")
+    endTime = time.time()
+    print("\n")
+    timeInSec = time.gmtime(endTime - startTime).tm_sec
+    if timeInSec == 0:
+        timeTaken = int(round(endTime - startTime, 3)* 1000)
+        print(f"Took {timeTaken} milliseconds to add braces {linesEdited} times in {fileNo} files")
+    else:
+        timeTaken = timeInSec
+        print(f"Took {timeTaken} seconds to add braces {linesEdited} times in {fileNo} files")
+    print("\n")
+
 if __name__ == "__main__":
     main()
