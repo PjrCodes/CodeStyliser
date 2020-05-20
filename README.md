@@ -1,8 +1,6 @@
-# CodeStyliser
+# CodeStyliser version 0.11-Beta
 
-This is the Code Styliser utility.
-
-The Code Styliser utility adds curly braces (`{}`) in C-source (`.c`) files wherever needed
+The Code Styliser utility fixes MISRA-C-2012 Rule 15.6 warnings automatically, by adding curly braces (`{}`) in C-source (`.c`) files wherever needed.
 
 It adds braces after single line `if()`, `for()`, `while()`, `else` and `else if()` statements.
 
@@ -21,15 +19,17 @@ if(condition) {
 }
 ```
 
-*It is my suggestion to check all the code once this utility is finished running, as few issues may arise*.
-
-There is no guarantee that this software will work out of the box without any issues. Please check [License](#License) for more details
+*It is my suggestion to check all the code once this utility is finished running, as there is no guarantee that this software will work out of the box without any issues.*
 
 **NOTE:** This utility will replace all `\r\n` line endings with `\n`.
 
 ## Usage
 
 This utility is written in Python 3.7.7, 64-Bit. However, you **dont** need to have python installed on your machine.
+
+**NOTE:** The binary file attached works only for 64-Bit Linux systems. It **WILL** not run for any other operating system.
+
+The binary has been tested on Ubuntu 16.04 LTS
 
 The usage is as follows:
 
@@ -175,12 +175,8 @@ foo */ for(...) statement; //bar
 
 ```
 
-## License
+## Copyright
 
 **Copyright (c) 2020, Pranjal Rastogi,**
 
 **All rights reserved.**
-
-This utility has **NO** warranty.
-
-This utility is licensed under a **BSD 2-Clause License**, please see LICENSE for more information
