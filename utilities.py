@@ -487,7 +487,11 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     print("err")
 
             elif not isBackSlashPresent:
-        
+                if lines[lineIndex - 2].rstrip()[-1] == "\\":
+                    print(lastSemiColonIndex)
+                    if lastSemiColonIndex == -1:
+                        # not semicolon ending
+                        return None
                 if line[lastCloseParenthIndex:].isspace():
                     # if there is nothing on line except the keyword()
                     if currentLineIsComment:
@@ -527,6 +531,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             isBackSlashPresent = lines[nxtLnIndex - 1].rstrip()[-1] == "\\"
             lastSemiColonIndex = lines[nxtLnIndex - 1][lastCloseParenthIndex:].find(";")
             if isBackSlashPresent:
+                
                 if lastSemiColonIndex != -1:
                     # same line semicolon
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -581,7 +586,10 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     print("errNOTLINE")
             elif not isBackSlashPresent:
                 if lines[nxtLnIndex - 2].rstrip()[-1] == "\\":
-                    return None
+                    print(lastSemiColonIndex)
+                    if lastSemiColonIndex == -1:
+                        # not semicolon ending
+                        return None
                 if lastSemiColonIndex == -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
                     
@@ -650,7 +658,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
-
             if lines[closingBraceLineIndex - 1].rstrip()[-1] == "\\":
                 # we found \
                 addClosingBraceLine = spaces + "} \\\n"
