@@ -37,4 +37,5 @@ Please check [issues](https://github.com/PjrCodes/CodeStyliser/issues) for the l
 Copyright (C) Pranjal Rastogi 2020
 
 This utility has no warranty.
-Please see LICENSE for warranty, sharing and other details.
+license: BSD-2 Clause
+Please see LICENSE for more information
