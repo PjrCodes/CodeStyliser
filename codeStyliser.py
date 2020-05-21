@@ -186,7 +186,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.11-BETA "
+    VERSION_NUMBER = "0.1.11.1-DEV "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
     isFileGiven = False
@@ -205,13 +205,15 @@ def main():
 
     print("\n")
     print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
+    print("EXPERIMENTAL VERSION. ERRORS MAY DEFINETLY ARISE")
     print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
     print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
-    print("{:=^80}".format(""))
+    print("{:=^80}".format("EXPERIMENTAL"))
+
     if isFileGiven:
-        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file")
+        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file/ a Header file(.h)")
     else:
-        print("Will stylise code in C-Source code (.c) files under " + DIR_NAME)
+        print("Will stylise code in C-Source code (.c)/ Header (.h) files under " + DIR_NAME)
     time.sleep(2)
 
     startTime = time.time()
@@ -223,7 +225,7 @@ def main():
             print("ERROR, Given file is not a (C) source code file")
             sys.exit()
         fileExt = fileExtension[1]
-        if fileExt == "c":
+        if fileExt == "c" or fileExt == "h":
             try:
                 fileNo += 1
                 with open(file_path, 'rb') as open_file:
@@ -251,7 +253,7 @@ def main():
                 print("ERROR: " + str(e) + " at file name: " + FILE_NAME)
                 sys.exit()
         else:
-            print("ERROR, Given file is not a (C) source code file")
+            print("ERROR, Given file is not a (C) source code/ (h) file file")
             sys.exit()
     else:
         for root, _, files in os.walk(DIR_NAME):
@@ -261,7 +263,7 @@ def main():
                 if len(fileExtension) != 2:
                     continue
                 fileExt = fileExtension[1]
-                if fileExt == "c":
+                if fileExt == "c" or fileExt == "h":
                     fileNo = fileNo + 1
                     try:
                         with open(file_path, 'rb') as open_file:
