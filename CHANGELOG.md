@@ -378,10 +378,10 @@ This is the current release, please see [CURRENT RELEASE](#[0.1.11]---2020-05-21
 - Initial (first) commit, with basic files
 
 
-[Not Listed Changes]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.11.1...HEAD
-[0.1.11.1]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.11...v0.1.11.1
-[0.1.11]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.4...v0.1.11
-[0.1.10.4]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.3...v0.1.10.4
+[Not Listed Changes]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.11...HEAD
+<!-- [0.1.11.1]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.11...v0.1.11.1 -->
+[0.1.11]: https://github.com/PjrCodes/CodeStyliser/compare/releases/tag/v0.1.11
+<!-- [0.1.10.4]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.3...v0.1.10.4
 [0.1.10.3]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.2...v0.1.10.3
 [0.1.10.2]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.1...v0.1.10.2
 [0.1.10.1]: https://github.com/PjrCodes/CodeStyliser/compare/v0.1.10.0...v0.1.10.1
@@ -414,4 +414,4 @@ This is the current release, please see [CURRENT RELEASE](#[0.1.11]---2020-05-21
 [0.0.4]: https://github.com/PjrCodes/CodeStyliser/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/PjrCodes/CodeStyliser/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/PjrCodes/CodeStyliser/compare/v0.0.1...v0.0.2
-[0.0.1]: https://github.com/PjrCodes/CodeStyliser/releases/tag/v0.0.1
+[0.0.1]: https://github.com/PjrCodes/CodeStyliser/releases/tag/v0.0.1 -->
