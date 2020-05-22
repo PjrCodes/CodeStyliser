@@ -1,14 +1,15 @@
 #!/usr/local/bin/python3
-# Copyright (c) 2020 Pranjal Rastogi All Rights Reserved
-# Do not copy this code.
-# check LICENSE for more details
-# ---
-# THE codeStyliser Utility
-# ---
 # Made in python 3.7.7 64 bit, use only this version
 # ---
+# Copyright (c) 2020, Pranjal Rastogi 
+# All rights reserved.
+# Do not copy this code without permission
+# check LICENSE for more details
+# ---
+# Part of The codeStyliser utility
+# ---
 # codeStyliser.py
-# code Styliser, starting main file
+# Starting point of the application
 # ---
 
 
@@ -16,18 +17,20 @@ import sys
 import re
 import os
 import utilities as utils
+import exceptions
 import time
+import handleKeyword
+import constants as consts
 import argparse
 
-parser = argparse.ArgumentParser(description='The Code Styliser Utility,\nCreated by Pranjal Rastogi. Copyright (c) 2020, Pranjal Rastogi\n All rights Reserved')
+
+parser = argparse.ArgumentParser(description= "The Code Styliser Utility, An utility that helps you add curly braces in C source code, wherever needed!", 
+                                epilog= "Copyright (c) 2020, Pranjal Rastogi. All rights reserved.")
+
 group = parser.add_mutually_exclusive_group(required=True)
 
-group.add_argument('-f', '--file', metavar=" file-name", dest="FILE_NAME", help="file name to format", type=str)
-group.add_argument('-d', '--directory', metavar=" directory-name",dest="DIR_NAME", help="directory to format files under", type=str)
-
-
-
-DEFINE_PATTERN = r"#\s*\b(define)\b"
+group.add_argument('-f', '--file', metavar="file-name", dest="FILE_NAME", help="file name to format", type=str)
+group.add_argument('-d', '--directory', metavar="directory-name",dest="DIR_NAME", help="directory to format files under", type=str)
 
 def styliseCode(fileToEdit):
     # lines edited in this file
@@ -39,7 +42,7 @@ def styliseCode(fileToEdit):
     lineIndex = -1
     while lineIndex < (len(lines) - 1):
 
-        try:
+        # try:
             # increment line count
             lineIndex = lineIndex + 1
             currentLineIsComment = False
@@ -70,7 +73,7 @@ def styliseCode(fileToEdit):
             
             firstCharIndex = utils.getFirstCharacterIndex(line)
             
-            if re.search(DEFINE_PATTERN, line):
+            if re.search(consts.DEFINE_PATTERN, line):
                 isMacro = True
                 if line.rfind("\\") != -1:
                     # found \ at the back of the line
@@ -90,7 +93,7 @@ def styliseCode(fileToEdit):
                 forLoopIndex = -1
 
             if forLoopIndex == firstCharIndex:
-                forLoopHandler = utils.handleKeyword(KEYWORD="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                forLoopHandler = handleKeyword.handleKeyword(keyword="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                     isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline, keywordIndex=forLoopIndex)
                 if forLoopHandler == None:
                     continue
@@ -108,7 +111,7 @@ def styliseCode(fileToEdit):
                 whileLoopIndex = -1
             
             if whileLoopIndex == firstCharIndex:
-                whileLoopHandler = utils.handleKeyword(KEYWORD="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                whileLoopHandler = handleKeyword.handleKeyword(keyword="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                     isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
                 if whileLoopHandler == None:
                     continue
@@ -126,7 +129,7 @@ def styliseCode(fileToEdit):
                 ifConditionIndex = -1
 
             if ifConditionIndex == firstCharIndex:
-                ifConditionHandler = utils.handleKeyword(KEYWORD="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                ifConditionHandler = handleKeyword.handleKeyword(keyword="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                     isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
                 if ifConditionHandler == None:
                     continue
@@ -150,7 +153,7 @@ def styliseCode(fileToEdit):
             if lineStartsOnBrace and startingElseIndex != -1:
                 # we have a line with an } and an else after it
                 # process else
-                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                elseConditionHandler = ifConditionHandler = handleKeyword.handleKeyword(keyword="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                 isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
@@ -159,7 +162,7 @@ def styliseCode(fileToEdit):
                     linesEdited = linesEdited + 1
             elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
                 # we have an else
-                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                elseConditionHandler = ifConditionHandler = handleKeyword.handleKeyword(keyword="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                 isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
@@ -167,16 +170,16 @@ def styliseCode(fileToEdit):
                     lines = elseConditionHandler
                     linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
-        except utils.CommentError:
-            print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {lineIndex+1}, skipping line!!")
-            continue
-        except (KeyboardInterrupt, SystemExit):
-            sys.exit()
-        except:
-            e = sys.exc_info()[0]
-            print("FATAL ERROR: " + str(e) + " in file name: " +
-                  fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!")
-            continue
+        # except exceptions.CommentError:
+        #     print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {lineIndex+1}, skipping line!!")
+        #     continue
+        # except (KeyboardInterrupt, SystemExit):
+        #     sys.exit()
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("FATAL ERROR: " + str(e) + " in file name: " +
+        #           fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!")
+        #     continue
 
     # write lines back to fileToEdit
     fileToEdit.seek(0)
@@ -186,17 +189,14 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.1.11.1-DEV "
-    WINDOWS_LINE_ENDING = b'\r\n'
-    UNIX_LINE_ENDING = b'\n'
     isFileGiven = False
     args = parser.parse_args()
-    DIR_NAME = args.DIR_NAME
-    FILE_NAME = args.FILE_NAME
+    givenDirName = args.DIR_NAME
+    givenFileName = args.FILE_NAME
     fileNo = 0
     linesEdited = 0
 
-    if FILE_NAME != None:
+    if givenFileName != None:
         isFileGiven = True
     else:
         isFileGiven = False
@@ -204,59 +204,59 @@ def main():
 
 
     print("\n")
-    print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
+    print("{:=^80}".format(" Welcome to CodeStyliser ver" + consts.VERSION_NUMBER))
     print("EXPERIMENTAL VERSION. ERRORS MAY DEFINETLY ARISE")
     print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
     print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
     print("{:=^80}".format("EXPERIMENTAL"))
 
     if isFileGiven:
-        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file/ a Header file(.h)")
+        print("Will stylise code in " + givenFileName + " if it is a C-Source (.c) file/ a Header file(.h)")
     else:
-        print("Will stylise code in C-Source code (.c)/ Header (.h) files under " + DIR_NAME)
+        print("Will stylise code in C-Source code (.c)/ Header (.h) files under " + givenDirName)
     time.sleep(2)
 
     startTime = time.time()
     print("\n" + "{:=^80}".format(" START "))
     if isFileGiven:
-        file_path = os.path.abspath(FILE_NAME)
-        fileExtension = FILE_NAME.split(".", 1)
+        file_path = os.path.abspath(givenFileName)
+        fileExtension = givenFileName.split(".", 1)
         if len(fileExtension) != 2:
             print("ERROR, Given file is not a (C) source code file")
             sys.exit()
         fileExt = fileExtension[1]
         if fileExt == "c" or fileExt == "h":
-            try:
+            # try:
                 fileNo += 1
                 with open(file_path, 'rb') as open_file:
                     content = open_file.read()
-                    content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+                    content = content.replace(consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
                 with open(file_path, 'wb') as open_file:
                     open_file.write(content)
                     open_file.close()
                 with open(file_path, "r+", encoding="utf-8") as fileToStyle:
                     linesEdited = styliseCode(fileToStyle) + linesEdited
-            except FileNotFoundError:
-                print(f"ERROR: Given filename, {FILE_NAME} not found!")
-                sys.exit()
-            except FileNotFoundError:
-                print(f"ERROR: Given filename, {FILE_NAME} not found!")
-                sys.exit()
-            except UnicodeDecodeError as e:
-                print("ERROR: while decoding file " + FILE_NAME + " the file is NOT a UTF-8 encoded file, Skipping file...")
-                print(e)
-                sys.exit()
-            except (KeyboardInterrupt, SystemExit):
-                sys.exit()
-            except:
-                e = sys.exc_info()[0]
-                print("ERROR: " + str(e) + " at file name: " + FILE_NAME)
-                sys.exit()
+            # except FileNotFoundError:
+            #     print(f"ERROR: Given filename, {givenFileName} not found!")
+            #     sys.exit()
+            # except FileNotFoundError:
+            #     print(f"ERROR: Given filename, {givenFileName} not found!")
+            #     sys.exit()
+            # except UnicodeDecodeError as e:
+            #     print("ERROR: while decoding file " + givenFileName + " the file is NOT a UTF-8 encoded file, Skipping file...")
+            #     print(e)
+            #     sys.exit()
+            # except (KeyboardInterrupt, SystemExit):
+            #     sys.exit()
+            # except:
+            #     e = sys.exc_info()[0]
+            #     print("ERROR: " + str(e) + " at file name: " + givenFileName)
+            #     sys.exit()
         else:
             print("ERROR, Given file is not a (C) source code/ (h) file file")
             sys.exit()
     else:
-        for root, _, files in os.walk(DIR_NAME):
+        for root, _, files in os.walk(givenDirName):
             for filename in files:
                 file_path = os.path.join(root, filename)
                 fileExtension = filename.split(".", 1)
@@ -277,15 +277,15 @@ def main():
                         print("ERROR: " + str(e) + " at file name: " +
                                 filename + " while changing line endings")
                         continue
-                    try:
-                        with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                            linesEdited = styliseCode(fileToStyle) + linesEdited
-                    except UnicodeDecodeError as e:
-                        print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file...")
-                        print(e)
-                        continue
-                    except (KeyboardInterrupt, SystemExit):
-                        sys.exit()
+                    # try:
+                    with open(file_path, "r+", encoding="utf-8") as fileToStyle:
+                        linesEdited = styliseCode(fileToStyle) + linesEdited
+                    # except UnicodeDecodeError as e:
+                    #     print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file...")
+                    #     print(e)
+                    #     continue
+                    # except (KeyboardInterrupt, SystemExit):
+                    #     sys.exit()
                 else:
                     continue
 
