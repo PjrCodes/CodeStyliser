@@ -12,5 +12,11 @@
 # custom exceptions
 # ---
 
+
 class CommentError(Exception):
     pass
+
+
+class HashIgnore(Exception):
+    pass
+

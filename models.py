@@ -12,18 +12,20 @@
 # custom models/ classes
 # ---
 
+
 class LineWithComment:
 
-    def __init__(self, line, hasComment, comment, isMultiline, multiLineJumpIndex):
+    def __init__(self, line, has_comment, comment, is_multiline, multi_line_jump_index):
         self.line = line
-        self.hasComment = hasComment
+        self.hasComment = has_comment
         self.comment = comment
-        self.isMultiline = isMultiline
-        self.multiLineJumpIndex = multiLineJumpIndex
+        self.isMultiline = is_multiline
+        self.multiLineJumpIndex = multi_line_jump_index
+
 
 class ParenthResult:
     
-    def __init__(self, isOnSameLine, lineIndex, lastCloseParenthIndex):
-        self.isOnSameLine = isOnSameLine
-        self.lineIndex = lineIndex
-        self.lastCloseParenthIndex = lastCloseParenthIndex
+    def __init__(self, is_on_same_line, line_index, last_close_parenth_index):
+        self.isOnSameLine = is_on_same_line
+        self.lineIndex = line_index
+        self.lastCloseParenthIndex = last_close_parenth_index

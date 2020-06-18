@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # Made in python 3.7.7 64 bit, use only this version
 # ---
-# Copyright (c) 2020, Pranjal Rastogi 
+# Copyright (c) 2020, Pranjal Rastogi
 # All rights reserved.
 # Do not copy this code without permission
 # check LICENSE for more details
@@ -23,185 +23,216 @@ import handleKeyword
 import constants as consts
 import argparse
 
-
-parser = argparse.ArgumentParser(description= "The Code Styliser Utility, An utility that helps you add curly braces in C source code, wherever needed!", 
-                                epilog= "Copyright (c) 2020, Pranjal Rastogi. All rights reserved.")
+parser = argparse.ArgumentParser(description="The Code Styliser Utility, An utility that helps you add curly braces in "
+                                             "C source code, wherever needed!",
+                                 epilog="Copyright (c) 2020, Pranjal Rastogi. All rights reserved.")
 
 group = parser.add_mutually_exclusive_group(required=True)
 
-group.add_argument('-f', '--file', metavar="file-name", dest="FILE_NAME", help="file name to format", type=str)
-group.add_argument('-d', '--directory', metavar="directory-name",dest="DIR_NAME", help="directory to format files under", type=str)
+group.add_argument('-f', '--file', metavar="file-name",
+                   dest="FILE_NAME", help="file name to format", type=str)
+group.add_argument('-d', '--directory', metavar="directory-name",
+                   dest="DIR_NAME", help="directory to format files under", type=str)
 
-def styliseCode(fileToEdit):
+
+def stylise_code(file_to_edit):
     # lines edited in this file
-    linesEdited = 0
+    lines_edited = 0
     # so that first line's index is 0
 
-    fileToEdit.seek(0)
-    lines = fileToEdit.readlines()
-    lineIndex = -1
-    while lineIndex < (len(lines) - 1):
+    file_to_edit.seek(0)
+    lines = file_to_edit.readlines()
+    line_index = -1
+    while line_index < (len(lines) - 1):
 
         # try:
-            # increment line count
-            lineIndex = lineIndex + 1
-            currentLineIsComment = False
-            isMultiline = False
-            commentOfCurrentLine = ""
-            # search for comments
-            trimmedCommentResult = utils.trimComment(lines[lineIndex], lineIndex, lines)
-            line = trimmedCommentResult.line
+        # increment line count
+        line_index = line_index + 1
+        current_line_is_comment = False
+        is_multiline = False
+        comment_of_current_line = ""
+        # search for comments
+        trimmed_comment_result = utils.trim_comment(
+            lines[line_index], line_index, lines)
+        line = trimmed_comment_result.line
 
-            if trimmedCommentResult.hasComment == True and trimmedCommentResult.isMultiline == False:
-                currentLineIsComment = True
-                commentOfCurrentLine = trimmedCommentResult.comment
-            elif trimmedCommentResult.isMultiline == True:
-                isMultiline = trimmedCommentResult.isMultiline
-                currentLineIsComment = trimmedCommentResult.hasComment
-                commentOfCurrentLine = trimmedCommentResult.comment
-                # if comment, jump
-                lineIndex = trimmedCommentResult.multiLineJumpIndex
-                line = trimmedCommentResult.line
-            elif trimmedCommentResult.hasComment == False:
-                currentLineIsComment = False
-                isMultiline = False
-                commentOfCurrentLine = trimmedCommentResult.comment
+        if trimmed_comment_result.hasComment is True and trimmed_comment_result.isMultiline is False:
+            current_line_is_comment = True
+            comment_of_current_line = trimmed_comment_result.comment
+        elif trimmed_comment_result.isMultiline:
+            is_multiline = trimmed_comment_result.isMultiline
+            current_line_is_comment = trimmed_comment_result.hasComment
+            comment_of_current_line = trimmed_comment_result.comment
+            # if comment, jump
+            line_index = trimmed_comment_result.multiLineJumpIndex
+            line = trimmed_comment_result.line
+        elif not trimmed_comment_result.hasComment:
+            current_line_is_comment = False
+            is_multiline = False
+            comment_of_current_line = trimmed_comment_result.comment
+        else:
+            print("FATAL ERROR: in comment checking, at line " +
+                  str(line_index) + " file: " + file_to_edit.name)
+            continue
+
+        first_char_index = utils.get_first_character_index(line)
+
+        if re.search(consts.DEFINE_PATTERN, line):
+            is_macro = True
+            if line.rfind("\\") != -1:
+                # found \ at the back of the line
+                pass
             else:
-                print("FATAL ERROR: in comment checking, at line " +
-                    str(lineIndex) + " file: " + fileToEdit.name)
+                # ignore line
                 continue
-            
-            firstCharIndex = utils.getFirstCharacterIndex(line)
-            
-            if re.search(consts.DEFINE_PATTERN, line):
-                isMacro = True
-                if line.rfind("\\") != -1:
-                    # found \ at the back of the line
-                    pass
-                else:
-                    # ignore line
-                    continue 
+        else:
+            is_macro = False
+
+        # ---------------------------------------------------------------------------
+        # find for loops
+        for_loop_match = re.search(r"\b(for)\b", line)
+        if for_loop_match:
+            for_loop_index = for_loop_match.start()
+        else:
+            for_loop_index = -1
+
+        if for_loop_index == first_char_index:
+            for_loop_handler = handleKeyword.handle_keyword(keyword="for", line=line, line_index=line_index, lines=lines,
+                                                            file_to_edit=file_to_edit,
+                                                            is_macro=is_macro,
+                                                            is_current_line_comment=current_line_is_comment,
+                                                            comment_of_current_line=comment_of_current_line,
+                                                            is_multiline=is_multiline, keyword_index=for_loop_index)
+            if for_loop_handler is None:
+                continue
             else:
-                isMacro = False
+                lines = for_loop_handler
+                lines_edited = lines_edited + 1
 
-            # ---------------------------------------------------------------------------
-            # find for loops
-            forLoopMatch = re.search(r"\b(for)\b", line)
-            if forLoopMatch:
-                forLoopIndex = forLoopMatch.start()
+        # ---------------------------------------------------------------------------
+
+        # find while loops
+        while_loop_match = re.search(r"\b(while)\b", line)
+        if while_loop_match:
+            while_loop_index = while_loop_match.start()
+        else:
+            while_loop_index = -1
+
+        if while_loop_index == first_char_index:
+            while_loop_handler = handleKeyword.handle_keyword(keyword="while", line=line, line_index=line_index,
+                                                              lines=lines, file_to_edit=file_to_edit,
+                                                              is_macro=is_macro,
+                                                              is_current_line_comment=current_line_is_comment,
+                                                              comment_of_current_line=comment_of_current_line,
+                                                              keyword_index=while_loop_index, is_multiline=is_multiline)
+            if while_loop_handler is None:
+                continue
             else:
-                forLoopIndex = -1
+                lines = while_loop_handler
+                lines_edited = lines_edited + 1
 
-            if forLoopIndex == firstCharIndex:
-                forLoopHandler = handleKeyword.handleKeyword(keyword="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline, keywordIndex=forLoopIndex)
-                if forLoopHandler == None:
-                    continue
-                else:
-                    lines = forLoopHandler
-                    linesEdited = linesEdited + 1
+        # ---------------------------------------------------------------------------
 
-            # ---------------------------------------------------------------------------
+        # find if conditions
+        if_condition_match = re.search(r"\b(if)\b", line)
+        if if_condition_match:
+            if_condition_index = if_condition_match.start()
+        else:
+            if_condition_index = -1
 
-            # find while loops
-            whileLoopMatch = re.search(r"\b(while)\b", line)
-            if whileLoopMatch:
-                whileLoopIndex = whileLoopMatch.start()
+        if if_condition_index == first_char_index:
+            if_condition_handler = handleKeyword.handle_keyword(keyword="if", line=line, line_index=line_index,
+                                                                lines=lines, file_to_edit=file_to_edit,
+                                                                is_macro=is_macro,
+                                                                is_current_line_comment=current_line_is_comment,
+                                                                comment_of_current_line=comment_of_current_line,
+                                                                keyword_index=if_condition_index,
+                                                                is_multiline=is_multiline)
+            if if_condition_handler is None:
+                continue
             else:
-                whileLoopIndex = -1
-            
-            if whileLoopIndex == firstCharIndex:
-                whileLoopHandler = handleKeyword.handleKeyword(keyword="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
-                if whileLoopHandler == None:
-                    continue
-                else:
-                    lines = whileLoopHandler
-                    linesEdited = linesEdited + 1
+                lines = if_condition_handler
+                lines_edited = lines_edited + 1
 
-            # ---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
+        # find else conditions
+        starting_curly_brace_index = line.find("}")
+        line_starts_on_brace = False
+        else_condition_match = re.search(r"\b(else)\b", line)
+        if else_condition_match:
+            starting_else_index = else_condition_match.start()
+        else:
+            starting_else_index = -1
 
-            # find if conditions
-            ifConditionMatch = re.search(r"\b(if)\b", line)
-            if ifConditionMatch:
-                ifConditionIndex = ifConditionMatch.start()
+        if starting_curly_brace_index == first_char_index:
+            # line starts on a }
+            line_starts_on_brace = True
+
+        if line_starts_on_brace and starting_else_index != -1:
+            # we have a line with an } and an else after it
+            # process else
+            else_condition_handler = handleKeyword.handle_keyword(keyword="else -", line=line,
+                                                                  line_index=line_index,
+                                                                  lines=lines,
+                                                                  file_to_edit=file_to_edit,
+                                                                  is_macro=is_macro,
+                                                                  is_current_line_comment=current_line_is_comment,
+                                                                  comment_of_current_line=comment_of_current_line,
+                                                                  keyword_index=starting_curly_brace_index,
+                                                                  is_multiline=is_multiline)
+            if else_condition_handler is None:
+                continue
             else:
-                ifConditionIndex = -1
-
-            if ifConditionIndex == firstCharIndex:
-                ifConditionHandler = handleKeyword.handleKeyword(keyword="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
-                if ifConditionHandler == None:
-                    continue
-                else:
-                    lines = ifConditionHandler
-                    linesEdited = linesEdited + 1
-
-            # ---------------------------------------------------------------------------
-            # find else conditions
-            startingCurlyBraceIndex = line.find("}")
-            elseConditionMatch = re.search(r"\b(else)\b", line)
-            if elseConditionMatch:
-                startingElseIndex = elseConditionMatch.start()
+                lines = else_condition_handler
+                lines_edited = lines_edited + 1
+        elif starting_else_index == first_char_index and not line_starts_on_brace:
+            # we have an else
+            else_condition_handler = handleKeyword.handle_keyword(keyword="else -", line=line,
+                                                                  line_index=line_index,
+                                                                  lines=lines,
+                                                                  file_to_edit=file_to_edit,
+                                                                  is_macro=is_macro,
+                                                                  is_current_line_comment=current_line_is_comment,
+                                                                  comment_of_current_line=comment_of_current_line,
+                                                                  keyword_index=starting_else_index,
+                                                                  is_multiline=is_multiline)
+            if else_condition_handler is None:
+                continue
             else:
-                startingElseIndex = -1
-            lineStartsOnBrace = False
-            if startingCurlyBraceIndex == firstCharIndex:
-                # line starts on a }
-                lineStartsOnBrace = True
-            
-            if lineStartsOnBrace and startingElseIndex != -1:
-                # we have a line with an } and an else after it
-                # process else
-                elseConditionHandler = ifConditionHandler = handleKeyword.handleKeyword(keyword="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
-                if elseConditionHandler == None:
-                    continue
-                else:
-                    lines = elseConditionHandler
-                    linesEdited = linesEdited + 1
-            elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
-                # we have an else
-                elseConditionHandler = ifConditionHandler = handleKeyword.handleKeyword(keyword="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
-                if elseConditionHandler == None:
-                    continue
-                else:
-                    lines = elseConditionHandler
-                    linesEdited = linesEdited + 1
-            # ---------------------------------------------------------------------------
+                lines = else_condition_handler
+                lines_edited = lines_edited + 1
+        # ---------------------------------------------------------------------------
         # except exceptions.CommentError:
-        #     print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {lineIndex+1}, skipping line!!")
+        #     print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {line_index+1}, \
+        #     skipping line!!")
         #     continue
         # except (KeyboardInterrupt, SystemExit):
         #     sys.exit()
         # except:
         #     e = sys.exc_info()[0]
         #     print("FATAL ERROR: " + str(e) + " in file name: " +
-        #           fileToEdit.name + " around line " + str(lineIndex + 1) + ", skipping line!!")
+        #           fileToEdit.name + " around line " + str(line_index + 1) + ", skipping line!!")
         #     continue
 
     # write lines back to fileToEdit
-    fileToEdit.seek(0)
-    fileToEdit.writelines(lines)
-    fileToEdit.close()
-    return linesEdited
+    file_to_edit.seek(0)
+    file_to_edit.writelines(lines)
+    file_to_edit.close()
+    return lines_edited
 
 
 def main():
-    isFileGiven = False
+    is_file_given = False
     args = parser.parse_args()
-    givenDirName = args.DIR_NAME
-    givenFileName = args.FILE_NAME
-    fileNo = 0
-    linesEdited = 0
+    given_dir_name = args.DIR_NAME
+    given_file_name = args.FILE_NAME
+    file_no = 0
+    lines_edited = 0
 
-    if givenFileName != None:
-        isFileGiven = True
+    if given_file_name is not None:
+        is_file_given = True
     else:
-        isFileGiven = False
-
-
+        is_file_given = False
 
     print("\n")
     print("{:=^80}".format(" Welcome to CodeStyliser ver" + consts.VERSION_NUMBER))
@@ -210,32 +241,34 @@ def main():
     print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
     print("{:=^80}".format("EXPERIMENTAL"))
 
-    if isFileGiven:
-        print("Will stylise code in " + givenFileName + " if it is a C-Source (.c) file/ a Header file(.h)")
+    if is_file_given:
+        print("Will stylise code in " + given_file_name +
+              " if it is a C-Source (.c) file/ a Header file(.h)")
     else:
-        print("Will stylise code in C-Source code (.c)/ Header (.h) files under " + givenDirName)
+        print("Will stylise code in C-Source code (.c)/ Header (.h) files under " + given_dir_name)
     time.sleep(2)
 
-    startTime = time.time()
+    start_time = time.time()
     print("\n" + "{:=^80}".format(" START "))
-    if isFileGiven:
-        file_path = os.path.abspath(givenFileName)
-        fileExtension = givenFileName.split(".", 1)
-        if len(fileExtension) != 2:
+    if is_file_given:
+        file_path = os.path.abspath(given_file_name)
+        file_extension = given_file_name.split(".", 1)
+        file_ext = file_extension[1]
+        if len(file_extension) != 2:
             print("ERROR, Given file is not a (C) source code file")
             sys.exit()
-        fileExt = fileExtension[1]
-        if fileExt == "c" or fileExt == "h":
+        if file_ext == "c" or file_ext == "h":
             # try:
-                fileNo += 1
-                with open(file_path, 'rb') as open_file:
-                    content = open_file.read()
-                    content = content.replace(consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
-                with open(file_path, 'wb') as open_file:
-                    open_file.write(content)
-                    open_file.close()
-                with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                    linesEdited = styliseCode(fileToStyle) + linesEdited
+            file_no += 1
+            with open(file_path, 'rb') as open_file:
+                content = open_file.read()
+                content = content.replace(
+                    consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
+            with open(file_path, 'wb') as open_file:
+                open_file.write(content)
+                open_file.close()
+            with open(file_path, "r+", encoding="utf-8") as fileToStyle:
+                lines_edited = stylise_code(fileToStyle) + lines_edited
             # except FileNotFoundError:
             #     print(f"ERROR: Given filename, {givenFileName} not found!")
             #     sys.exit()
@@ -243,7 +276,8 @@ def main():
             #     print(f"ERROR: Given filename, {givenFileName} not found!")
             #     sys.exit()
             # except UnicodeDecodeError as e:
-            #     print("ERROR: while decoding file " + givenFileName + " the file is NOT a UTF-8 encoded file, Skipping file...")
+            #     print("ERROR: while decoding file " + givenFileName + " the file is NOT a UTF-8 encoded file,\
+            #     Skipping file...")
             #     print(e)
             #     sys.exit()
             # except (KeyboardInterrupt, SystemExit):
@@ -256,32 +290,34 @@ def main():
             print("ERROR, Given file is not a (C) source code/ (h) file file")
             sys.exit()
     else:
-        for root, _, files in os.walk(givenDirName):
+        for root, _, files in os.walk(given_dir_name):
             for filename in files:
                 file_path = os.path.join(root, filename)
-                fileExtension = filename.split(".", 1)
-                if len(fileExtension) != 2:
+                file_extension = filename.split(".", 1)
+                if len(file_extension) != 2:
                     continue
-                fileExt = fileExtension[1]
-                if fileExt == "c" or fileExt == "h":
-                    fileNo = fileNo + 1
+                file_ext = file_extension[1]
+                if file_ext == "c" or file_ext == "h":
+                    file_no = file_no + 1
                     try:
                         with open(file_path, 'rb') as open_file:
                             content = open_file.read()
-                            content = content.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+                            content = content.replace(
+                                consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
                         with open(file_path, 'wb') as open_file:
                             open_file.write(content)
                             open_file.close()
                     except:
                         e = sys.exc_info()[0]
                         print("ERROR: " + str(e) + " at file name: " +
-                                filename + " while changing line endings")
+                              filename + " while changing line endings")
                         continue
                     # try:
                     with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                        linesEdited = styliseCode(fileToStyle) + linesEdited
+                        lines_edited = stylise_code(fileToStyle) + lines_edited
                     # except UnicodeDecodeError as e:
-                    #     print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file...")
+                    #     print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, \
+                    #     Skipping file...")
                     #     print(e)
                     #     continue
                     # except (KeyboardInterrupt, SystemExit):
@@ -289,17 +325,19 @@ def main():
                 else:
                     continue
 
-
-    endTime = time.time()
+    end_time = time.time()
     print("\n")
-    timeInSec = time.gmtime(endTime - startTime).tm_sec
-    if timeInSec == 0:
-        timeTaken = int(round(endTime - startTime, 3)* 1000)
-        print(f"Took {timeTaken} milliseconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
+    time_in_sec = time.gmtime(end_time - start_time).tm_sec
+    if time_in_sec == 0:
+        time_taken = int(round(end_time - start_time, 3) * 1000)
+        print(
+            f"Took {time_taken} milliseconds to add braces {lines_edited} time(s) in {file_no} file(s)")
     else:
-        timeTaken = timeInSec
-        print(f"Took {timeTaken} seconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
+        time_taken = time_in_sec
+        print(
+            f"Took {time_taken} seconds to add braces {lines_edited} time(s) in {file_no} file(s)")
     print("\n")
+
 
 if __name__ == "__main__":
     main()
