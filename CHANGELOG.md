@@ -23,6 +23,13 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
+### [0.1.11.2-DEV] - 2020-06-18
+
+#### Changed
+- **Highly** modularised code internally
+- Performance improvements
+- PEP8 Compliance
+
 ### [0.1.11.1] - 2020-05-21
 
 #### Changed
