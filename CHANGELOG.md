@@ -23,6 +23,14 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
+### [0.1.11.4-DEV] - 2020-06-25
+
+***WARNING***: Not completely tested.
+
+#### Changed
+- The way else/ else if is handled
+
+
 ### [0.1.11.2-DEV] - 2020-06-18
 
 #### Changed
