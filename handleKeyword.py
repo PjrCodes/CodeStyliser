@@ -337,37 +337,51 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_macro, is_
             # raise FatalError
             return None
         else:
-            # nxt_ln_else = False
+            nxt_ln_else = False
+            index_of_else = closing_brace_line_index
             # add closing braces at closingBraceLine (inserting a new ln) with indentation
             if is_multiline:
                 spaces = " " * (keyword_index + len(comment_of_current_line))
             else:
                 spaces = " " * keyword_index
+            # HACK: WHAT IS THIS?
             if len(lines[closing_brace_line_index - 1].strip()) == 0 or \
                     len(lines[closing_brace_line_index - 2].strip()) == 0:
                 # line be empty
                 add_closing_brace_line = spaces + "}\n"
+                for line in lines[closing_brace_line_index:]:
+                    if line.find("else") != -1:
+                        add_closing_brace_line = spaces + "} "
+                        add_closing_brace_line = add_closing_brace_line + line[
+                                                                          (len(add_closing_brace_line) - 2):].lstrip()
+                        nxt_ln_else = True
+                        index_of_else = lines.index(line)
+                        break
             else:
+                # line is not empty
                 if lines[closing_brace_line_index - 1].rstrip()[-1] == "\\":
                     # we found \
                     add_closing_brace_line = spaces + "} \\\n"
                 elif lines[closing_brace_line_index - 2].rstrip()[-1] == "\\":
+                    # there was a \ in prev line, but not this line
                     to_add_back_slash = lines[closing_brace_line_index - 1].rstrip() + " \\\n"
                     del lines[closing_brace_line_index - 1]
                     lines.insert(closing_brace_line_index - 1, to_add_back_slash)
                     add_closing_brace_line = spaces + "}\n"
                 else:
+                    # no \
                     add_closing_brace_line = spaces + "}\n"
-                    # if lines[closing_brace_line_index].find("else") != -1:
-                    #     add_closing_brace_line = spaces + "} "
-                    #     add_closing_brace_line = add_closing_brace_line + lines[closing_brace_line_index][
-                    #                                                       (len(add_closing_brace_line) - 2):]
-                    #     nxt_ln_else = True
+                    if line.find("else") != -1:
+                        add_closing_brace_line = spaces + "} "
+                        add_closing_brace_line = add_closing_brace_line + line[
+                                                                          (len(add_closing_brace_line) - 2):].lstrip()
+                        nxt_ln_else = True
+                        index_of_else = lines.index(line)
 
-            # if not nxt_ln_else:
-            lines.insert(closing_brace_line_index, "")
-            lines.insert(closing_brace_line_index, add_closing_brace_line)
-            # else:
-            #     del lines[closing_brace_line_index]
-            #     lines.insert(closing_brace_line_index, add_closing_brace_line)
+            if not nxt_ln_else:
+                lines.insert(closing_brace_line_index, "")
+                lines.insert(closing_brace_line_index, add_closing_brace_line)
+            else:
+                del lines[index_of_else]
+                lines.insert(index_of_else, add_closing_brace_line)
             return lines
