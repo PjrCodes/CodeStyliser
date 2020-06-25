@@ -230,8 +230,8 @@ def main():
         is_file_given = False
 
     print("\n")
-    print("{:=^80}".format(" Welcome to CodeStyliser ver" + consts.VERSION_NUMBER))
-    print("EXPERIMENTAL VERSION. ERRORS MAY DEFINETLY ARISE")
+    print("{:^=80}".format(" Welcome to CodeStyliser ver" + consts.VERSION_NUMBER))
+    print("EXPERIMENTAL VERSION. ERRORS MAY DEFINITELY ARISE")
     print("Made by Pranjal Rastogi, in Python 3.7.7 64-Bit")
     print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
     print("{:=^80}".format("EXPERIMENTAL"))
