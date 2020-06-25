@@ -99,7 +99,6 @@ def stylise_code(file_to_edit):
         if for_loop_index == first_char_index:
             for_loop_handler = handleKeyword.handle_keyword(keyword="for", line=line, line_index=line_index, lines=lines,
                                                             file_to_edit=file_to_edit,
-                                                            is_macro=is_macro,
                                                             is_current_line_comment=current_line_is_comment,
                                                             comment_of_current_line=comment_of_current_line,
                                                             is_multiline=is_multiline, keyword_index=for_loop_index)
@@ -121,7 +120,6 @@ def stylise_code(file_to_edit):
         if while_loop_index == first_char_index:
             while_loop_handler = handleKeyword.handle_keyword(keyword="while", line=line, line_index=line_index,
                                                               lines=lines, file_to_edit=file_to_edit,
-                                                              is_macro=is_macro,
                                                               is_current_line_comment=current_line_is_comment,
                                                               comment_of_current_line=comment_of_current_line,
                                                               keyword_index=while_loop_index, is_multiline=is_multiline)
@@ -143,7 +141,6 @@ def stylise_code(file_to_edit):
         if if_condition_index == first_char_index:
             if_condition_handler = handleKeyword.handle_keyword(keyword="if", line=line, line_index=line_index,
                                                                 lines=lines, file_to_edit=file_to_edit,
-                                                                is_macro=is_macro,
                                                                 is_current_line_comment=current_line_is_comment,
                                                                 comment_of_current_line=comment_of_current_line,
                                                                 keyword_index=if_condition_index,
@@ -175,7 +172,6 @@ def stylise_code(file_to_edit):
                                                                   line_index=line_index,
                                                                   lines=lines,
                                                                   file_to_edit=file_to_edit,
-                                                                  is_macro=is_macro,
                                                                   is_current_line_comment=current_line_is_comment,
                                                                   comment_of_current_line=comment_of_current_line,
                                                                   keyword_index=starting_curly_brace_index,
@@ -191,7 +187,6 @@ def stylise_code(file_to_edit):
                                                                   line_index=line_index,
                                                                   lines=lines,
                                                                   file_to_edit=file_to_edit,
-                                                                  is_macro=is_macro,
                                                                   is_current_line_comment=current_line_is_comment,
                                                                   comment_of_current_line=comment_of_current_line,
                                                                   keyword_index=starting_else_index,

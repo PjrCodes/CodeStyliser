@@ -18,7 +18,7 @@ import models
 import exceptions
 
 
-def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_macro, is_current_line_comment,
+def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_line_comment,
                    comment_of_current_line, is_multiline, keyword_index):
     # found a  "KEYWORD"
     error_print_data = (keyword, (line_index + 1), file_to_edit.name)
@@ -371,7 +371,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_macro, is_
                 else:
                     # no \
                     add_closing_brace_line = spaces + "}\n"
-                    if line.find("else") != -1:
+                    if lines[closing_brace_line_index].find("else") != -1:
                         add_closing_brace_line = spaces + "} "
                         add_closing_brace_line = add_closing_brace_line + line[
                                                                           (len(add_closing_brace_line) - 2):].lstrip()
@@ -382,6 +382,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_macro, is_
                 lines.insert(closing_brace_line_index, "")
                 lines.insert(closing_brace_line_index, add_closing_brace_line)
             else:
+
                 del lines[index_of_else]
                 lines.insert(index_of_else, add_closing_brace_line)
             return lines
