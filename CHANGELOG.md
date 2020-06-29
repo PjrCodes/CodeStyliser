@@ -25,6 +25,11 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [0.1.11.4-DEV] - 2020-06-25
 
+#### Fixed
+- Exception handling error that arose in version [0.1.11.4-DEV](#[0.1.11.4-dev]---2020-06-25-[yanked])
+
+### [0.1.11.4-DEV] - 2020-06-25 [YANKED]
+
 ***WARNING***: Not completely tested.
 
 #### Changed
