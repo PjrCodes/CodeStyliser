@@ -23,6 +23,11 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
+### [0.1.11.7-DEV] - 2020-07-03
+
+#### Fixed
+- Fixed latest issue [Non Matching else issue](https://github.com/PjrCodes/CodeStyliser/issues/28)
+
 ### [0.1.11.6+1-DEV] - 2020-07-03 [HOT-FIX]
 
 #### Fixed

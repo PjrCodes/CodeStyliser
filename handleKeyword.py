@@ -347,18 +347,20 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
 
             # HACK: WHAT IS THIS, EVEN I DON'T KNOW!!!
 
-            if len(lines[closing_brace_line_index - 1].strip()) == 0 or \
-                    len(lines[closing_brace_line_index - 2].strip()) == 0:
+            if len(lines[closing_brace_line_index].strip()) == 0:
                 # line be empty
                 add_closing_brace_line = spaces + "}\n"
+                # check for else
                 tmp_lines = lines
                 for line in tmp_lines[closing_brace_line_index:]:
+
                     comment_check = utils.trim_comment(line, tmp_lines.index(line), tmp_lines[tmp_lines.index(line):])
+                    first_char = utils.get_first_character_index(line)
                     if comment_check.hasComment:
                         if comment_check.isMultiline:
                             tmp_lines = tmp_lines[comment_check.multiLineJumpIndex:]
                         continue
-                    elif line.find("else") != -1:
+                    elif line.find("else") == first_char:
                         add_closing_brace_line = spaces + "} "
                         add_closing_brace_line = add_closing_brace_line + line[
                                                                           (len(add_closing_brace_line) - 2):].lstrip()
@@ -366,10 +368,9 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                         index_of_else = tmp_lines.index(line)
                         break
                     elif len(line.strip()) != 0:
-                        print("why")
                         break
-                    else:
-                        print("what")
+
+
             else:
                 # line is not empty
                 if lines[closing_brace_line_index - 1].rstrip()[-1] == "\\":
@@ -388,8 +389,8 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                     # TODO: check
                     # NOTE: no need to check for comments here as closing brace line index automatically never
                     #   returns that
-
-                    if lines[closing_brace_line_index].find("else") != -1:
+                    first_char = utils.get_first_character_index(lines[closing_brace_line_index])
+                    if lines[closing_brace_line_index].find("else") == first_char:
                         add_closing_brace_line = spaces + "} "
                         add_closing_brace_line = add_closing_brace_line + lines[closing_brace_line_index][
                             (len(add_closing_brace_line)-2):].lstrip()
