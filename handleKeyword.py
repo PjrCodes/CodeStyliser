@@ -357,11 +357,14 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                         nxt_ln_else = True
                         index_of_else = lines.index(line)
                         break
+                    elif not len(line.strip()) == 0:
+                        break
             else:
                 # line is not empty
                 if lines[closing_brace_line_index - 1].rstrip()[-1] == "\\":
                     # we found \
                     add_closing_brace_line = spaces + "} \\\n"
+                    # TODO: ELSE CHECK
                 elif lines[closing_brace_line_index - 2].rstrip()[-1] == "\\":
                     # there was a \ in prev line, but not this line
                     to_add_back_slash = lines[closing_brace_line_index - 1].rstrip() + " \\\n"
@@ -371,18 +374,19 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 else:
                     # no \
                     add_closing_brace_line = spaces + "}\n"
+                    # TODO: check
                     if lines[closing_brace_line_index].find("else") != -1:
+                        print("JERE")
                         add_closing_brace_line = spaces + "} "
-                        add_closing_brace_line = add_closing_brace_line + line[
-                                                                          (len(add_closing_brace_line) - 2):].lstrip()
+                        add_closing_brace_line = add_closing_brace_line + lines[closing_brace_line_index][
+                            (len(add_closing_brace_line)-2):].lstrip()
                         nxt_ln_else = True
-                        index_of_else = lines.index(line)
+                        index_of_else = closing_brace_line_index
 
             if not nxt_ln_else:
                 lines.insert(closing_brace_line_index, "")
                 lines.insert(closing_brace_line_index, add_closing_brace_line)
             else:
-
                 del lines[index_of_else]
                 lines.insert(index_of_else, add_closing_brace_line)
             return lines
