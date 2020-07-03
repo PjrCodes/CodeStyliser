@@ -344,21 +344,32 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 spaces = " " * (keyword_index + len(comment_of_current_line))
             else:
                 spaces = " " * keyword_index
-            # HACK: WHAT IS THIS?
+
+            # HACK: WHAT IS THIS, EVEN I DON'T KNOW!!!
+
             if len(lines[closing_brace_line_index - 1].strip()) == 0 or \
                     len(lines[closing_brace_line_index - 2].strip()) == 0:
                 # line be empty
                 add_closing_brace_line = spaces + "}\n"
-                for line in lines[closing_brace_line_index:]:
-                    if line.find("else") != -1:
+                tmp_lines = lines
+                for line in tmp_lines[closing_brace_line_index:]:
+                    comment_check = utils.trim_comment(line, tmp_lines.index(line), tmp_lines[tmp_lines.index(line):])
+                    if comment_check.hasComment:
+                        if comment_check.isMultiline:
+                            tmp_lines = tmp_lines[comment_check.multiLineJumpIndex:]
+                        continue
+                    elif line.find("else") != -1:
                         add_closing_brace_line = spaces + "} "
                         add_closing_brace_line = add_closing_brace_line + line[
                                                                           (len(add_closing_brace_line) - 2):].lstrip()
                         nxt_ln_else = True
-                        index_of_else = lines.index(line)
+                        index_of_else = tmp_lines.index(line)
                         break
-                    elif not len(line.strip()) == 0:
+                    elif len(line.strip()) != 0:
+                        print("why")
                         break
+                    else:
+                        print("what")
             else:
                 # line is not empty
                 if lines[closing_brace_line_index - 1].rstrip()[-1] == "\\":
@@ -375,8 +386,10 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                     # no \
                     add_closing_brace_line = spaces + "}\n"
                     # TODO: check
+                    # NOTE: no need to check for comments here as closing brace line index automatically never
+                    #   returns that
+
                     if lines[closing_brace_line_index].find("else") != -1:
-                        print("JERE")
                         add_closing_brace_line = spaces + "} "
                         add_closing_brace_line = add_closing_brace_line + lines[closing_brace_line_index][
                             (len(add_closing_brace_line)-2):].lstrip()

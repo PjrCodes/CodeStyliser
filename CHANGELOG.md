@@ -23,6 +23,10 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
+### [0.1.11.6+1-DEV] - 2020-07-03 [HOT-FIX]
+
+#### Fixed
+- Comment error (unlisted issue)
 
 ### [0.1.11.6-DEV] - 2020-07-03 
 

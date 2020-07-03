@@ -13,7 +13,7 @@
 # ---
 
 
-VERSION_NUMBER = "0.1.11.6-DEV "
+VERSION_NUMBER = "0.1.11.6+1-DEV "
 WINDOWS_LINE_ENDING = b'\r\n'
 UNIX_LINE_ENDING = b'\n'
 DEFINE_PATTERN = r"#\s*\b(define)\b"
