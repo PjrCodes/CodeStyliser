@@ -277,7 +277,6 @@ def get_closing_brace_line_index(index, lines):
                             has_keyword = False
                             cont = False
                             break
-                    
                 if cont:
                     continue
                 else:
@@ -347,10 +346,87 @@ def get_closing_brace_line_index(index, lines):
 
         # don't touch me!
         open_next_line_curly_brace_index = check_for_open_brace(next_line_index, lines)
-        if open_curly_brace_index != -1 or open_next_line_curly_brace_index[0] != -1:
+
+        # TODO: Fix the "if-else if" case (if ending with elseif)
+        if keyword == r"\b(if)\b":
+
+            tmp = nxt_ln_index - 1
+            if lines[nxt_ln_index - 1].find("{") == -1:
+                # has no curly on same line
+                tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
+                if check_for_open_brace(nxt_ln_index, lines)[0] == -1:
+                    tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
+                else:
+                    res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
+                    if res is None:
+                        return None
+                    else:
+                        tmp = res.lineIndex - 1
+                        # if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
+                        #     tmp = res.lineIndex
+            else:
+                res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
+                if res is None:
+                    return None
+                else:
+                    tmp = res.lineIndex - 1
+                    # if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
+                    #     tmp = res.lineIndex
+
+            while tmp < len(lines):
+
+                if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
+                    tmp += 1
+                tmp_comment = trim_comment(lines[tmp], tmp, lines)
+                tmp_line = lines[tmp]
+
+                if tmp_comment.hasComment:
+                    if tmp_comment.isMultiline:
+                        tmp = tmp_comment.multiLineJumpIndex
+                    tmp_line = tmp_comment.line
+                elif re.search(r"\b(else)\b", tmp_line):
+                    # found else!
+
+                    if tmp_line.find("if") != -1:
+                        # else if
+                        chk_parenth = check_for_parentheses(tmp_line, tmp, lines, "p")
+
+                        if not chk_parenth.isOnSameLine:
+                            tmp2 = chk_parenth.lineIndex
+                            tmp = tmp2 + 1
+                            continue
+                        else:
+                            tmp = get_next_semi_colon_line_index(tmp, lines)
+                            continue
+                    else:
+                        if tmp_line.find("{") == -1:
+                            # no same line curly
+                            if check_for_open_brace(tmp + 1, lines)[0] == -1:
+                                # no later curly
+                                return get_next_semi_colon_line_index(tmp+1, lines) + 1
+                            else:
+                                res = check_for_parentheses(tmp_line, tmp, lines, "b")
+                                if res is None:
+                                    return None
+                                else:
+                                    return res.lineIndex
+                        else:
+                            res = check_for_parentheses(tmp_line, tmp, lines, "b")
+                            if res is None:
+                                return None
+                            else:
+                                return res.lineIndex
+
+                elif not tmp_line.isspace():
+
+                    return get_next_semi_colon_line_index(tmp, tmp_line) + 1
+                else:
+                    tmp += 1
+                    continue
+
+        elif (open_curly_brace_index != -1 or open_next_line_curly_brace_index[0] != -1) and keyword != r"\b(if)\b":
             # we found open curly brace related to this other keyword
             # we must go on to find the close }
-            
             close_curly_brace_index = line.find("}")
             if close_curly_brace_index == -1:
                 # run the code

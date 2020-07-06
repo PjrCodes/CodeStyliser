@@ -19,4 +19,3 @@ class CommentError(Exception):
 
 class HashIgnore(Exception):
     pass
-

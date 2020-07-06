@@ -205,11 +205,11 @@ def stylise_code(file_to_edit):
             continue
         except (KeyboardInterrupt, SystemExit):
             sys.exit()
-        except:
-            e = sys.exc_info()[0]
-            print("FATAL ERROR: " + str(e) + " in file name: " +
-                  file_to_edit.name + " around line " + str(line_index + 1) + ", skipping line!!")
-            continue
+        # except:
+        #     e = sys.exc_info()[0]
+        #     print("FATAL ERROR: " + str(e) + " in file name: " +
+        #           file_to_edit.name + " around line " + str(line_index + 1) + ", skipping line!!")
+        #     continue
 
     # write lines back to fileToEdit
     file_to_edit.seek(0)
@@ -276,10 +276,10 @@ def main():
                 sys.exit()
             except (KeyboardInterrupt, SystemExit):
                 sys.exit()
-            except:
-                e = sys.exc_info()[0]
-                print("ERROR: " + str(e) + " at file name: " + given_file_name)
-                sys.exit()
+            # except:
+            #     e = sys.exc_info()[0]
+            #     print("ERROR: " + str(e) + " at file name: " + given_file_name)
+            #     sys.exit()
         else:
             print("ERROR, Given file is not a (C) source code/ (h) file file")
             sys.exit()
@@ -293,19 +293,19 @@ def main():
                 file_ext = file_extension[1]
                 if file_ext == "c" or file_ext == "h":
                     file_no = file_no + 1
-                    try:
-                        with open(file_path, 'rb') as open_file:
-                            content = open_file.read()
-                            content = content.replace(
-                                consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
-                        with open(file_path, 'wb') as open_file:
-                            open_file.write(content)
-                            open_file.close()
-                    except:
-                        e = sys.exc_info()[0]
-                        print("ERROR: " + str(e) + " at file name: " +
-                              filename + " while changing line endings")
-                        continue
+                    # try:
+                    with open(file_path, 'rb') as open_file:
+                        content = open_file.read()
+                        content = content.replace(
+                            consts.WINDOWS_LINE_ENDING, consts.UNIX_LINE_ENDING)
+                    with open(file_path, 'wb') as open_file:
+                        open_file.write(content)
+                        open_file.close()
+                    # except:
+                    #     e = sys.exc_info()[0]
+                    #     print("ERROR: " + str(e) + " at file name: " +
+                    #           filename + " while changing line endings")
+                    #     continue
                     try:
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
                             lines_edited = stylise_code(fileToStyle) + lines_edited

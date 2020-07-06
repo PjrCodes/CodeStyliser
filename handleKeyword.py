@@ -82,7 +82,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
 
         if is_on_same_line:
             last_semi_colon_index = line[last_close_parenth_index:].find(";")
-            is_back_slash_present = line.rstrip()[-1] == "\\"
+            is_back_slash_present = line.rstrip().endswith("\\")
             if is_back_slash_present:
                 # backSLASH!
                 if last_semi_colon_index != -1:
@@ -131,7 +131,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 if lines[line_index - 2].isspace() or len(lines[line_index - 2]) == 0:
                     pass
                 else:
-                    if lines[line_index - 2].rstrip()[-1] == "\\":
+                    if lines[line_index - 2].rstrip().endswith("\\"):
                         if last_semi_colon_index == -1:
                             # not semicolon ending
                             return None
@@ -182,7 +182,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 return None
         else:
             # the (condition) doesnt end on same line
-            is_back_slash_present = lines[nxt_ln_index - 1].rstrip()[-1] == "\\"
+            is_back_slash_present = lines[nxt_ln_index - 1].rstrip().endswith("\\")
             last_semi_colon_index = lines[nxt_ln_index - 1][last_close_parenth_index:].find(";")
             if is_back_slash_present:
 
@@ -256,7 +256,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 if lines[nxt_ln_index - 2].isspace() or len(lines[nxt_ln_index - 2]) == 0:
                     pass
                 else:
-                    if lines[nxt_ln_index - 2].rstrip()[-1] == "\\":
+                    if lines[nxt_ln_index - 2].rstrip().endswith("\\"):
                         if last_semi_colon_index == -1:
                             # not semicolon ending
                             return None
@@ -333,7 +333,9 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
 
         closing_brace_line_index = utils.get_closing_brace_line_index(check_for_semi_colon_index, lines)
         if closing_brace_line_index is None:
-            print("FATAL ERROR: ignored %s loop/ condition at %d in file %s" % error_print_data)
+            print("FATAL ERROR: ignored %s loop/ condition at %d in file %s. Could be caused due to nested if-elseif, "
+                  "fix in next update" %
+                  error_print_data)
             # raise FatalError
             return None
         else:
@@ -371,7 +373,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                         break
             else:
                 # line is not empty
-                if lines[closing_brace_line_index - 1].rstrip()[-1] == "\\":
+                if lines[closing_brace_line_index - 1].rstrip().endswith("\\"):
                     # we found \
                     add_closing_brace_line = spaces + "} \\\n"
                     first_char = utils.get_first_character_index(lines[closing_brace_line_index])
@@ -382,7 +384,7 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                         nxt_ln_else = True
                         index_of_else = closing_brace_line_index
 
-                elif lines[closing_brace_line_index - 2].rstrip()[-1] == "\\":
+                elif lines[closing_brace_line_index - 2].rstrip().endswith("\\"):
                     # there was a \ in prev line, but not this line
                     to_add_back_slash = lines[closing_brace_line_index - 1].rstrip() + " \\\n"
                     del lines[closing_brace_line_index - 1]

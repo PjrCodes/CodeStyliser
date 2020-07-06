@@ -6,7 +6,7 @@
 # Do not copy this code without permission
 # check LICENSE for more details
 # ---
-# Part of The codeStyliser utility
+# Part of The codeStyliser utility - 1181 lines
 # ---
 # constants.py
 # constants
