@@ -23,7 +23,17 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
-### [0.1.11.9-DEV] - 2020-07-06
+### [0.1.11.9+1-DEV] - 2020-07-07
+
+#### Added
+- Verbose logging output (To be made more verbose). Use the tag `-v` or `--verbose` to enable
+verbose output.
+
+#### Fixed
+- Fixed unlisted issue involving comments in issue [#34](https://github.com/PjrCodes/CodeStyliser/issues/34).
+That issue is now fixed.
+
+### [0.1.11.9-DEV] - 2020-07-06 
 
 #### Fixed
 - Fixed issue [#34](https://github.com/PjrCodes/CodeStyliser/issues/34) and case 1 of 

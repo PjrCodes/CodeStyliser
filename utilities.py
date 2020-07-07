@@ -349,7 +349,6 @@ def get_closing_brace_line_index(index, lines):
 
         # TODO: Fix the "if-else if" case (if ending with elseif)
         if keyword == r"\b(if)\b":
-
             tmp = nxt_ln_index - 1
             if lines[nxt_ln_index - 1].find("{") == -1:
                 # has no curly on same line
@@ -374,19 +373,20 @@ def get_closing_brace_line_index(index, lines):
                     #     tmp = res.lineIndex
 
             while tmp < len(lines):
-
                 if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
                     tmp += 1
                 tmp_comment = trim_comment(lines[tmp], tmp, lines)
                 tmp_line = lines[tmp]
-
                 if tmp_comment.hasComment:
                     if tmp_comment.isMultiline:
                         tmp = tmp_comment.multiLineJumpIndex
+
                     tmp_line = tmp_comment.line
+                    if tmp_line.isspace():
+                        tmp += 1
+                        continue
                 elif re.search(r"\b(else)\b", tmp_line):
                     # found else!
-
                     if tmp_line.find("if") != -1:
                         # else if
                         chk_parenth = check_for_parentheses(tmp_line, tmp, lines, "p")
@@ -418,11 +418,18 @@ def get_closing_brace_line_index(index, lines):
                                 return res.lineIndex
 
                 elif not tmp_line.isspace():
-
                     return get_next_semi_colon_line_index(tmp, tmp_line) + 1
                 else:
                     tmp += 1
                     continue
+                # NOTE: the above has a bug in which if the program ends on
+                #  ```
+                #  for()\
+                #     if()\
+                #         asd;
+                #         ```
+                #         The program will never end. HOWEVER, this will never happen as the program will always end
+                #           on a `}`, as it is C code. Hence we can safely ignore
 
         elif (open_curly_brace_index != -1 or open_next_line_curly_brace_index[0] != -1) and keyword != r"\b(if)\b":
             # we found open curly brace related to this other keyword
