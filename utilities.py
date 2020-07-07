@@ -380,7 +380,7 @@ def get_closing_brace_line_index(index, lines):
                 if tmp_comment.hasComment:
                     if tmp_comment.isMultiline:
                         tmp = tmp_comment.multiLineJumpIndex
-
+                        continue
                     tmp_line = tmp_comment.line
                     if tmp_line.isspace():
                         tmp += 1
