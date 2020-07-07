@@ -22,3 +22,5 @@ SINGLE_LINE_COMMENT_PATTERN = r"(\/\*[^\n]*)|(\/\/[^\n]*)"
 OPEN_BRACE_PATTERN = r"^(\s*\{)|^(\{)"
 KEYWORDS = [r'\b(for)\b', r'\b(while)\b', r'\b(do)\b',
             r'\b(switch)\b', r'\b(if)\b', r'\b(else)\b']
+
+to_LOG = False

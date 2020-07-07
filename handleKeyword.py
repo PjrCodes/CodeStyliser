@@ -15,11 +15,16 @@
 import utilities as utils
 import re
 import models
+import constants as consts
+import os
 import exceptions
 
 
 def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_line_comment,
                    comment_of_current_line, is_multiline, keyword_index):
+    if consts.to_LOG:
+        print("LOG: " + f'file path: {file_to_edit.name}, lineIndex: {line_index}, keyword: {keyword}')
+
     # found a  "KEYWORD"
     error_print_data = (keyword, (line_index + 1), file_to_edit.name)
     has_hash = utils.check_for_hash(line_index, lines)

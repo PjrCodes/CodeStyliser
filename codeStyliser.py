@@ -33,6 +33,7 @@ group.add_argument('-f', '--file', metavar="file-name",
                    dest="FILE_NAME", help="file name to format", type=str)
 group.add_argument('-d', '--directory', metavar="directory-name",
                    dest="DIR_NAME", help="directory to format files under", type=str)
+parser.add_argument('-v', '--verbose', help="log output", action="store_true")
 
 
 def stylise_code(file_to_edit):
@@ -223,6 +224,7 @@ def main():
     args = parser.parse_args()
     given_dir_name = args.DIR_NAME
     given_file_name = args.FILE_NAME
+    consts.to_LOG = vars(args)['verbose']
     file_no = 0
     lines_edited = 0
 
