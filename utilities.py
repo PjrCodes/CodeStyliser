@@ -349,13 +349,11 @@ def get_closing_brace_line_index(index, lines):
 
         # TODO: Fix the "if-else if" case (if ending with elseif)
         if keyword == r"\b(if)\b":
-            print("ere")
             tmp = nxt_ln_index - 1
             if lines[nxt_ln_index - 1].find("{") == -1:
                 # has no curly on same line
                 tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
                 if check_for_open_brace(nxt_ln_index, lines)[0] == -1:
-                    print("here")
                     tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
                 else:
                     res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
