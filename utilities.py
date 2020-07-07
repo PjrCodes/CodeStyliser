@@ -385,7 +385,8 @@ def get_closing_brace_line_index(index, lines):
                     if tmp_line.isspace():
                         tmp += 1
                         continue
-                elif re.search(r"\b(else)\b", tmp_line):
+                        
+                if re.search(r"\b(else)\b", tmp_line):
                     # found else!
                     if tmp_line.find("if") != -1:
                         # else if

@@ -359,23 +359,30 @@ def handle_keyword(keyword, line, line_index, lines, file_to_edit, is_current_li
                 add_closing_brace_line = spaces + "}\n"
                 # check for else
                 tmp_lines = lines
-                for line in tmp_lines[closing_brace_line_index:]:
+                c = 0
+                while c < len(tmp_lines[closing_brace_line_index:]):
+                    tmp_line = tmp_lines[c]
+                    comment_check = utils.trim_comment(tmp_line, c, tmp_lines)
 
-                    comment_check = utils.trim_comment(line, tmp_lines.index(line), tmp_lines[tmp_lines.index(line):])
-                    first_char = utils.get_first_character_index(line)
+                    first_char = utils.get_first_character_index(tmp_line)
                     if comment_check.hasComment:
                         if comment_check.isMultiline:
-                            tmp_lines = tmp_lines[comment_check.multiLineJumpIndex:]
-                        continue
-                    elif line.find("else") == first_char:
+                            c = comment_check.multiLineJumpIndex
+                            continue
+                        tmp_line = comment_check.line
+                        if tmp_line.isspace():
+                            c += 1
+                            continue
+                    if tmp_line.find("else") == first_char:
                         add_closing_brace_line = spaces + "} "
-                        add_closing_brace_line = add_closing_brace_line + line[
+                        add_closing_brace_line = add_closing_brace_line + tmp_line[
                                                                           (len(add_closing_brace_line) - 2):].lstrip()
                         nxt_ln_else = True
-                        index_of_else = tmp_lines.index(line)
+                        index_of_else = c
                         break
                     elif len(line.strip()) != 0:
                         break
+                    c += 1
             else:
                 # line is not empty
                 if lines[closing_brace_line_index - 1].rstrip().endswith("\\"):
