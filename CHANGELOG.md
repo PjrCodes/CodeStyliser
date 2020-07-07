@@ -23,6 +23,12 @@ All notable changes to the CodeStyliser project will be documented in this file.
 
 ### [Not Listed Changes]
 
+### [0.1.12-DEV] - 2020-07-07
+
+#### Fixed
+- Fixed unlisted issues that arose in previous versions that were causing program crashes
+- Fixed [#37](https://github.com/PjrCodes/CodeStyliser/issues/37)
+
 ### [0.1.11.9+1-DEV] - 2020-07-07
 
 #### Added
