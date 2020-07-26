@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1dRQQLTI8MS3AO7HbKoFWKG7kmC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/sample.c&#10;/Users/Pranjal/Desktop/LatestProjects/CodeStyliser/astyle/src/ASResource.cpp&#10;/Users/Pranjal/Desktop/LatestProjects/CodeStyliser/astyle/build/mac/Makefile&#10;/Users/Pranjal/Desktop/LatestProjects/CodeStyliser/inner/im.c" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.toDoOptions" />
+  </component>
+  <component name="RunManager" selected="Python.debug sample-c">
+    <configuration name="codeStyliser" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="CodeStyliser" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/codeStyliser.py" />
+      <option name="PARAMETERS" value="-f sample.c" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="debug sample-c" type="PythonConfigurationType" factoryName="Python">
+      <module name="CodeStyliser" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/local/bin/python3.7" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/codeStyliser.py" />
+      <option name="PARAMETERS" value="-f  sample.c -v" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.debug sample-c" />
+      <item itemvalue="Python.codeStyliser" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.codeStyliser" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="" />
+      <created>1592385408692</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1592385408692</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="117" y="70" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1594467135637">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="104" y="62" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.800@0.0.1280.800" timestamp="1593079149560" />
+    <state x="117" y="70" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900@0.0.1440.900" timestamp="1594467135637" />
+    <state x="465" y="254" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1594270981546">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="465" y="254" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1594270981546" />
+    <state x="62" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1594140301003">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="62" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1440.900@0.0.1440.900" timestamp="1594140301003" />
+    <state width="1419" height="242" key="GridCell.Tab.0.bottom" timestamp="1595352159806">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.0.bottom/0.0.1280.800@0.0.1280.800" timestamp="1593079197189" />
+    <state width="1419" height="242" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1595352159806" />
+    <state width="1259" height="261" key="GridCell.Tab.0.bottom/0.23.1280.700@0.23.1280.700" timestamp="1593082757216" />
+    <state width="1419" height="300" key="GridCell.Tab.0.bottom/0.23.1440.785@0.23.1440.785" timestamp="1594479771906" />
+    <state width="1419" height="242" key="GridCell.Tab.0.center" timestamp="1595352159803">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.0.center/0.0.1280.800@0.0.1280.800" timestamp="1593079197187" />
+    <state width="1419" height="242" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1595352159803" />
+    <state width="1259" height="261" key="GridCell.Tab.0.center/0.23.1280.700@0.23.1280.700" timestamp="1593082757215" />
+    <state width="1419" height="300" key="GridCell.Tab.0.center/0.23.1440.785@0.23.1440.785" timestamp="1594479771906" />
+    <state width="1419" height="242" key="GridCell.Tab.0.left" timestamp="1595352159803">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.0.left/0.0.1280.800@0.0.1280.800" timestamp="1593079197186" />
+    <state width="1419" height="242" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1595352159803" />
+    <state width="1259" height="261" key="GridCell.Tab.0.left/0.23.1280.700@0.23.1280.700" timestamp="1593082757215" />
+    <state width="1419" height="300" key="GridCell.Tab.0.left/0.23.1440.785@0.23.1440.785" timestamp="1594479771905" />
+    <state width="1419" height="242" key="GridCell.Tab.0.right" timestamp="1595352159805">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.0.right/0.0.1280.800@0.0.1280.800" timestamp="1593079197188" />
+    <state width="1419" height="242" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1595352159805" />
+    <state width="1259" height="261" key="GridCell.Tab.0.right/0.23.1280.700@0.23.1280.700" timestamp="1593082757216" />
+    <state width="1419" height="300" key="GridCell.Tab.0.right/0.23.1440.785@0.23.1440.785" timestamp="1594479771906" />
+    <state width="1419" height="300" key="GridCell.Tab.1.bottom" timestamp="1594563686782">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.1.bottom/0.0.1280.800@0.0.1280.800" timestamp="1593079197192" />
+    <state width="1419" height="300" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1594563686782" />
+    <state width="1259" height="261" key="GridCell.Tab.1.bottom/0.23.1280.700@0.23.1280.700" timestamp="1593082757217" />
+    <state width="1419" height="300" key="GridCell.Tab.1.bottom/0.23.1440.785@0.23.1440.785" timestamp="1594479771908" />
+    <state width="1419" height="300" key="GridCell.Tab.1.center" timestamp="1594563686780">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.1.center/0.0.1280.800@0.0.1280.800" timestamp="1593079197190" />
+    <state width="1419" height="300" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1594563686780" />
+    <state width="1259" height="261" key="GridCell.Tab.1.center/0.23.1280.700@0.23.1280.700" timestamp="1593082757216" />
+    <state width="1419" height="300" key="GridCell.Tab.1.center/0.23.1440.785@0.23.1440.785" timestamp="1594479771907" />
+    <state width="1419" height="300" key="GridCell.Tab.1.left" timestamp="1594563686779">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.1.left/0.0.1280.800@0.0.1280.800" timestamp="1593079197190" />
+    <state width="1419" height="300" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1594563686779" />
+    <state width="1259" height="261" key="GridCell.Tab.1.left/0.23.1280.700@0.23.1280.700" timestamp="1593082757216" />
+    <state width="1419" height="300" key="GridCell.Tab.1.left/0.23.1440.785@0.23.1440.785" timestamp="1594479771907" />
+    <state width="1419" height="300" key="GridCell.Tab.1.right" timestamp="1594563686781">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1259" height="261" key="GridCell.Tab.1.right/0.0.1280.800@0.0.1280.800" timestamp="1593079197191" />
+    <state width="1419" height="300" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1594563686781" />
+    <state width="1259" height="261" key="GridCell.Tab.1.right/0.23.1280.700@0.23.1280.700" timestamp="1593082757217" />
+    <state width="1419" height="300" key="GridCell.Tab.1.right/0.23.1440.785@0.23.1440.785" timestamp="1594479771907" />
+    <state x="168" y="26" key="SettingsEditor" timestamp="1594132616846">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="149" y="23" key="SettingsEditor/0.0.1280.800@0.0.1280.800" timestamp="1592385987602" />
+    <state x="168" y="26" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1594132616846" />
+    <state x="100" y="100" width="1080" height="600" key="dock-window-1" timestamp="1592413315587">
+      <screen x="0" y="0" width="1280" height="800" />
+    </state>
+    <state x="100" y="100" width="1080" height="600" key="dock-window-1/0.0.1280.800@0.0.1280.800" timestamp="1592413315587" />
+    <state x="100" y="100" width="1080" height="600" key="dock-window-2" timestamp="1592413315588">
+      <screen x="0" y="0" width="1280" height="800" />
+    </state>
+    <state x="100" y="100" width="1080" height="600" key="dock-window-2/0.0.1280.800@0.0.1280.800" timestamp="1592413315588" />
+    <state x="100" y="100" width="1080" height="600" key="dock-window-3" timestamp="1592413588360">
+      <screen x="0" y="0" width="1280" height="800" />
+    </state>
+    <state x="100" y="100" width="1080" height="600" key="dock-window-3/0.0.1280.800@0.0.1280.800" timestamp="1592413588360" />
+    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup" timestamp="1595695209587">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="305" y="124" width="670" height="676" key="search.everywhere.popup/0.0.1280.800@0.0.1280.800" timestamp="1592462247368" />
+    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1595695209587" />
+  </component>
+</project>
