@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
-    </list>
+    <list default="true" id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
