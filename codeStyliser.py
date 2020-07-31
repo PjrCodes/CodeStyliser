@@ -320,7 +320,7 @@ def main():
                     open_file.write(content)
                     open_file.close()
                 with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                linesEdited = styliseCode(fileToStyle) + linesEdited
+                    linesEdited = styliseCode(fileToStyle) + linesEdited
             except FileNotFoundError:
                 print(f"ERROR: Given filename, {FILE_NAME} not found!")
                 sys.exit()
