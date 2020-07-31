@@ -25,9 +25,8 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-f', '--file', metavar=" file-name", dest="FILE_NAME", help="file name to format", type=str)
 group.add_argument('-d', '--directory', metavar=" directory-name",dest="DIR_NAME", help="directory to format files under", type=str)
 
-
-
 DEFINE_PATTERN = r"#\s*\b(define)\b"
+
 
 def styliseCode(fileToEdit):
     # lines edited in this file
@@ -91,7 +90,8 @@ def styliseCode(fileToEdit):
 
             if forLoopIndex == firstCharIndex:
                 forLoopHandler = utils.handleKeyword(KEYWORD="for", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline, keywordIndex=forLoopIndex)
+                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, isMultiline=isMultiline, 
+                                                    keywordIndex=forLoopIndex)[0]
                 if forLoopHandler == None:
                     continue
                 else:
@@ -109,7 +109,8 @@ def styliseCode(fileToEdit):
             
             if whileLoopIndex == firstCharIndex:
                 whileLoopHandler = utils.handleKeyword(KEYWORD="while", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, isMultiline=isMultiline)
+                                                    isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=whileLoopIndex, 
+                                                    isMultiline=isMultiline)[0]
                 if whileLoopHandler == None:
                     continue
                 else:
@@ -126,12 +127,39 @@ def styliseCode(fileToEdit):
                 ifConditionIndex = -1
 
             if ifConditionIndex == firstCharIndex:
-                ifConditionHandler = utils.handleKeyword(KEYWORD="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                ifConditionHandler, changedLines = utils.handleKeyword(KEYWORD="if", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
                                                     isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=ifConditionIndex, isMultiline=isMultiline)
+                print("sdf", changedLines)
+                print(ifConditionHandler)
                 if ifConditionHandler == None:
                     continue
                 else:
                     lines = ifConditionHandler
+                    if changedLines:
+                        # search for next curly... get it and merge } else
+                        index = lineIndex
+                        closing_brace = utils.getClosingBraceLineIndex(index, lines)
+                        print("line: ", lines[closing_brace])
+
+                        for x in lines[closing_brace+1:]:
+                            x = utils.trimComment(x, lines.index(x), lines).line
+                            print("lin: ",x)
+                
+                            if x.isspace() or len(x) == 0:
+                                continue
+                            elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
+                                print("here")
+                                print(x)
+                                lines[closing_brace -1] = ""
+                                new_ln = "} " + x.lstrip()
+                                print(new_ln)
+                                ind = lines.index(x)
+                                lines[ind] = ""
+                                lines.insert(ind, new_ln)
+                                break
+                            elif not x.isspace() or len(x) != 0:
+                                print("hereo hereo")
+                                break
                     linesEdited = linesEdited + 1
 
             # ---------------------------------------------------------------------------
@@ -142,7 +170,10 @@ def styliseCode(fileToEdit):
                 startingElseIndex = elseConditionMatch.start()
             else:
                 startingElseIndex = -1
+
+            
             lineStartsOnBrace = False
+
             if startingCurlyBraceIndex == firstCharIndex:
                 # line starts on a }
                 lineStartsOnBrace = True
@@ -150,21 +181,76 @@ def styliseCode(fileToEdit):
             if lineStartsOnBrace and startingElseIndex != -1:
                 # we have a line with an } and an else after it
                 # process else
-                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
+                elseConditionHandler, changedLines = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, 
+                                                keywordIndex=startingCurlyBraceIndex, isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
                 else:
                     lines = elseConditionHandler
+                    if line.find("if") != -1:
+                        print("else if honolul") 
+                        if changedLines:
+                            # search for next curly... get it and merge } else
+                            index = lineIndex
+                            closing_brace = utils.getClosingBraceLineIndex(index, lines)
+                            print("lineas: ", lines[closing_brace])
+
+                            for x in lines[closing_brace+1:]:
+                                x = utils.trimComment(x, lines.index(x), lines).line
+                                print("linas: ",x)
+                                if x.isspace() or len(x) == 0:
+                                    continue
+                                elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
+                                    print("here")
+                                    print(x)
+                                    lines[closing_brace] = ""
+                                    new_ln = "} " + x.lstrip()
+                                    print(new_ln)
+                                    ind = lines.index(x)
+                                    lines[ind] = ""
+                                    lines.insert(ind, new_ln)
+                                    break
+                                elif not x.isspace() or len(x) != 0:
+                                    print("hereo hereo")
+                                    break
+
                     linesEdited = linesEdited + 1
             elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
                 # we have an else
-                elseConditionHandler = ifConditionHandler = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, isMultiline=isMultiline)
+                elseConditionHandler, changedLines = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, 
+                                                isMultiline=isMultiline)
                 if elseConditionHandler == None:
                     continue
                 else:
                     lines = elseConditionHandler
+                    if line.find("if") != -1:
+                        print("else if honolul")
+                        if changedLines:
+                            # search for next curly... get it and merge } else
+                            index = lineIndex
+                            closing_brace = utils.getClosingBraceLineIndex(index, lines)
+                            print("line: ", lines[closing_brace])
+
+                            for x in lines[closing_brace+1:]:
+                                x = utils.trimComment(x, lines.index(x), lines).line
+                                print("lin: ",x)
+                                if x.isspace() or len(x) == 0:
+                                    continue
+                                elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
+                                    print("here")
+                                    print(x)
+                                    lines[closing_brace] = ""
+                                    new_ln = "} " + x.lstrip()
+                                    print(new_ln)
+                                    ind = lines.index(x)
+                                    lines[ind] = ""
+                                    lines.insert(ind, new_ln)
+                                    break
+                                elif not x.isspace() or len(x) != 0:
+                                    print("hereo hereo")
+                                    break
                     linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
         except utils.CommentError:
@@ -182,11 +268,12 @@ def styliseCode(fileToEdit):
     fileToEdit.seek(0)
     fileToEdit.writelines(lines)
     fileToEdit.close()
+
     return linesEdited
 
 
 def main():
-    VERSION_NUMBER = "0.1.11-BETA "
+    VERSION_NUMBER = "DEBUG_SCAM "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
     isFileGiven = False
@@ -223,7 +310,7 @@ def main():
             print("ERROR, Given file is not a (C) source code file")
             sys.exit()
         fileExt = fileExtension[1]
-        if fileExt == "c":
+        if fileExt == "c" or fileExt == "h":
             try:
                 fileNo += 1
                 with open(file_path, 'rb') as open_file:
@@ -233,7 +320,7 @@ def main():
                     open_file.write(content)
                     open_file.close()
                 with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                    linesEdited = styliseCode(fileToStyle) + linesEdited
+                linesEdited = styliseCode(fileToStyle) + linesEdited
             except FileNotFoundError:
                 print(f"ERROR: Given filename, {FILE_NAME} not found!")
                 sys.exit()
@@ -261,7 +348,7 @@ def main():
                 if len(fileExtension) != 2:
                     continue
                 fileExt = fileExtension[1]
-                if fileExt == "c":
+                if fileExt == "c" or fileExt == "h":
                     fileNo = fileNo + 1
                     try:
                         with open(file_path, 'rb') as open_file:
@@ -277,7 +364,7 @@ def main():
                         continue
                     try:
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                            linesEdited = styliseCode(fileToStyle) + linesEdited
+                                linesEdited = styliseCode(fileToStyle) + linesEdited
                     except UnicodeDecodeError as e:
                         print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file...")
                         print(e)

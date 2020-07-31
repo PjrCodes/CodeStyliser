@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="" />
+    <list default="true" id="1089be4f-d942-4a2b-b1b2-998b8d7f2ca4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/codeStyliser.py" beforeDir="false" afterPath="$PROJECT_DIR$/codeStyliser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,8 +71,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.debug sample-c" />
       <item itemvalue="Python.codeStyliser" />
+      <item itemvalue="Python.debug sample-c" />
     </list>
     <recent_temporary>
       <list>
@@ -176,10 +180,10 @@
       <screen x="0" y="0" width="1280" height="800" />
     </state>
     <state x="100" y="100" width="1080" height="600" key="dock-window-3/0.0.1280.800@0.0.1280.800" timestamp="1592413588360" />
-    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup" timestamp="1595695209587">
+    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup" timestamp="1595823398880">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="305" y="124" width="670" height="676" key="search.everywhere.popup/0.0.1280.800@0.0.1280.800" timestamp="1592462247368" />
-    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1595695209587" />
+    <state x="343" y="140" width="754" height="761" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1595823398880" />
   </component>
 </project>

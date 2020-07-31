@@ -383,20 +383,19 @@ def getClosingBraceLineIndex(index, lines):
             return getNextSemiColonLineIndex(keywordLineCheckIndex, lines) + 1
 
 
-
-
-def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
+def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, currentLineIsComment, commentOfCurrentLine, isMultiline, keywordIndex):
     # found a  "KEYWORD"
     errorPrintData = (KEYWORD, (lineIndex + 1), fileToEdit.name)
     hasHash = checkForHash(lineIndex, lines)
+
     if hasHash != -1:
         # has hash
         if line.find("{") != -1:
             # has {
-            return None
+            return None, False
         else:
             print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
-        return None
+        return None, False
     
     # we must now skip over all parentheses to find the end of the (condition)
     if KEYWORD == "else -":
@@ -413,7 +412,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
 
     if checkParenthResult == None:
         print("ERROR: While checking parentheses: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-        return None
+        return None, False
 
     elif not checkParenthResult.isOnSameLine:
         # (condition) doesnt end on same line
@@ -440,11 +439,15 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
         else:
             lastCloseParenthIndex = checkParenthResult.lastCloseParenthIndex + 1
     
+    if openCurlyBraceIndex != -1:
+        return None, False
+    if checkForOpenBrace(nextLineIndex, lines)[0] != -1:
+        return None, False
 
     if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines)[0] == -1:
         
         # no { on same line and on subsequent lines, we must add {} if possible        
-
+        changedLines = True
         if isOnSameLine:
             lastSemiColonIndex = line[lastCloseParenthIndex:].find(";")
             isBackSlashPresent = line.rstrip()[-1] == "\\"
@@ -463,7 +466,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     # insert toAddLine and return
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
-                    return lines
+                    return lines, changedLines
                 elif lastSemiColonIndex == -1:
                     if currentLineIsComment:
                         if isMultiline:
@@ -476,7 +479,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     lines.insert(lineIndex, toAddLine)
                     checkForSemiColonIndex = lineIndex + 1
                 else:
-                    return None
+                    changedLines = False
+                    return None, changedLines
 
             elif not isBackSlashPresent:
                 if lines[lineIndex - 2].isspace() or len(lines[lineIndex-2]) == 0:
@@ -485,7 +489,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     if lines[lineIndex - 2].rstrip()[-1] == "\\":
                         if lastSemiColonIndex == -1:
                             # not semicolon ending
-                            return None
+                            changedLines = False
+                            return None, changedLines
                 if lastSemiColonIndex == -1:
                     # if there is nothing on line except the keyword()
                     if currentLineIsComment:
@@ -513,11 +518,13 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     # insert toAddLine and return
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
-                    return lines
+                    return lines, changedLines
                 else:
-                    return None
+                    changedLines = False
+                    return None, changedLines
             else:
-                return None
+                changedLines = False
+                return None, changedLines
         else:
             # the (condition) doesnt end on same line
             isBackSlashPresent = lines[nxtLnIndex - 1].rstrip()[-1] == "\\"
@@ -541,14 +548,16 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                         # has hash
                         if lines[nxtLnIndex - 1].find("{") != -1:
                             # has {
-                            return None
+                            changedLines = False
+                            return None, changedLines
                         else:
                             print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
-                            return None
+                            changedLines = False
+                            return None, changedLines
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
-                    return lines
+                    return lines, changedLines
 
                 elif lastSemiColonIndex == -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -566,10 +575,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                         # has hash
                         if lines[nxtLnIndex - 1].find("{") != -1:
                             # has {
-                            return None
+                            changedLines = False
+                            return None, changedLines
                         else:
                             print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
-                            return None
+                            changedLines = False
+                            return None, changedLines
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
@@ -582,7 +593,8 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                     if lines[nxtLnIndex - 2].rstrip()[-1] == "\\":
                         if lastSemiColonIndex == -1:
                             # not semicolon ending
-                            return None
+                            changedLines = False
+                            return None, changedLines
                 
                 if lastSemiColonIndex == -1:
                     nxtLnTrimComment = trimComment(lines[nxtLnIndex - 1], (nxtLnIndex - 1), lines)
@@ -600,10 +612,12 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                         # has hash
                         if lines[nxtLnIndex - 1].find("{") != -1:
                             # has {
-                            return None
+                            changedLines = False
+                            return None, changedLines
                         else:
                             print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
-                            return None
+                            changedLines = False
+                            return None, changedLines
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
@@ -625,30 +639,37 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
                         # has hash
                         if lines[nxtLnIndex - 1].find("{") != -1:
                             # has {
-                            return None
+                            changedLines = False
+                            return None, changedLines
                         else:
                             print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
-                            return None
+                            changedLines = False
+                            return None, changedLines
 
                     del lines[nxtLnIndex - 1]
                     lines.insert(nxtLnIndex - 1, toAddLine)
-                    return lines
+                    changedLines = True
+                    return lines, changedLines
                 else:
-                    return None
+                    changedLines = False
+                    return None, changedLines
             else:
-                return None
+                changedLines = False
+                return None, changedLines
 
 
         closingBraceLineIndex = getClosingBraceLineIndex(checkForSemiColonIndex, lines)
         if closingBraceLineIndex == None:
             print("FATAL ERROR: ignored %s loop/ condition at %d in file %s" % errorPrintData)
-            return None
+            changedLines = False
+            return None, changedLines
         else:
             # add closing braces at closingBraceLine (inserting a new ln) with indentation
             if isMultiline:
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
+            print(closingBraceLineIndex)
             if len(lines[closingBraceLineIndex - 1].strip()) == 0 or len(lines[closingBraceLineIndex - 2].strip()) == 0:
                 addClosingBraceLine = spaces + "}\n"
                 pass
@@ -666,7 +687,10 @@ def handleKeyword(KEYWORD, line, lineIndex, lines, fileToEdit, isMacro, currentL
             
             lines.insert(closingBraceLineIndex, "")
             lines.insert(closingBraceLineIndex, addClosingBraceLine)
-            return lines
+            changedLines = True
+            return lines, changedLines
+    else:
+        return lines, False
 
 
 
