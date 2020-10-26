@@ -445,7 +445,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
         return None, False
 
     if openCurlyBraceIndex == -1 and checkForOpenBrace(nextLineIndex, lines)[0] == -1:
-        
         # no { on same line and on subsequent lines, we must add {} if possible        
         changedLines = True
         if isOnSameLine:
@@ -500,7 +499,6 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                             toAddLine = line.rstrip() + " { " + commentOfCurrentLine + "\n"
                     else:
                         toAddLine = line.rstrip() + " {\n"
-
                     del lines[lineIndex]
                     lines.insert(lineIndex, toAddLine)
                     checkForSemiColonIndex = lineIndex + 1
@@ -657,7 +655,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                 changedLines = False
                 return None, changedLines
 
-
+        # CLOSING
         closingBraceLineIndex = getClosingBraceLineIndex(checkForSemiColonIndex, lines)
         if closingBraceLineIndex == None:
             print("FATAL ERROR: ignored %s loop/ condition at %d in file %s" % errorPrintData)
@@ -669,7 +667,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                 spaces = " " * (keywordIndex + len(commentOfCurrentLine))
             else:
                 spaces = " " * keywordIndex
-            print(closingBraceLineIndex)
+
             if len(lines[closingBraceLineIndex - 1].strip()) == 0 or len(lines[closingBraceLineIndex - 2].strip()) == 0:
                 addClosingBraceLine = spaces + "}\n"
                 pass
