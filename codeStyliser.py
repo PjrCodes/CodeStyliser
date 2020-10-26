@@ -136,36 +136,38 @@ def styliseCode(fileToEdit):
                 else:
                     lines = ifConditionHandler
                     if changedLines:
+                        
                         # search for next curly... get it and merge } else
                         index = lineIndex
                         closing_brace = utils.getClosingBraceLineIndex(index, lines)
                         # print("line: ", lines[closing_brace])
+                        if lines[index].find("}") != -1:
+                            pass
+                        else:
+                            for x in lines[closing_brace+1:]:
+                                x = utils.trimComment(x, lines.index(x), lines).line
+                                # print("lin: ",x)
 
-                        for x in lines[closing_brace+1:]:
-                            x = utils.trimComment(x, lines.index(x), lines).line
-                            # print("lin: ",x)
-                
-                            if x.isspace() or len(x) == 0:
-                                continue
-                            elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
-                                # print("here")
-                                # print(x) 
-                                lines[closing_brace - 1] = ""
-                                spaces = ""
-                                for i in x:
-                                    if i.isspace():
-                                        spaces += i
-                                    else:
-                                        break
-                                new_ln = spaces + "} " + x.lstrip()
-                                # print(new_ln)
-                                ind = lines.index(x)
-                                lines[ind] = ""
-                                lines.insert(ind, new_ln)
-                                break
-                            elif not x.isspace() or len(x) != 0:
-                                # print("hereo hereo")
-                                break
+                                if x.isspace() or len(x) == 0:
+                                    continue
+                                elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
+                                    # print(x) 
+                                    lines[closing_brace - 1] = ""
+                                    spaces = ""
+                                    for i in x:
+                                        if i.isspace():
+                                            spaces += i
+                                        else:
+                                            break
+                                    new_ln = spaces + "} " + x.lstrip()
+                                    # print(new_ln)
+                                    ind = lines.index(x)
+                                    lines[ind] = ""
+                                    lines.insert(ind, new_ln)
+                                    break
+                                elif not x.isspace() or len(x) != 0:
+                                    # print("hereo hereo")
+                                    break
                     linesEdited = linesEdited + 1
 
             # ---------------------------------------------------------------------------
@@ -201,6 +203,7 @@ def styliseCode(fileToEdit):
                             index = lineIndex
                             closing_brace = utils.getClosingBraceLineIndex(index, lines)
                             # print("lineas: ", lines[closing_brace])
+                            # print("lineas2.0: ", lines[index])
 
                             for x in lines[closing_brace+1:]:
                                 x = utils.trimComment(x, lines.index(x), lines).line
@@ -229,43 +232,49 @@ def styliseCode(fileToEdit):
                     linesEdited = linesEdited + 1
             elif startingElseIndex == firstCharIndex and not lineStartsOnBrace:
                 # we have an else
-                pass 
-                # THEORATICALLY, this should never happen.
 
-                # elseConditionHandler, changedLines = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
-                #                                 isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, 
-                #                                 isMultiline=isMultiline)
-                # if elseConditionHandler == None:
-                #     continue
-                # else:
-                #     lines = elseConditionHandler
-                #     if line.find("if") != -1:
-                #         # print("else if honolul")
-                #         if changedLines:
-                #             # search for next curly... get it and merge } else
-                #             index = lineIndex
-                #             closing_brace = utils.getClosingBraceLineIndex(index, lines)
-                #             # print("line: ", lines[closing_brace])
 
-                #             for x in lines[closing_brace+1:]:
-                #                 x = utils.trimComment(x, lines.index(x), lines).line
-                #                 # print("lin: ",x)
-                #                 if x.isspace() or len(x) == 0:
-                #                     continue
-                #                 elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
-                #                     # print("here")
-                #                     # print(x)
-                #                     lines[closing_brace] = ""
-                #                     new_ln = "} " + x.lstrip()
-                #                     # print(new_ln)
-                #                     ind = lines.index(x)
-                #                     lines[ind] = ""
-                #                     lines.insert(ind, new_ln)
-                #                     break
-                #                 elif not x.isspace() or len(x) != 0:
-                #                     # print("hereo hereo")
-                #                     break
-                    # linesEdited = linesEdited + 1
+
+                elseConditionHandler, changedLines = utils.handleKeyword(KEYWORD="else -", line=line, lineIndex=lineIndex, lines=lines, fileToEdit=fileToEdit,
+                                                isMacro=isMacro,currentLineIsComment=currentLineIsComment, commentOfCurrentLine=commentOfCurrentLine, keywordIndex=startingElseIndex, 
+                                                isMultiline=isMultiline)
+                if elseConditionHandler == None:
+                    continue
+                else:
+                    lines = elseConditionHandler
+                    if line.find("if") != -1:
+                        # print("else if honolul")
+                        if changedLines:
+                            # search for next curly... get it and merge } else
+                            index = lineIndex
+                            closing_brace = utils.getClosingBraceLineIndex(index, lines)
+                            # print("line: ", lines[closing_brace])
+
+                            for x in lines[closing_brace+1:]:
+                                x = utils.trimComment(x, lines.index(x), lines).line
+                                # print("lin: ",x)
+                                if x.isspace() or len(x) == 0:
+                                    continue
+                                elif x.find("else") == utils.getFirstCharacterIndex(x) and changedLines:
+                                    # print("here")
+                                    # print(x)
+                                    lines[closing_brace] = ""
+                                    spaces = ""
+                                    for i in x:
+                                        if i.isspace():
+                                            spaces += i
+                                        else:
+                                            break
+                                    new_ln = spaces + "} " + x.lstrip()
+                                    # print(new_ln)
+                                    ind = lines.index(x)
+                                    lines[ind] = ""
+                                    lines.insert(ind, new_ln)
+                                    break
+                                elif not x.isspace() or len(x) != 0:
+                                    # print("hereo hereo")
+                                    break
+                        linesEdited = linesEdited + 1
             # ---------------------------------------------------------------------------
         except utils.CommentError:
             print(f"WARN: Found a comment inside Parentheses in {fileToEdit.name} around line {lineIndex+1}, skipping line!!")
