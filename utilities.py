@@ -394,7 +394,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
             # has {
             return None, False
         else:
-            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
+            print("Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
         return None, False
     
     # we must now skip over all parentheses to find the end of the (condition)
@@ -411,7 +411,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
         checkParenthResult = checkForParentheses(line, lineIndex, lines, "p")
 
     if checkParenthResult == None:
-        print("ERROR: While checking parentheses: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+        print("Ignored %s loop/ condition at %d in file %s, Check brackets." % errorPrintData)
         return None, False
 
     elif not checkParenthResult.isOnSameLine:
@@ -549,7 +549,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                             changedLines = False
                             return None, changedLines
                         else:
-                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
+                            print("Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             changedLines = False
                             return None, changedLines
 
@@ -576,7 +576,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                             changedLines = False
                             return None, changedLines
                         else:
-                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
+                            print("Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             changedLines = False
                             return None, changedLines
 
@@ -613,7 +613,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                             changedLines = False
                             return None, changedLines
                         else:
-                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
+                            print("Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             changedLines = False
                             return None, changedLines
 
@@ -640,7 +640,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
                             changedLines = False
                             return None, changedLines
                         else:
-                            print("WARN: Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
+                            print("Ignored %s loop/ condition at line %d in %s as \'#\' found in next line" % errorPrintData)
                             changedLines = False
                             return None, changedLines
 
@@ -658,7 +658,7 @@ def handleKeyword(KEYWORD, line, lineIndex, lines: list, fileToEdit, isMacro, cu
         # CLOSING
         closingBraceLineIndex = getClosingBraceLineIndex(checkForSemiColonIndex, lines)
         if closingBraceLineIndex == None:
-            print("FATAL ERROR: ignored %s loop/ condition at %d in file %s" % errorPrintData)
+            print("Ignored %s loop/ condition at %d in file %s" % errorPrintData)
             changedLines = False
             return None, changedLines
         else:

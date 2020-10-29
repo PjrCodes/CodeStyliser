@@ -1,4 +1,4 @@
-# CodeStyliser version 0.11-Beta
+# CodeStyliser version 0.12
 
 The Code Styliser utility fixes MISRA-C-2012 Rule 15.6 warnings automatically, by adding curly braces (`{}`) in C-source (`.c`) files wherever needed.
 
@@ -19,7 +19,26 @@ if(condition) {
 }
 ```
 
-*It is my suggestion to check all the code once this utility is finished running, as there is no guarantee that this software will work out of the box without any issues.*
+and,
+
+```c
+if (condition)
+  statement;
+else
+  statement;
+```
+
+becomes
+
+```c
+if(condition) {
+  statement;
+} else {
+  statement;
+}
+```
+
+*It is my suggestion to check all the code once this utility is finished running.*
 
 **NOTE:** This utility will replace all `\r\n` line endings with `\n`.
 
@@ -27,9 +46,9 @@ if(condition) {
 
 This utility is written in Python 3.7.7, 64-Bit. However, you **dont** need to have python installed on your machine.
 
-**NOTE:** The binary file attached works only for 64-Bit Linux systems. It **WILL** not run for any other operating system.
+**NOTE:** The binary file attached works only for 64-Bit Linux systems.
 
-The binary has been tested on Ubuntu 16.04 LTS
+The binary has been tested on **Ubuntu 16.04 LTS**
 
 The usage is as follows:
 
@@ -45,14 +64,17 @@ The usage is as follows:
 * The complete usage of this binary is as follows:
 
 ```shell
-  usage: codeStyliser.py [-h] (-f  file-name | -d  directory-name)
+usage: codeStyliser [-h] (-f  file-name | -d  directory-name)
 
-  optional arguments:
-    -h, --help            show this help message and exit
-    -f  file-name, --file  file-name
-                          file name to format
-    -d  directory-name, --directory  directory-name
-                          directory to format files under
+The Code Styliser Utility, Created by Pranjal Rastogi. Copyright (c) 2020,
+Pranjal Rastogi All rights Reserved
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f  file-name, --file  file-name
+                        name of file to format
+  -d  directory-name, --directory  directory-name
+                        directory name, under which to format all files
 ```
 
 ## Known issues
@@ -63,7 +85,7 @@ The utility only changes UTF-8 encoded files, it will ignore all other file enco
 
 ### Non-keyword block of code
 
-If a block of code, that is not a keyword( `for()`, `if()`, `while()`, `do`, etc.) is in the code after a keyword, which doesn't have curly braces (`{}`), the closing curly brace (`}`) is added in the wrong position by the utility.
+If a block of code, that is not a keyword( `for()`, `if()`, `while()`, `do`, etc.) appears immediately after a detected keyword (not containing curly braces), the closing curly brace (`}`) is added in the wrong position.
 
 For example,
 
@@ -88,7 +110,7 @@ for (...) {
   }
 ```
 
-This doesnt happen if the block of code starts on a keyword
+This doesnt happen if the inner block starts on a keyword.
 
 ### Tab indentation error
 
@@ -113,7 +135,7 @@ becomes
 
 if the characters used to indent the `for(...)` are tabs, and not spaces.
 
-### Hash ignore
+### Ignoring '#' keywords
 
 The code will ignore all keywords that have a `#` on the next immediate valid line.
 
@@ -135,7 +157,7 @@ For example,
     #endif
 ```
 
-Here, the `for(...)` is ignored, i.e. *NO* braces will be added.
+Here, the `for(...)` is ignored and no braces will be added.
 
 ```c
 for(...)
@@ -143,7 +165,7 @@ foo;
 #endif
 ```
 
-In the above case, the `for(...)` is not ignored, i.e. braces will be added.
+In the above case, the `for(...)` is not ignored and no braces are added.
 
 ### Issues with Comments
 
