@@ -292,7 +292,7 @@ def styliseCode(fileToEdit):
 
 
 def main():
-    VERSION_NUMBER = "0.12 "
+    VERSION_NUMBER = "0.2 "
     WINDOWS_LINE_ENDING = b'\r\n'
     UNIX_LINE_ENDING = b'\n'
     isFileGiven = False

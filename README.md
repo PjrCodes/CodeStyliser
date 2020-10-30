@@ -1,4 +1,4 @@
-# CodeStyliser version 0.12
+# CodeStyliser version 0.2
 
 The Code Styliser utility fixes MISRA-C-2012 Rule 15.6 warnings automatically, by adding curly braces (`{}`) in C-source (`.c`) files wherever needed.
 
