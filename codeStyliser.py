@@ -310,23 +310,23 @@ def main():
 
 
     print("\n")
-    print("{:=^80}".format(" Welcome to CodeStyliser ver" + VERSION_NUMBER))
+    print("{:=^80}".format(" Welcome to CodeStyliser v" + VERSION_NUMBER))
     print("Made in Python 3.7.7 64-Bit")
     print("Copyright (c) 2020, Pranjal Rastogi\nAll Rights Reserved.")
-    print("{:=^80}".format(""))
+    print("{:-^60}".format(""))
     if isFileGiven:
-        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file")
+        print("Will stylise code in " + FILE_NAME + " if it is a C-Source (.c) file or a Header (.h) file")
     else:
-        print("Will stylise code in all C-Source code (.c) files under " + DIR_NAME)
-    time.sleep(2)
+        print(f"Will stylise code in all C-Source code (.c) and Header (.h) files under '{DIR_NAME}'")
+    time.sleep(1.2)
 
     startTime = time.time()
-    print("\n" + "{:=^80}".format(" START "))
+    print("\n" + "{:-^60}".format(" START "))
     if isFileGiven:
         file_path = os.path.abspath(FILE_NAME)
         fileExtension = FILE_NAME.split(".", 1)
         if len(fileExtension) != 2:
-            print("ERROR: Given file is not a (C) source code file")
+            print("ERROR: Given file is not a C-Source (.c) or Header (.h) file")
             sys.exit()
         fileExt = fileExtension[1]
         if fileExt == "c" or fileExt == "h":
@@ -353,7 +353,7 @@ def main():
                 print("ERROR: at file name: " + FILE_NAME)
                 sys.exit()
         else:
-            print("ERROR: Given file is not a (C) source code file")
+            print("ERROR: Given file is not a C-Source (.c) or Header (.h) file")
             sys.exit()
     else:
         for root, _, files in os.walk(DIR_NAME):
@@ -373,12 +373,11 @@ def main():
                             open_file.write(content)
                             open_file.close()
                     except:
-                        print("ERROR: at file name: " +
-                                filename)
+                        print("ERROR: at file name: " + filename)
                         continue
                     try:
                         with open(file_path, "r+", encoding="utf-8") as fileToStyle:
-                                linesEdited = styliseCode(fileToStyle) + linesEdited
+                            linesEdited = styliseCode(fileToStyle) + linesEdited
                     except UnicodeDecodeError:
                         print("ERROR: while decoding file " + file_path + " the file is NOT a UTF-8 encoded file, Skipping file!")
                         continue
@@ -394,11 +393,11 @@ def main():
     timeInSec = time.gmtime(endTime - startTime).tm_sec
     if timeInSec == 0:
         timeTaken = int(round(endTime - startTime, 3)* 1000)
-        print(f"Took {timeTaken} milliseconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
+        print("{:=^80}".format(f" Took {timeTaken} milliseconds to add braces {linesEdited} time(s) in {fileNo} file(s) "))
     else:
         timeTaken = timeInSec
-        print(f"Took {timeTaken} seconds to add braces {linesEdited} time(s) in {fileNo} file(s)")
-    print("\n")
+        print("{:=^80}".format(f" Took {timeTaken} seconds to add braces {linesEdited} time(s) in {fileNo} file(s) "))
+    print()
 
 if __name__ == "__main__":
     main()
