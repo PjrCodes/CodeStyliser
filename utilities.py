@@ -1,9 +1,8 @@
 #!/usr/local/bin/python3
 # Made in python 3.7.7 64 bit, use only this version
 # ---
-# Copyright (c) 2020, Pranjal Rastogi 
+# Copyright (c) 2021, Pranjal Rastogi 
 # All rights reserved.
-# Do not copy this code without permission
 # check LICENSE for more details
 # ---
 # Part of The codeStyliser utility
@@ -15,8 +14,6 @@
 
 # TODO: use logger
 # TODO: use EXCEPTIONS in a SMARTER WAY!!!
-
-# HACK:FIXME: EVERYTHING IS A HACK!!!
 
 
 import re

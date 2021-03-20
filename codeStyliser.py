@@ -1,9 +1,8 @@
 #!/usr/local/bin/python3
 # Made in python 3.7.7 64 bit, use only this version
 # ---
-# Copyright (c) 2020, Pranjal Rastogi
+# Copyright (c) 2021, Pranjal Rastogi
 # All rights reserved.
-# Do not copy this code without permission
 # check LICENSE for more details
 # ---
 # Part of The codeStyliser utility
@@ -25,7 +24,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="The Code Styliser Utility, An utility that helps you add curly braces in "
                                              "C source code, wherever needed!",
-                                 epilog="Copyright (c) 2020, Pranjal Rastogi. All rights reserved.")
+                                 epilog="Copyright (c) 2021, Pranjal Rastogi. All rights reserved.")
 
 group = parser.add_mutually_exclusive_group(required=True)
 
