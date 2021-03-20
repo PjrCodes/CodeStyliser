@@ -27,6 +27,7 @@ import constants as consts
 
 
 def trim_comment(line, line_no, lines):
+    """Returns a line wo comment object, Tells if line is_empty, returns line in all cases!"""
     search_for_single_line_comment = re.search(consts.SINGLE_LINE_COMMENT_PATTERN, line)
     if search_for_single_line_comment:
         if search_for_single_line_comment.group()[0:2] == "/*":
@@ -34,17 +35,17 @@ def trim_comment(line, line_no, lines):
             same_line_end = line.find("*/")
             if same_line_end != -1:
                 # ends on same line
-                # TODO: ALSO CHECK IF THERE IS ANYTHING ON THE LINE AFTER THE COMMENT, IN WHICH CASE WE NEED TO DIE
+                # TODO: ALSO CHECK IF THERE IS ANYTHING ON THE LINE BEFORE THE COMMENT, IN WHICH CASE WE NEED TO DIE
                 # FIXME: THIS WILL FAIL IF THERE IS SOMETHING AFTER COMMENT
                 # BUG: THIS IS A BUG AS IT CAUSES AN ERROR IN COMMENT HANDLING, AND PARENTHESES COUNTING,
                 #      RAISING INDEX ERROR's
                 if line[(same_line_end + 1):].isspace():
                     return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
-                                                  search_for_single_line_comment.group(), False, None)
+                                                  search_for_single_line_comment.group(), False, None, is_empty=True)
                 else:
                     # there is something after comment on line
                     return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
-                                                  search_for_single_line_comment.group(), False, None)
+                                                  search_for_single_line_comment.group(), False, None, is_empty=False)
             else:
                 # iterate for line in lines till we get */
                 index = line_no + 1
@@ -52,18 +53,28 @@ def trim_comment(line, line_no, lines):
                     multi_comment_end = lines[index].find("*/")
                     if multi_comment_end != -1:
                         # multi line comment has ended
-                        return models.LineWithComment(lines[index][(multi_comment_end + 2):], True,
-                                                      lines[index][:(multi_comment_end+2)], True, index)
+                        if line[(multi_comment_end + 1):].isspace():
+                            return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
+                                                          search_for_single_line_comment.group(), False, None,
+                                                          is_empty=True)
+                        else:
+                            return models.LineWithComment(lines[index][(multi_comment_end + 2):], True,
+                                                          lines[index][:(multi_comment_end+2)], True, index,
+                                                          is_empty=False)
                     else:
-                        # no multi line comment end found
+                        # no multi line comment end found, keep looping till found.
                         index = index + 1
-                    
+
         # found a single line comment of type //
-        return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
-                                      search_for_single_line_comment.group(), False, None)
+        if line[:search_for_single_line_comment.start()].isspace():
+            return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
+                                          search_for_single_line_comment.group(), False, None, is_empty=True)
+        else:
+            return models.LineWithComment(line[:search_for_single_line_comment.start()], True,
+                                          search_for_single_line_comment.group(), False, None, is_empty=False)
     else:
         # no comment
-        return models.LineWithComment(line, False, "", False, None)
+        return models.LineWithComment(line, False, "", False, None, is_empty=False)
 
 
 def get_first_character_index(given_str):
@@ -131,19 +142,21 @@ def check_for_open_brace(next_line_index, lines):
                 next_line_index += 1
                 continue
             else:
-                if re.search(consts.OPEN_BRACE_PATTERN, line_without_comment.line):
-                    # if the line before comment has {
-                    break
+                print("ISSUE")
+                if line_without_comment.isMultiline:
+                    # go after multiline comments
+                    next_line_index = line_without_comment.multiLineJumpIndex
+                    continue
                 else:
-                    # there is something before line, but it is not an open brace
-                    break
-            if line_without_comment.isMultiline == True:
-                # go after multiline comments
-                next_line_index = line_without_comment.multiLineJumpIndex
-                continue
-            else:
-                next_line_index = next_line_index + 1
-                continue
+
+                    next_line_index += 1
+                    if re.search(consts.OPEN_BRACE_PATTERN, line_without_comment.line):
+                        # if the line before comment has {
+                        break
+                    else:
+                        # there is something before line, but it is not an open brace
+                        break
+
         elif line_without_comment.line.isspace():
             # line is blank
             next_line_index += 1
@@ -199,263 +212,264 @@ def get_closing_brace_line_index(index, lines):
 
     # run operations on line
     keyword_line_check_index = index
-    has_keyword = False
-    while keyword_line_check_index < (len(lines)):
-
-        current_line_wo_comment = trim_comment(lines[keyword_line_check_index], keyword_line_check_index, lines)
-        line = current_line_wo_comment.line
-        first_char_of_ln = get_first_character_index(line)
-        if line.isspace() or len(line) == 0:
-            if current_line_wo_comment.isMultiline:
-                # jump line to after multiline comment
-                keyword_line_check_index = current_line_wo_comment.multiLineJumpIndex
-                continue
-            else:
-                keyword_line_check_index += 1
-                continue
+    skipper = skip_nests(keyword_line_check_index, lines)
+    # recursively call:
+    while True:
+        if skipper.hasKeyword:
+            skipper = skip_nests(index=skipper.lineIndex, lines=lines)
         else:
-            
-            if current_line_wo_comment.hasComment:
-                if current_line_wo_comment.isMultiline:
-                    for keyword in consts.KEYWORDS:
-                        keyword_check_re = re.search(keyword, line)
-                        if keyword_check_re:
-                            if keyword_check_re.start() == first_char_of_ln:
-                                # we found a keyword
-                                cont = False
-                                has_keyword = True
-                                break
-                            else:
-                                # keyword not on first char
-                                has_keyword = False
-                                continue
-                        else:
-                            # didn't find KEYWORD
-                            has_keyword = False
-                            continue
-                    if cont:
-                        continue
-                    else:
-                        keyword_line_check_index = current_line_wo_comment.multiLineJumpIndex
-                        break
-                    keyword_line_check_index = current_line_wo_comment.multiLineJumpIndex
-                    continue
+            break
+        print("True")
 
-                if current_line_wo_comment.line.isspace():
-                    continue
-                else:
-                    if line.find("*/") != -1:
-                        keyword_line_check_index += 1
-                    for keyword in consts.KEYWORDS:
-                        keyword_check_re = re.search(keyword, line)
-                        if keyword_check_re:
-                            if keyword_check_re.start() == first_char_of_ln:
-                                # we found a keyword
-                                cont = False
-                                has_keyword = True
-                                break
-                            else:
-                                # keyword not on first char
-                                has_keyword = False
-                                continue
-                        else:
-                            # didn't find KEYWORD
-                            has_keyword = False
-                            continue
-                    else:
-                        # no keyword was found or line is a statement
-                       
-                        if current_line_wo_comment.line.isspace() or len(current_line_wo_comment.line) == 0:
-                            if current_line_wo_comment.isMultiline:
-                                keyword_line_check_index = current_line_wo_comment.multiLineJumpIndex
-                                continue
-                            else:
-                                keyword_line_check_index += 1
-                                continue
-                        else:
-                            
-                            has_keyword = False
-                            cont = False
-                            break
-                if cont:
-                    continue
-                else:
-                    break
-
-            elif not current_line_wo_comment.hasComment:
-                
-                if line.find("*/") != -1:
-                    keyword_line_check_index += 1
-                line = lines[keyword_line_check_index]
-                if line.isspace():
-                    continue
-                else:
-                    for keyword in consts.KEYWORDS:
-                        keyword_check_re = re.search(keyword, line)
-                        if keyword_check_re:
-                            if keyword_check_re.start() == first_char_of_ln:
-                                # we found a keyword
-                                cont = False
-                                has_keyword = True
-                                break
-                            else:
-                                cont = False
-                                has_keyword = False
-                                continue
-                        else:
-                            # didn't find KEYWORD
-                            cont = False
-                            has_keyword = False
-                            continue
-                    else:
-                        # didn't find any keyword
-                        has_keyword = False
-
-                    if cont:
-                        continue
-                    else:
-                        break
-
-    if not has_keyword:
+    if not skipper.hasKeyword:
         # didn't find a keyword
         return get_next_semi_colon_line_index(index, lines) + 1  # we found semicolon
     else:
-        # here we reach only if it is KEYWORD found
-        if keyword == r"\b(else)\b" or keyword == r"\b(do)\b":
-            if line.find("if") != -1:
-                # line is else if
-                check_parenth_result = check_for_parentheses(line, keyword_line_check_index, lines, "p")
+        return skipper.lineIndex
+
+
+def skip_nests(index, lines: list):
+    """Skips nests and return the last line's index. In a NestResult.  None is returned in failure cases"""
+
+    # check for keyword
+    found_key = ""
+    has_key = False
+    i = index
+    tmp_line = ""
+    last_tm = i
+    while i < len(lines):
+        # main checking loop
+
+        tmp_comm = trim_comment(lines[i], i, lines)
+
+        # tmp_line is the line after trimming comment!
+        tmp_line = tmp_comm.line
+        first_char_of_ln = get_first_character_index(tmp_line)
+
+        if tmp_comm.isEmpty and tmp_comm.hasComment:
+            # an empty line with comment (only comment)
+            if tmp_comm.isMultiline:
+                i = tmp_comm.multiLineJumpIndex
+                continue
             else:
-                check_parenth_result = models.ParenthResult(True, keyword_line_check_index, None)
+                i += 1
+                continue
+        elif tmp_line.isspace() or len(tmp_line) == 0:
+            # same thing basically. We should never reach here anyhow.
+            i += 1
+            continue
         else:
-            check_parenth_result = check_for_parentheses(line, keyword_line_check_index, lines, "p")
-        if check_parenth_result is None:
-            return None
-
-        elif not check_parenth_result.isOnSameLine:
-            # (condition) doesnt end on same line
-            nxt_ln_index = check_parenth_result.lineIndex
-            next_line_index = nxt_ln_index
-            open_curly_brace_index = lines[nxt_ln_index - 1][check_parenth_result.lastCloseParenthIndex:].find("{")
-            
-        else:
-            # (condition) ends on same line
-            next_line_index = keyword_line_check_index + 1
-            nxt_ln_index = keyword_line_check_index + 1
-            open_curly_brace_index = line[check_parenth_result.lastCloseParenthIndex:].find("{")
-
-        # don't touch me!
-        open_next_line_curly_brace_index = check_for_open_brace(next_line_index, lines)
-
-        # TODO: Fix the "if-else if" case (if ending with elseif)
-        if keyword == r"\b(if)\b":
-            tmp = nxt_ln_index - 1
-            if lines[nxt_ln_index - 1].find("{") == -1:
-                # has no curly on same line
-                tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
-                if check_for_open_brace(nxt_ln_index, lines)[0] == -1:
-                    tmp = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
-                else:
-                    res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
-                    if res is None:
-                        return None
+            # valid line w/o comment or with comment, not matter
+            # if tmp_line.find("*/") != -1:
+            #     i += 1
+            cont = True
+            for key in consts.KEYWORDS:
+                key_re = re.search(key, tmp_line)
+                if key_re:
+                    if key_re.start() == first_char_of_ln:
+                        # we found keyword in beginning of sentence
+                        found_key = key
+                        cont = False  # break outer
+                        has_key = True  # yes son, yes
+                        break
                     else:
-                        tmp = res.lineIndex - 1
-                        # if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
-                        #     tmp = res.lineIndex
+                        # not on first char
+                        has_key = False
+                else:
+                    # no keyword
+                    has_key = False
             else:
-                res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
+                # looping over
+                if has_key:
+                    cont = False
+                    break
+                else:
+                    # not has key after loop, and also is not blank
+                    # must be a statement!!!
+                    cont = False
+                    has_key = False
+                    break
+            if cont:
+                i += 1
+                continue  # next line please
+            else:
+                break
+
+    if not has_key:
+        # no keyword
+        return models.NestResult(None, False)
+
+    # else: (WE FOUND A KEYWORD on tmp_line)
+
+    # re-declare (useless, but still doing!)
+    tmp_comm = trim_comment(lines[i], i, lines)
+    tmp_line = tmp_comm.line
+
+    # set parentheses
+    if found_key == r"\b(else)\b" or found_key == r"\b(do)\b":
+        # line is else - or do
+        if tmp_line.find("if") != -1:
+            # line is else if, it has parentheses.
+            p_check = check_for_parentheses(tmp_line, i, lines, "p")
+        else:
+            # line has no parentheses.
+            p_check = models.ParenthResult(True, i, None)
+    else:
+        # line has parentheses.
+        p_check = check_for_parentheses(tmp_line, i, lines, "p")
+
+    # error occurred:
+    if p_check is None:
+        return None
+
+    # get open_curly_brace_index
+    if not p_check.isOnSameLine:
+        # (condition) doesnt end on same line.
+
+        nxt_ln_index = p_check.lineIndex
+        open_curly_brace_index = lines[nxt_ln_index-1][p_check.lastCloseParenthIndex:].find("{")
+    else:
+        # (condition) doesnt end on same line.
+
+        nxt_ln_index = i + 1
+        open_curly_brace_index = tmp_line[p_check.lastCloseParenthIndex:].find("{")
+
+    nxt_line_curly_index = check_for_open_brace(nxt_ln_index, lines)
+    global answer
+    answer = 0
+    # handle the {}{}{} and the if-else nests.
+    # TODO: Fix the "if-else if" case (if ending with elseif)
+    if found_key == r"\b(if)\b":
+        # check for if-else-if-else
+
+        tm = nxt_ln_index - 1
+        if open_curly_brace_index == -1:
+            # has no curly on same line
+            # check for nxt ln curly
+            if nxt_line_curly_index[0] == -1:
+                # no brace on later line also
+                tm = get_next_semi_colon_line_index(nxt_ln_index, lines) + 1
+            else:
+                # brace was there on nxt-line-curly-index
+                # TODO: handle comments
+                # loop for em
+                res = check_for_parentheses(lines[nxt_line_curly_index[1]], nxt_line_curly_index[1], lines, "b")
                 if res is None:
                     return None
                 else:
-                    tmp = res.lineIndex - 1
-                    # if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
-                    #     tmp = res.lineIndex
+                    tm = res.lineIndex - 1
 
-            while tmp < len(lines):
-                if lines[tmp].find("}") != -1 and lines[tmp].find("else") == -1:
-                    tmp += 1
-                tmp_comment = trim_comment(lines[tmp], tmp, lines)
-                tmp_line = lines[tmp]
-                if tmp_comment.hasComment:
-                    if tmp_comment.isMultiline:
-                        tmp = tmp_comment.multiLineJumpIndex
+        else:
+            # there was a curly on same line.
+            res = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, "b")
+            if res is None:
+                return None
+            else:
+                tm = res.lineIndex - 1
+
+        while tm < len(lines):
+            if lines[tm].find("}") != -1 and lines[tm].find("else") == -1:
+                # it is at end of if with a }, search from next line
+                tm += 1
+
+            tmp_comm = trim_comment(lines[tm], tm, lines)
+            tm_line = tmp_comm.line
+
+            # handle comment based
+            if tmp_comm.hasComment:
+                if tmp_comm.isMultiline:
+                    tm = tmp_comm.multiLineJumpIndex
+                    continue
+                if tm_line.isspace() or len(tm_line) == 0:
+                    # TODO: replace with isempty
+                    tm += 1
+                    continue
+
+            # line had else (after an if)
+            if re.search(r"\b(else)\b", tm_line):
+                # found else..
+                if tm_line.find("if") != -1:
+                    # else if
+                    ch_paren = check_for_parentheses(tm_line, tm, lines, "p")
+
+                    if not ch_paren.isOnSameLine:
+                        tmp2 = ch_paren.lineIndex
+                        tm = tmp2 + 1
                         continue
-                    tmp_line = tmp_comment.line
-                    if tmp_line.isspace():
-                        tmp += 1
-                        continue
-
-                if re.search(r"\b(else)\b", tmp_line):
-                    # found else!
-                    if tmp_line.find("if") != -1:
-                        # else if
-                        chk_parenth = check_for_parentheses(tmp_line, tmp, lines, "p")
-
-                        if not chk_parenth.isOnSameLine:
-                            tmp2 = chk_parenth.lineIndex
-                            tmp = tmp2 + 1
-                            continue
-                        else:
-                            tmp = get_next_semi_colon_line_index(tmp, lines)
-                            continue
                     else:
-                        if tmp_line.find("{") == -1:
-                            # no same line curly
-                            if check_for_open_brace(tmp + 1, lines)[0] == -1:
-                                # no later curly
-                                return get_next_semi_colon_line_index(tmp+1, lines) + 1
-                            else:
-                                res = check_for_parentheses(tmp_line, tmp, lines, "b")
-                                if res is None:
-                                    return None
-                                else:
-                                    return res.lineIndex
+                        tm = get_next_semi_colon_line_index(tm, lines)
+                        continue
+
+                    # TODO: stop looping at some point (else if case)
+                else:
+                    # not an else if, its an else.
+                    if tm_line.find("{") == -1:
+                        # no same line curly
+                        if check_for_open_brace(tm + 1, lines)[0] == -1:
+                            # no later curly
+
+                            answer = get_next_semi_colon_line_index(tm+1, lines) + 1
                         else:
-                            res = check_for_parentheses(tmp_line, tmp, lines, "b")
+                            res = check_for_parentheses(tm_line, tm, lines, "b")
                             if res is None:
                                 return None
                             else:
-                                return res.lineIndex
+                                answer = res.lineIndex
+                    else:
+                        # Same line curly
+                        res = check_for_parentheses(tm_line, tm, lines, "b")
+                        if res is None:
+                            return None
+                        else:
+                            answer = res.lineIndex
 
-                elif not tmp_line.isspace():
-                    return tmp
-                else:
-                    tmp += 1
-                    continue
-                # NOTE: the above has a bug in which if the program ends on
-                #  ```
-                #  for()\
-                #     if()\
-                #         asd;
-                #         ```
-                #         The program will never end. HOWEVER, this will never happen as the program will always end
-                #           on a `}`, as it is C code. Hence we can safely ignore
-
-        elif (open_curly_brace_index != -1 or open_next_line_curly_brace_index[0] != -1) and keyword != r"\b(if)\b":
-            # we found open curly brace related to this other keyword
-            # we must go on to find the close }
-            close_curly_brace_index = line.find("}")
-            if close_curly_brace_index == -1:
-                # run the code
-                # search for matching {},
-                #   if match, return that line ki index.
-                #   else, raise, DEATH-ERROR.
-                if open_curly_brace_index == -1:
-                    result = check_for_parentheses(lines[open_next_line_curly_brace_index[1]],
-                                                   open_next_line_curly_brace_index[1], lines, type_of_parenth="b")
-                else:
-                    result = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines,
-                                                   type_of_parenth="b")
-                if result is None:
-                    return None
-
-                else:
-                    return result.lineIndex
+            elif not tm_line.isspace():
+                answer = tm
             else:
-                # same line has the thingy
-                return get_next_semi_colon_line_index(keyword_line_check_index, lines) + 1
+                tm += 1
+                continue
+        # else:
+        #     answer = tm
+            # NOTE: the above has a bug in which if the program ends on
+            #  ```
+            #  for()\
+            #     if()\
+            #         asd;
+            #         ```
+            #         The program will never end. HOWEVER, this will never happen as the program will always end
+            #           on a `}`, as it is C code. Hence we can safely ignore
+
+    elif (open_curly_brace_index != -1 or nxt_line_curly_index[0] != -1) and found_key != r"\b(if)\b":
+        # we found open curly brace related to this other keyword
+        # we must go on to find the close }
+        close_curly_index = tmp_line.find("}")
+        if close_curly_index == -1:
+            # search for matching {},
+            #   if match, return!!!
+            #   else, raise, DEATH-ERROR.
+            if open_curly_brace_index == -1:
+                result = check_for_parentheses(lines[nxt_line_curly_index[1]], nxt_line_curly_index[1],
+                                               lines, type_of_parenth="b")
+            else:
+                result = check_for_parentheses(lines[nxt_ln_index - 1], nxt_ln_index - 1, lines, type_of_parenth="b")
+
+            if result is None:
+                return None
+            else:
+                answer = result.lineIndex
         else:
-            # we didn't find it.
-            # we must return semicolon index again!
-            return get_next_semi_colon_line_index(keyword_line_check_index, lines) + 1
+            # same line
+            answer = get_next_semi_colon_line_index(last_tm + 1, lines) + 1
+    else:
+        answer = get_next_semi_colon_line_index(last_tm + 1, lines) + 1
+
+    return models.NestResult(answer, has_keyword=has_key)
+
+
+
+
+
+
+
+
+
