@@ -144,7 +144,7 @@ dmypy.json
 # Ignore all local history of files
 .history
 
-# ignore inner
+# ignore inner (sample files)
 inner/*
 sample.c
 # ignore astyle
